@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final logic = Get.put(HomeLogic());
+  final logic = Get.find<HomeLogic>();
   final state = Get.find<HomeLogic>().state;
 
   @override

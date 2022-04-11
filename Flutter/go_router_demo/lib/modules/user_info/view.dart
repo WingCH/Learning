@@ -11,7 +11,7 @@ class UserInfoPage extends StatefulWidget {
 }
 
 class _UserInfoPageState extends State<UserInfoPage> {
-  final logic = Get.put(UserInfoLogic());
+  final logic = Get.find<UserInfoLogic>();
   final state = Get.find<UserInfoLogic>().state;
 
   @override

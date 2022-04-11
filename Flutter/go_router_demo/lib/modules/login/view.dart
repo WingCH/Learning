@@ -11,7 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final logic = Get.put(LoginLogic());
+  final logic = Get.find<LoginLogic>();
   final state = Get.find<LoginLogic>().state;
 
   @override

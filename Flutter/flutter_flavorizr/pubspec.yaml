@@ -86,19 +86,26 @@ flutter:
 
 flavorizr:
   ide: "idea"
-  flavors:
-    uat:
-      app:
-        name: "UAT App"
-      android:
-        applicationId: "com.example.app.uat"
-      ios:
-        bundleId: "com.example.app.uat"
+  app:
+    android:
+      flavorDimensions: "flavor-type"
+    ios:
 
+  flavors:
     production:
       app:
-        name: "App"
+        name: "Mall"
+        icon: "assets/app_icon/production_app_icon.png"
       android:
-        applicationId: "com.example.app"
+        applicationId: "com.mall.app"
       ios:
-        bundleId: "com.example.app"
+        bundleId: "com.mall.app"
+    uat:
+      app:
+        name: "UAT Mall"
+        icon: "assets/app_icon/uat_app_icon.png"
+      android:
+        applicationId: "com.mall.app.uat"
+      ios:
+        bundleId: "com.mall.app.uat"
+

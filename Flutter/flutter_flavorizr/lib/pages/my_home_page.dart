@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
-import '../flavors.dart';
+
+import '../env_config.dart';
 
 class MyHomePage extends StatelessWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(F.title),
+        title: Text(EnvConfig.title),
       ),
       body: Center(
-        child: Text(
-          'Hello ${F.title}',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              EnvConfig.title,
+            ),
+            Text(
+              'Base Url ${EnvConfig.baseUrl}',
+            ),
+          ],
         ),
       ),
     );

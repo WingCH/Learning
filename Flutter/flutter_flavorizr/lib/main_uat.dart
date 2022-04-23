@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'app.dart';
-import 'flavors.dart';
+import 'env_config.dart';
 
 void main() {
-  F.appFlavor = Flavor.UAT;
+  EnvConfig.appFlavor = Flavor.UAT;
   runApp(App());
 }

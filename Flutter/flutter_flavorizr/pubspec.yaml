@@ -1,4 +1,4 @@
-name: flutter_flavorizr
+name: flutter_flavorizr_demo
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -38,13 +38,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^1.0.4
+  flutter_flavorizr: ^2.1.3
 
 
 # For information on the generic Dart part of this file, see the

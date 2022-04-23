@@ -83,3 +83,22 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flavorizr:
+  ide: "idea"
+  flavors:
+    uat:
+      app:
+        name: "UAT App"
+      android:
+        applicationId: "com.example.app.uat"
+      ios:
+        bundleId: "com.example.app.uat"
+
+    production:
+      app:
+        name: "App"
+      android:
+        applicationId: "com.example.app"
+      ios:
+        bundleId: "com.example.app"

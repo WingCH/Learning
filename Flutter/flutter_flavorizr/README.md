@@ -75,7 +75,7 @@
 
       <img src="doc/README/image-20220423233855191.png" alt="image-20220423233855191" style="zoom:50%;" />
 
-3. Delete extra Assets
+3. Delete unused Assets
 
    <img src="doc/README/image-20220423234309941.png" alt="image-20220423234309941" style="zoom:50%;" />
 
@@ -123,3 +123,9 @@ flutter run --flavor uat -t lib/main_uat.dart
 | Android | <img src="doc/README/Screenshot_20220423_235838.png" alt="Screenshot_20220423_235838" style="zoom:25%;" /> | <img src="doc/README/Screenshot_20220423_235829.png" alt="Screenshot_20220423_235829" style="zoom:25%;" /> | <img src="doc/README/Screenshot_20220423_235849.png" alt="Screenshot_20220423_235849" style="zoom:25%;" /> |
 | iOS | <img src="doc/README/Simulator%20Screen%20Shot%20-%20iPhone%2013%20Pro%20-%202022-04-24%20at%2000.00.10.png" alt="Simulator Screen Shot - iPhone 13 Pro - 2022-04-24 at 00.00.10" style="zoom:25%;" /> | <img src="doc/README/Simulator%20Screen%20Shot%20-%20iPhone%2013%20Pro%20-%202022-04-24%20at%2000.00.03.png" alt="Simulator Screen Shot - iPhone 13 Pro - 2022-04-24 at 00.00.03" style="zoom:25%;" /> | <img src="doc/README/Simulator%20Screen%20Shot%20-%20iPhone%2013%20Pro%20-%202022-04-24%20at%2000.00.18.png" alt="Simulator Screen Shot - iPhone 13 Pro - 2022-04-24 at 00.00.18" style="zoom:25%;" /> |
 
+---
+
+### Reference
+
+1. https://pierre-dev.hashnode.dev/get-the-best-out-of-flutter-flavors-with-flutterflavorizr
+2. 

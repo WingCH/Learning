@@ -6,24 +6,23 @@
 //
 
 import UIKit
+import WebKit
 
 class WebViewController: UIViewController {
+    let webView = WKWebView()
+
+    override func loadView() {
+        super.loadView()
+        view.addSubview(webView)
+        webView.edgesToSuperview(usingSafeArea: true)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        if let url = URL(string: "https://wingch.site/content/iOS/WidgetsKit%20Transparent%20background.html") {
+            let request = URLRequest(url: url)
+            webView.load(request)
+        }
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

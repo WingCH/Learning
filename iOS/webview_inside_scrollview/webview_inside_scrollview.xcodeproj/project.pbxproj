@@ -11,6 +11,7 @@
 		0EDE50ED28254ED300A2D8D7 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDE50EC28254ED300A2D8D7 /* RootViewController.swift */; };
 		0EDE50F128254ED300A2D8D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0EDE50F028254ED300A2D8D7 /* Assets.xcassets */; };
 		0EDE50F428254ED300A2D8D7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0EDE50F228254ED300A2D8D7 /* LaunchScreen.storyboard */; };
+		0EDE50FB2825F41600A2D8D7 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDE50FA2825F41600A2D8D7 /* WebViewController.swift */; };
 		2765EFDCFA3B8A762EAE3B14 /* Pods_webview_inside_scrollview.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39C5E9FEB83EB044304715BA /* Pods_webview_inside_scrollview.framework */; };
 /* End PBXBuildFile section */
 
@@ -20,6 +21,7 @@
 		0EDE50EC28254ED300A2D8D7 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		0EDE50F028254ED300A2D8D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0EDE50F328254ED300A2D8D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		0EDE50FA2825F41600A2D8D7 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		39C5E9FEB83EB044304715BA /* Pods_webview_inside_scrollview.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_webview_inside_scrollview.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBC4A150062BE8BC65C643B9 /* Pods-webview_inside_scrollview.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-webview_inside_scrollview.debug.xcconfig"; path = "Target Support Files/Pods-webview_inside_scrollview/Pods-webview_inside_scrollview.debug.xcconfig"; sourceTree = "<group>"; };
 		FD73026839E761C3F6D93D8E /* Pods-webview_inside_scrollview.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-webview_inside_scrollview.release.xcconfig"; path = "Target Support Files/Pods-webview_inside_scrollview/Pods-webview_inside_scrollview.release.xcconfig"; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 			children = (
 				0EDE50EA28254ED300A2D8D7 /* AppDelegate.swift */,
 				0EDE50EC28254ED300A2D8D7 /* RootViewController.swift */,
+				0EDE50FA2825F41600A2D8D7 /* WebViewController.swift */,
 				0EDE50F028254ED300A2D8D7 /* Assets.xcassets */,
 				0EDE50F228254ED300A2D8D7 /* LaunchScreen.storyboard */,
 			);
@@ -72,7 +75,6 @@
 				BBC4A150062BE8BC65C643B9 /* Pods-webview_inside_scrollview.debug.xcconfig */,
 				FD73026839E761C3F6D93D8E /* Pods-webview_inside_scrollview.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -199,6 +201,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0EDE50ED28254ED300A2D8D7 /* RootViewController.swift in Sources */,
+				0EDE50FB2825F41600A2D8D7 /* WebViewController.swift in Sources */,
 				0EDE50EB28254ED300A2D8D7 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

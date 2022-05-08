@@ -7,6 +7,7 @@
 
 import TinyConstraints
 import UIKit
+import WebKit
 
 class RootViewController: UIViewController {
     let scrollView: UIScrollView = {
@@ -30,10 +31,15 @@ class RootViewController: UIViewController {
         return view
     }()
 
+    let webView = WKWebView()
+    var webViewHeightConstraint: Constraint?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         addSubViews()
         constrainSubviews()
+
+        webView.navigationDelegate = self
     }
 
     fileprivate func addSubViews() {
@@ -43,6 +49,7 @@ class RootViewController: UIViewController {
 
         contentStackView.addArrangedSubview(view1)
         contentStackView.addArrangedSubview(view2)
+        contentStackView.addArrangedSubview(webView)
     }
 
     fileprivate func constrainSubviews() {
@@ -60,35 +67,20 @@ class RootViewController: UIViewController {
 
         view1.height(100)
         view2.height(1500)
+        webViewHeightConstraint = webView.height(200)
+
+        if let url = URL(string: "https://wingch.site/content/iOS/WidgetsKit%20Transparent%20background.html") {
+            let request = URLRequest(url: url)
+            webView.load(request)
+        }
     }
+}
 
-    /*
-         fileprivate func addSubViews() {
-             view.addSubview(scrollView)
-             scrollView.addSubview(contentStackView)
-     //        scrollView.addSubview(scrollContentView)
-     //        scrollContentView.addSubview(contentStackView)
-     //
-             contentStackView.addArrangedSubview(view1)
-             contentStackView.addArrangedSubview(view2)
-         }
-
-         fileprivate func constrainSubviews() {
-             view.backgroundColor = .white
-
-             scrollView.edgesToSuperview()
-
-     //        scrollContentView.backgroundColor = .green
-
-     //        scrollContentView.edgesToSuperview()
-     //        scrollContentView.widthToSuperview()
-     //        scrollContentView.heightToSuperview()
-
-             contentStackView.axis = .vertical
-             contentStackView.widthToSuperview()
-
-             view1.height(100)
-             view2.height(1500)
-         }
-         */
+// https://stackoverflow.com/a/54276004/5588637
+extension RootViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.webViewHeightConstraint?.constant = webView.scrollView.contentSize.height
+        }
+    }
 }

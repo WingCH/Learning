@@ -1,19 +1,17 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../coordinate_pro.dart';
 
-/// create by 张风捷特烈 on 2020-03-19
-/// contact me by email 1981462002@qq.com
-/// 说明: 纸
-
 class Paper extends StatelessWidget {
+  const Paper({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: CustomPaint(
-        // 使用CustomPaint
         painter: PaperPainter(),
       ),
     );
@@ -26,6 +24,27 @@ class PaperPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     coordinate.paint(canvas, size);
+    canvas.translate(size.width / 2, size.height / 2);
+
+    Path path = Path();
+    Paint paint = Paint()
+      ..color = Colors.purpleAccent
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    path.moveTo(100, -250);
+    path.relativeLineTo(150, 0);
+    path.relativeArcToPoint(
+      const Offset(10, 10),
+      radius: const Radius.circular(10),
+      largeArc: false,
+      clockwise: true,
+    );
+    path.relativeLineTo(0, 150);
+    canvas.drawPath(path, paint);
+    canvas.drawPath(path.transform(Matrix4.rotationZ(pi).storage), paint);
+    canvas.drawPath(path.transform(Matrix4.rotationZ(pi / 2).storage), paint);
+    canvas.drawPath(path.transform(Matrix4.rotationZ(-pi / 2).storage), paint);
   }
 
   @override

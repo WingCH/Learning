@@ -9,8 +9,8 @@ void main() {
   //横屏
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-  //全屏显示
+  //全屏顯示
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
-  runApp(Paper());
+  runApp(const Paper());
 }

@@ -59,6 +59,21 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              child: const Text('go to menu'),
+              onPressed: () {
+                context.go('/home/menu');
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              child: const Text('redemption'),
+              onPressed: () {
+                context.go('/redemption');
+                // context.go('/redemption');
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
               child: const Text('logout'),
               onPressed: () {
                 context.go('/login');

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:go_router_demo2/pages/login.dart';
+import 'package:go_router_demo2/pages/menu.dart';
+import 'package:go_router_demo2/pages/redemption.dart';
 import 'package:go_router_demo2/pages/register.dart';
 
 import 'pages/home.dart';
+import 'pages/redemption_enter_code.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,6 +26,12 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomePage(),
+        routes: [
+          GoRoute(
+            path: 'menu',
+            builder: (context, state) => const MenuPage(),
+          ),
+        ],
       ),
       GoRoute(
         path: '/login',
@@ -31,6 +40,16 @@ class MyApp extends StatelessWidget {
           GoRoute(
             path: 'register',
             builder: (context, state) => const RegisterPage(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/redemption',
+        builder: (context, state) => const RedemptionPage(),
+        routes: [
+          GoRoute(
+            path: 'enter_code',
+            builder: (context, state) => const RedemptionEnterCodePage(),
           ),
         ],
       ),

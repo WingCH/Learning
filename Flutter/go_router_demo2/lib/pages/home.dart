@@ -6,15 +6,19 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() {
     debugPrint('$runtimeType -- createState');
-    return _HomePageState();
+    return _HomePageState(title: runtimeType.toString());
   }
 }
 
 class _HomePageState extends State<HomePage> {
+  final String title;
+  _HomePageState({required this.title});
+
   int _counter = 0;
 
+
   void _incrementCounter() {
-    debugPrint('$runtimeType -- _incrementCounter');
+    debugPrint('$title -- _incrementCounter');
 
     setState(() {
       _counter++;
@@ -24,16 +28,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    debugPrint('$runtimeType -- initState');
+    debugPrint('$title -- initState');
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('$runtimeType -- build');
+    debugPrint('$title -- build');
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HomePage'),
+        title:  Text(title),
       ),
       body: Center(
         child: Column(

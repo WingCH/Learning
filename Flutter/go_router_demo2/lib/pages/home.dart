@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,10 +13,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final String title;
+
   _HomePageState({required this.title});
 
   int _counter = 0;
-
 
   void _incrementCounter() {
     debugPrint('$title -- _incrementCounter');
@@ -32,12 +33,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    debugPrint('$title -- dispose');
+  }
+
+  @override
   Widget build(BuildContext context) {
     debugPrint('$title -- build');
 
     return Scaffold(
       appBar: AppBar(
-        title:  Text(title),
+        title: Text(title),
       ),
       body: Center(
         child: Column(
@@ -49,6 +56,13 @@ class _HomePageState extends State<HomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              child: const Text('logout'),
+              onPressed: () {
+                context.go('/login');
+              },
             ),
           ],
         ),

@@ -68,8 +68,11 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               child: const Text('redemption'),
               onPressed: () {
-                context.go('/redemption');
-                // context.go('/redemption');
+                Uri uri = Uri(
+                  path: '/redemption',
+                  queryParameters: {'from': 'home'},
+                );
+                context.go(uri.toString());
               },
             ),
             const SizedBox(height: 20),

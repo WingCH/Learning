@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class RedemptionPage extends StatefulWidget {
-  const RedemptionPage({Key? key}) : super(key: key);
+  const RedemptionPage({
+    Key? key,
+    required this.queryParams,
+  }) : super(key: key);
+
+  final Map<String, String> queryParams;
 
   @override
   State<RedemptionPage> createState() {
@@ -35,7 +40,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        leading:  BackButton(onPressed: (){},),
+        leading: BackButton(
+          onPressed: () {
+            context.go('/${widget.queryParams['from']}');
+          },
+        ),
       ),
       body: Center(
         child: Column(
@@ -44,7 +53,11 @@ class _RedemptionPageState extends State<RedemptionPage> {
             ElevatedButton(
               child: const Text('enter code'),
               onPressed: () {
-               context.go('/redemption/enter_code');
+                Uri uri = Uri(
+                  path: '/redemption/enter_code',
+                  queryParameters: widget.queryParams,
+                );
+                context.go(uri.toString());
               },
             ),
             const SizedBox(height: 20),

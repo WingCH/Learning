@@ -52,7 +52,11 @@ class _MenuPageState extends State<MenuPage> {
             ElevatedButton(
               child: const Text('redemption'),
               onPressed: () {
-                context.go('/redemption');
+                Uri uri = Uri(
+                  path: '/redemption',
+                  queryParameters: {'from': 'home/menu'},
+                );
+                context.go(uri.toString());
               },
             ),
           ],

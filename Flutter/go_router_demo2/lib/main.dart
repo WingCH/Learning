@@ -45,7 +45,11 @@ class MyApp extends StatelessWidget {
       ),
       GoRoute(
         path: '/redemption',
-        builder: (context, state) => const RedemptionPage(),
+        builder: (context, state) {
+          return RedemptionPage(
+            queryParams: state.queryParams,
+          );
+        },
         routes: [
           GoRoute(
             path: 'enter_code',

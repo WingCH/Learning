@@ -42,6 +42,7 @@ class LibraryService {
   static final LibraryService _instance = LibraryService._internal();
 
   final _booksSubject = BehaviorSubject<List<Book>>.seeded([]);
+  final _borrowedBooksSubject = BehaviorSubject<List<String>>.seeded([]);
 
   Stream<List<Book>> get stream => _booksSubject.stream;
 

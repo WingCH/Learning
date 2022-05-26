@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tuple/tuple.dart';
 
 import 'library_service.dart';
 
@@ -35,26 +34,17 @@ class DemoPage extends StatelessWidget {
         children: [
           SizedBox(
             height: 400,
-            child: StreamBuilder<List<Tuple2<Book, bool>>>(
-              stream: libraryService.borrowedBooksStream,
+            child: StreamBuilder<List<Book>>(
+              stream: libraryService.stream,
               builder: (context, snapshot) {
-                print('[book listview]StreamBuilder builder');
+                print('[book listview] StreamBuilder builder');
                 return ListView.builder(
                   itemCount: snapshot.data?.length ?? 0,
                   padding: const EdgeInsets.all(8),
                   itemBuilder: (BuildContext context, int index) {
-                    Book? book = snapshot.data?[index].item1;
-                    bool isBorrowed = snapshot.data?[index].item2 ?? false;
+                    Book? book = snapshot.data?[index];
                     return _BookItem(
                       book: book!,
-                      isBorrowed: isBorrowed,
-                      onTap: () {
-                        if (isBorrowed) {
-                          libraryService.checkOut(bookId: book.id);
-                        } else {
-                          libraryService.checkIn(bookId: book.id);
-                        }
-                      },
                     );
                   },
                 );
@@ -82,31 +72,41 @@ class _BookItem extends StatelessWidget {
   const _BookItem({
     Key? key,
     required this.book,
-    required this.isBorrowed,
-    required this.onTap,
   }) : super(key: key);
 
   final Book book;
-  final bool isBorrowed;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: ListTile(
-        onTap: onTap,
-        title: Text(book.name),
-        trailing: Container(
-          width: 60,
-          height: 60,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFFe0f2f1),
+    final libraryService = LibraryService();
+    return StreamBuilder<bool?>(
+      stream: libraryService.getBookBorrowStatus(id: book.id).distinct(),
+      builder: (context, snapshot) {
+        print('[book item] StreamBuilder builder');
+        bool isBorrowed = snapshot.data ?? false;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: ListTile(
+            onTap: () {
+              if (isBorrowed) {
+                libraryService.checkOut(bookId: book.id);
+              } else {
+                libraryService.checkIn(bookId: book.id);
+              }
+            },
+            title: Text(book.name),
+            trailing: Container(
+              width: 60,
+              height: 60,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0xFFe0f2f1),
+              ),
+              child: Icon(isBorrowed ? Icons.close : Icons.book),
+            ),
           ),
-          child: Icon(isBorrowed ? Icons.close : Icons.book),
-        ),
-      ),
+        );
+      },
     );
   }
 }

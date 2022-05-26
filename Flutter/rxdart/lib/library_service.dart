@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:tuple/tuple.dart';
 
@@ -34,7 +35,10 @@ class Book {
 class LibraryService {
   LibraryService._internal() {
     _booksSubject.listen((value) {
-      print('listen: $value');
+      print('_booksSubject: $value');
+    });
+    _borrowedBooksSubject.listen((value) {
+      print('_borrowedBooksSubject: $value');
     });
   }
 
@@ -63,6 +67,14 @@ class LibraryService {
           );
         },
       );
+
+  Stream<bool?> getBookBorrowStatus({required String id}) {
+    return borrowedBooksStream.flatMap<bool?>((value) {
+      bool? isBorrowed =
+          value.firstWhereOrNull((element) => element.item1.id == id)?.item2;
+      return Stream<bool?>.value(isBorrowed);
+    });
+  }
 
   void setup() {
     Stream<List<Tuple2<Book, bool>>> a = _booksSubject.stream.switchMap(

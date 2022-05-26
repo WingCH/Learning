@@ -1,4 +1,5 @@
 import 'package:rxdart/rxdart.dart';
+import 'package:tuple/tuple.dart';
 
 class Book {
   final String id;
@@ -46,7 +47,39 @@ class LibraryService {
 
   Stream<List<Book>> get stream => _booksSubject.stream;
 
+  Stream<List<Tuple2<Book, bool>>> get borrowedBooksStream =>
+      _booksSubject.stream.switchMap(
+        (bookList) {
+          return _borrowedBooksSubject.stream.flatMap(
+            (booksId) {
+              return Stream.value(
+                bookList.map(
+                  (book) {
+                    return Tuple2<Book, bool>(book, booksId.contains(book.id));
+                  },
+                ).toList(),
+              );
+            },
+          );
+        },
+      );
+
   void setup() {
+    Stream<List<Tuple2<Book, bool>>> a = _booksSubject.stream.switchMap(
+      (bookList) {
+        return _borrowedBooksSubject.stream.flatMap(
+          (booksId) {
+            return Stream.value(
+              bookList.map(
+                (book) {
+                  return Tuple2<Book, bool>(book, booksId.contains(book.id));
+                },
+              ).toList(),
+            );
+          },
+        );
+      },
+    );
     _booksSubject.value = [
       Book(
         id: "1",
@@ -74,8 +107,16 @@ class LibraryService {
   }
 
   /// 借書
-  void checkIn({required String bookName}) {}
+  void checkIn({required String bookId}) {
+    List<String> oldList = _borrowedBooksSubject.value.toList();
+    oldList.add(bookId);
+    _borrowedBooksSubject.value = oldList;
+  }
 
   /// 還書
-  void checkOut({required Book bookName}) {}
+  void checkOut({required String bookId}) {
+    List<String> oldList = _borrowedBooksSubject.value.toList();
+    oldList.remove(bookId);
+    _borrowedBooksSubject.value = oldList;
+  }
 }

@@ -22,15 +22,23 @@ class CameraApp extends StatefulWidget {
 class _CameraAppState extends State<CameraApp> {
   late CameraController controller;
 
+  void receivedImage(CameraImage image) {
+    print("receivedImage: $image");
+  }
+
+  
+
   @override
   void initState() {
     super.initState();
-    controller = CameraController(_cameras[0], ResolutionPreset.max, enableAudio: false);
+    controller =
+        CameraController(_cameras[0], ResolutionPreset.max, enableAudio: false);
     controller.initialize().then((_) {
       if (!mounted) {
         return;
       }
       setState(() {});
+      controller.startImageStream(receivedImage);
     }).catchError(
       (Object e) {
         if (e is CameraException) {

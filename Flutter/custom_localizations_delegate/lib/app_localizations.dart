@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_setting.dart';
+
 class AppLocalizations {
   final Locale locale;
 
@@ -9,14 +11,8 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static final Map<String, Map<String, String>> _localizedValues = {
-    'en': {
-      'title': 'Hello World',
-    },
-    'zh': {
-      'title': '你好',
-    },
-  };
+  final Map<String, Map<String, String>> _localizedValues =
+      AppSetting.instance.localizedValues;
 
   String get title {
     return _localizedValues[locale.languageCode]?['title'] ?? 'title';

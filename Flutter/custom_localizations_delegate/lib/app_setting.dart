@@ -15,9 +15,30 @@ class AppSetting {
 
   Locale locale;
   VoidCallback? whenLocaleChanged;
+  VoidCallback? whenLocalizedValuesChanged;
+  Map<String, Map<String, String>> localizedValues = {
+    'en': {
+      'title': 'Hello World',
+    },
+    'zh': {
+      'title': '你好',
+    },
+  };
 
   void changeLocale(Locale locale) {
     this.locale = locale;
     whenLocaleChanged?.call();
+  }
+
+  void changeLocalizedValues() {
+    localizedValues = {
+      'en': {
+        'title': 'Hong Kong',
+      },
+      'zh': {
+        'title': '香港',
+      },
+    };
+    whenLocalizedValuesChanged?.call();
   }
 }

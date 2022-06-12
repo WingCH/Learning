@@ -23,23 +23,23 @@ class _MyAppState extends State<MyApp> {
     AppSetting.instance.whenLocaleChanged = () {
       setState(() {});
     };
+    AppSetting.instance.whenLocalizedValuesChanged = () {
+      setState(() {});
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Custom localizations delegate',
+      locale: AppSetting.instance.locale,
       localizationsDelegates: const [
         AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      locale: AppSetting.instance.locale,
-      supportedLocales: const [
-        Locale('zh'),
-        Locale('en'),
-      ],
+      supportedLocales: AppLocalizationsDelegate.supportedLocales,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Demo'),
+        title: const Text('Custom localizations delegate'),
       ),
       body: Center(
         child: Column(
@@ -84,7 +84,13 @@ class _HomePageState extends State<HomePage> {
                   child: const Text('change to chinese'),
                 ),
               ],
-            )
+            ),
+            TextButton(
+              onPressed: () {
+                AppSetting.instance.changeLocalizedValues();
+              },
+              child: const Text('change localized values'),
+            ),
           ],
         ),
       ),

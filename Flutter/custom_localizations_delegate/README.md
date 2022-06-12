@@ -1,6 +1,6 @@
 # custom_localizations_delegate
 
-A new Flutter project.
+Online demo: https://flutter-custom-localizations-delegate.pages.dev/#/
 
 ## Getting Started
 

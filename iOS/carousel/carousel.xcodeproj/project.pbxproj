@@ -11,6 +11,8 @@
 		0EE1E1CD285F0AE6000CE846 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE1E1CC285F0AE6000CE846 /* RootViewController.swift */; };
 		0EE1E1D1285F0AE6000CE846 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0EE1E1D0285F0AE6000CE846 /* Assets.xcassets */; };
 		0EE1E1D4285F0AE6000CE846 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0EE1E1D2285F0AE6000CE846 /* LaunchScreen.storyboard */; };
+		0EE1E1DB285F0C30000CE846 /* CarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE1E1DA285F0C30000CE846 /* CarouselCell.swift */; };
+		0EE1E1DD285F1265000CE846 /* CarouselView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE1E1DC285F1265000CE846 /* CarouselView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		0EE1E1CC285F0AE6000CE846 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		0EE1E1D0285F0AE6000CE846 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0EE1E1D3285F0AE6000CE846 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		0EE1E1DA285F0C30000CE846 /* CarouselCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselCell.swift; sourceTree = "<group>"; };
+		0EE1E1DC285F1265000CE846 /* CarouselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +59,8 @@
 				0EE1E1CC285F0AE6000CE846 /* RootViewController.swift */,
 				0EE1E1D0285F0AE6000CE846 /* Assets.xcassets */,
 				0EE1E1D2285F0AE6000CE846 /* LaunchScreen.storyboard */,
+				0EE1E1DA285F0C30000CE846 /* CarouselCell.swift */,
+				0EE1E1DC285F1265000CE846 /* CarouselView.swift */,
 			);
 			path = carousel;
 			sourceTree = "<group>";
@@ -129,7 +135,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0EE1E1DB285F0C30000CE846 /* CarouselCell.swift in Sources */,
 				0EE1E1CD285F0AE6000CE846 /* RootViewController.swift in Sources */,
+				0EE1E1DD285F1265000CE846 /* CarouselView.swift in Sources */,
 				0EE1E1CB285F0AE6000CE846 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

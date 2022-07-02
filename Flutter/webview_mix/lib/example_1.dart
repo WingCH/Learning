@@ -7,6 +7,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 /*
 when webview height is too large, the app will be crash.
 https://github.com/flutter/flutter/issues/45243
+https://github.com/flutter/flutter/issues/34138
+https://github.com/daohoangson/flutter_widget_from_html/issues/375
  */
 class Example1Page extends StatefulWidget {
   const Example1Page({Key? key}) : super(key: key);
@@ -23,7 +25,7 @@ class _Example1PageState extends State<Example1Page> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
 
   void updateHeight(double height) async {
@@ -63,14 +65,14 @@ class _Example1PageState extends State<Example1Page> {
               color: Colors.blue,
               child: WebView(
                 debuggingEnabled: true,
-                initialUrl: 'https://wingch.site/',
+                initialUrl: 'https://flutter.dev/',
                 javascriptMode: JavascriptMode.unrestricted,
                 onWebViewCreated: (WebViewController webViewController) {
                   print('WebView created');
                   _webViewController = webViewController;
                   _webViewController.runJavascript("""
                       const resizeObserver = new ResizeObserver(entries =>
-  Resize.postMessage(entries[0].target.clientHeight))
+  Resize.postMessage(document.documentElement.scrollHeight))
   resizeObserver.observe(document.body)
                     """);
                 },

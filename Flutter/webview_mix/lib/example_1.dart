@@ -6,6 +6,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 /*
 when webview height is too large, the app will be crash.
+https://github.com/flutter/flutter/issues/45243
  */
 class Example1Page extends StatefulWidget {
   const Example1Page({Key? key}) : super(key: key);

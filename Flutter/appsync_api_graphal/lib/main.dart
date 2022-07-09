@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'amplifyconfiguration.dart';
 
+//AWS AppSync console: https://us-west-1.console.aws.amazon.com/appsync/home?region=us-west-1#/ow5ukem53jhr3f6mv2y4vuioa4/v1/schema
 void main() {
   runApp(const MyApp());
 }
@@ -51,8 +52,8 @@ class _HomePageState extends State<HomePage> {
 
       // https://docs.amplify.aws/guides/api-graphql/subscriptions-by-id/q/platform/flutter/
       const graphQLDocument = r'''
-      subscription SubscribeToData {
-          subscribe(name:"channel") {
+      subscription sub($channelName: String!) {
+          subscribe(name: $channelName) {
             name
             data
           }
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
       final Stream<GraphQLResponse<String>> operation = Amplify.API.subscribe(
         GraphQLRequest<String>(
           document: graphQLDocument,
-          // variables: <String, String>{'channelName': 'channel'},
+          variables: <String, String>{'channelName': 'channel'},
         ),
         onEstablished: () => print('Subscription established'),
       );

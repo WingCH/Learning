@@ -33,26 +33,20 @@ class HomePage extends StatelessWidget {
           color: Colors.red,
           width: 200,
           height: 100,
-          // 顯示價格，淨餘先顯示title
+          // 顯示價格，淨餘先顯示藍色
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               return Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      color: Colors.amber,
-                      child: const Text(
-                        'Title',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    child: Container(color: Colors.blue),
                   ),
                   Container(
                     constraints: BoxConstraints(
                       maxWidth: constraints.maxWidth,
                     ),
                     child: const Text(
-                      '\$982.1234567123456',
+                      '\$982.00',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

@@ -35,7 +35,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // StreamSubscription<GraphQLResponse<Channel>>? subscription;
+  String coinTickerResult = '';
+  String topNft = '';
 
   @override
   void initState() {
@@ -49,9 +50,16 @@ class _HomePageState extends State<HomePage> {
 
     try {
       await Amplify.configure(amplifyconfig);
+      _getCoinTicker();
+      _getTopNft();
+    } on AmplifyAlreadyConfiguredException catch (error) {
+      print('AmplifyAlreadyConfiguredException: $error');
+    }
+  }
 
-      // https://docs.amplify.aws/guides/api-graphql/subscriptions-by-id/q/platform/flutter/
-      const graphQLDocument = r'''
+  void _getCoinTicker() async {
+    // https://docs.amplify.aws/guides/api-graphql/subscriptions-by-id/q/platform/flutter/
+    const graphQLDocument = r'''
       subscription sub($channelName: String!) {
           subscribe(name: $channelName) {
             name
@@ -59,23 +67,53 @@ class _HomePageState extends State<HomePage> {
           }
       }
     ''';
-      final Stream<GraphQLResponse<String>> operation = Amplify.API.subscribe(
-        GraphQLRequest<String>(
-          document: graphQLDocument,
-          variables: <String, String>{'channelName': 'channel'},
-        ),
-        onEstablished: () => print('Subscription established'),
-      );
+    final Stream<GraphQLResponse<String>> operation = Amplify.API.subscribe(
+      GraphQLRequest<String>(
+        document: graphQLDocument,
+        variables: <String, String>{'channelName': 'coinTicker'},
+      ),
+      onEstablished: () => print('Subscription established'),
+    );
 
-      try {
-        await for (var event in operation) {
-          print('Subscription event data received: ${event.data}');
-        }
-      } on Exception catch (e) {
-        print('Error in subscription stream: $e');
+    try {
+      await for (var event in operation) {
+        print('Subscription event data received: ${event.data}');
+        setState(() {
+          coinTickerResult = event.data ?? '';
+        });
       }
-    } on AmplifyAlreadyConfiguredException catch (error) {
-      print('AmplifyAlreadyConfiguredException: $error');
+    } on Exception catch (e) {
+      print('Error in subscription stream: $e');
+    }
+  }
+
+  void _getTopNft() async {
+    // https://docs.amplify.aws/guides/api-graphql/subscriptions-by-id/q/platform/flutter/
+    const graphQLDocument = r'''
+      subscription sub($channelName: String!) {
+          subscribe(name: $channelName) {
+            name
+            data
+          }
+      }
+    ''';
+    final Stream<GraphQLResponse<String>> operation = Amplify.API.subscribe(
+      GraphQLRequest<String>(
+        document: graphQLDocument,
+        variables: <String, String>{'channelName': 'topNft'},
+      ),
+      onEstablished: () => print('Subscription established'),
+    );
+
+    try {
+      await for (var event in operation) {
+        print('Subscription event data received: ${event.data}');
+        setState(() {
+          topNft = event.data ?? '';
+        });
+      }
+    } on Exception catch (e) {
+      print('Error in subscription stream: $e');
     }
   }
 
@@ -85,8 +123,35 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Appsync Api GraphQL Demo'),
       ),
-      body: const Center(
-        child: Text('Hello World'),
+      body: Column(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Text('coinTicker',
+                    style: Theme.of(context).textTheme.headline6),
+                Expanded(
+                  child: coinTickerResult.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : Text(coinTickerResult),
+                ),
+              ],
+            ),
+          ),
+          const Divider(),
+          Expanded(
+            child: Column(
+              children: [
+                Text('topNft', style: Theme.of(context).textTheme.headline6),
+                Expanded(
+                  child: topNft.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : Text(topNft),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -40,12 +40,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    final docRef = db.collection("learning").doc("counter");
+    final docRef = db.collection("learning").doc("counter").collection('record');
     docRef.snapshots().listen(
       (event) {
-        final data = event.data() as Map<String, dynamic>;
         setState(() {
-          count = data["count"] as int;
+          count = event.docs.length;
         });
       },
       onError: (error) => print("Listen failed: $error"),
@@ -54,9 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> add() async {
-    final docRef = db.collection("learning").doc("counter");
-    await docRef.update({
-      "count": count + 1,
+    await db.collection("learning").doc("counter").collection('record').add({
+      "timestamp": FieldValue.serverTimestamp(),
     });
   }
 

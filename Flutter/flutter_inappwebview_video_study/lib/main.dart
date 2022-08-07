@@ -75,7 +75,11 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   InAppWebView(
                     key: webViewKey,
-                    initialUrlRequest: URLRequest(url: Uri.parse("https://inappwebview.dev/")),
+                    initialUrlRequest: URLRequest(
+                      url: Uri.parse(
+                        "https://video-webview-sample.pages.dev",
+                      ),
+                    ),
                     initialOptions: options,
                     onWebViewCreated: (controller) {
                       webViewController = controller;

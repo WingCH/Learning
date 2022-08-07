@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        video {
+            width: 80%;
+        }
+    </style>
+    <script>
+        console.log('head script started: ' + Date());
+
+        function logBodyOnLoad() {
+            console.log('body onload: ' + Date());
+        }
+
+        function logEvent(event) {
+            const msg = `Event <strong>${event.type}</strong> at <em>${event.clientX}, ${event.clientY}</em>`;
+            console.log(msg);
+        }
+    </script>
+</head>
+<body onload="logBodyOnLoad()">
+<video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4#t=0.001"
+       controls></video>
+<video src="https://samplelib.com/lib/preview/mp4/sample-30s.mp4#t=0.001" controls></video>
+<video src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4#t=1" controls></video>
+
+</body>
+</html>

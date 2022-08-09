@@ -39,23 +39,21 @@ class _FlutterNativeTimezoneExampleState
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Local timezone app'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Text('Local timezone: $_timezone\n'),
-            const Text('Available timezones:'),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _availableTimezones.length,
-                itemBuilder: (_, index) => Text(_availableTimezones[index]),
-              ),
-            )
-          ],
-        ),
+    return  Scaffold(
+      appBar: AppBar(
+        title: const Text('flutter_native_timezone'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Text('Local timezone: $_timezone\n'),
+          const Text('Available timezones:'),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _availableTimezones.length,
+              itemBuilder: (_, index) => Text(_availableTimezones[index]),
+            ),
+          )
+        ],
       ),
     );
   }

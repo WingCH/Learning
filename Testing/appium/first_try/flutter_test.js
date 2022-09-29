@@ -3,6 +3,7 @@ const { remote } = require('webdriverio');
 const assert = require('assert');
 const { byValueKey } = require('appium-flutter-finder');
 
+// capabilities : https://appium.io/docs/en/writing-running-appium/caps/index.html
 /*
 Appium Inspector does not support 'appium:automationName': 'Flutter', so use `UiAutomator2`
 {
@@ -13,12 +14,19 @@ Appium Inspector does not support 'appium:automationName': 'Flutter', so use `Ui
   "appium:appActivity": "com.example.study_flutter_integration_test.MainActivity"
 }
 */
+// const capabilities = {
+//   'appium:platformName': 'Android',
+//   'appium:automationName': 'Flutter',
+//   'appium:deviceName': 'Android',
+//   'appium:appPackage': 'com.example.study_flutter_integration_test',
+//   'appium:appActivity': 'com.example.study_flutter_integration_test.MainActivity',
+// };
+
 const capabilities = {
-  'appium:platformName': 'Android',
+  'appium:platformName': 'iOS',
   'appium:automationName': 'Flutter',
-  'appium:deviceName': 'Android',
-  'appium:appPackage': 'com.example.study_flutter_integration_test',
-  'appium:appActivity': 'com.example.study_flutter_integration_test.MainActivity',
+  'appium:deviceName': 'iPhone 13 Pro',
+  'appium:bundleId': 'com.example.studyFlutterIntegrationTest',
 };
 
 const wdOpts = {
@@ -41,7 +49,7 @@ async function runTest() {
       element: { elementId: buttonFinder }
     });
 
-    assert.strictEqual(await driver.getElementText(counterTextFinder), '3');
+    assert.strictEqual(await driver.getElementText(counterTextFinder), '2');
   } finally {
     await driver.pause(1000);
     await driver.deleteSession();

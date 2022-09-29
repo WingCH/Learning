@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "appium-flutter-finder": "^0.1.0",
     "webdriverio": "^7.25.0"
   }
 }

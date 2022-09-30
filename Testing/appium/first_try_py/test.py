@@ -26,12 +26,13 @@ class TestAppium(unittest.TestCase):
 
     def test_tap_increment(self) -> None:
         finder = FlutterFinder()
-        text_finder = finder.by_value_key('counterXXXXX')
+        text_finder = finder.by_value_key('counterX')
         text_element = FlutterElement(self.driver, text_finder)
         print('getCenter before')
-        # if value key not found, this function will hold forever
-        a = self.driver.execute_script("flutter:getCenter", text_finder)
-        print('getCenter after')
+
+        # this will throw error if not found counterText after 1 second
+        self.driver.execute_script("flutter:waitFor", text_finder, 1)
+
         self.assertEqual(text_element.text, '0')
 
         button_finder = finder.by_value_key('increment')

@@ -1,3 +1,4 @@
+# python test.py
 import unittest
 from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
@@ -25,8 +26,12 @@ class TestAppium(unittest.TestCase):
 
     def test_tap_increment(self) -> None:
         finder = FlutterFinder()
-        text_finder = finder.by_value_key('counter')
+        text_finder = finder.by_value_key('counterXXXXX')
         text_element = FlutterElement(self.driver, text_finder)
+        print('getCenter before')
+        # if value key not found, this function will hold forever
+        a = self.driver.execute_script("flutter:getCenter", text_finder)
+        print('getCenter after')
         self.assertEqual(text_element.text, '0')
 
         button_finder = finder.by_value_key('increment')

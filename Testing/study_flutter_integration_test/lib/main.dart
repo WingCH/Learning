@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 void main() {
+  // for appium-flutter-driver, remove when run native integration test
   enableFlutterDriverExtension();
   runApp(const MyApp());
 }

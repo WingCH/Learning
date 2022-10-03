@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
             final metamaskUri =
                 Uri.https('metamask.app.link', 'wc', {'uri': uri});
 
-            // order way
+            // other way
             // metamask://wc?uri=wc%3A75fc02ac-b8a0-4761-91f7-5addfb414f3d%401%3Fbridge%3Dhttps%253A%252F%252Fu.bridge.walletconnect
             // final metamaskUri2 = Uri(
             //   scheme: 'metamask',

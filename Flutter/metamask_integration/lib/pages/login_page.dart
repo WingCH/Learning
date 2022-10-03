@@ -34,16 +34,22 @@ class _LoginPageState extends State<LoginPage> {
             // e.g: wc:6fabddfa-5353-4011-8f08-f458f4f877bf@1?bridge=https%3A%2F%2Ft.bridge.walletconnect.org&key=a00825511cb421c5e6c9f4a4f9142797a0667a96516a82293a2adf7513a5b441
             _uri = uri;
 
-            // trustwallet, https://link.trustwallet.com
+            // trustwallet, https://link.trustwallet.com.
             // https://developer.trustwallet.com/deeplinking#connect-to-a-walletconnect-session
-            final trustwalletUri = Uri.https('link.trustwallet.com', 'wc', {
-              'uri': uri
-            });
-            print(trustwalletUri);
-            // https://metamask.app.link/
+            // e.g: https://link.trustwallet.com/wc?uri=wc%3A0c1773eb-33d5-4e10-96ce-61ecca6469e6%401%3Fbridge%3Dhttps%253A%252F%252Fs.bridge.walletconnect.org%26key%3D5d6d84b2fb06829f38fb5f5d2e23f96e361bbf895f1d896a9cfbf8b38fed32c3
+            // tested in iOS and Android, both works
+            final trustWalletUri =
+                Uri.https('link.trustwallet.com', 'wc', {'uri': uri});
+            print(trustWalletUri);
+
+            // metamask, https://metamask.app.link
+            // https://github.com/WalletConnect/walletconnect-monorepo/issues/647
+            // e.g:  https://metamask.app.link/wc?uri=wc%3A1c7b2142-8fe4-4e32-b619-4cb1bbc9ac31%401%3Fbridge%3Dhttps%253A%252F%252F6.bridge.walletconnect.org%26key%3Da4265e07a7ba0d39ff6c41e2a9177de1a3cbef7ea77c9f33fd8746effa5ba6a7
+            final metamaskUri =
+                Uri.https('metamask.app.link', 'wc', {'uri': uri});
 
             await launchUrlString(
-              trustwalletUri.toString(),
+              trustWalletUri.toString(),
               mode: LaunchMode.externalApplication,
             );
           },

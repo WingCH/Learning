@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -45,11 +46,21 @@ class _LoginPageState extends State<LoginPage> {
             // metamask, https://metamask.app.link
             // https://github.com/WalletConnect/walletconnect-monorepo/issues/647
             // e.g:  https://metamask.app.link/wc?uri=wc%3A1c7b2142-8fe4-4e32-b619-4cb1bbc9ac31%401%3Fbridge%3Dhttps%253A%252F%252F6.bridge.walletconnect.org%26key%3Da4265e07a7ba0d39ff6c41e2a9177de1a3cbef7ea77c9f33fd8746effa5ba6a7
+            // tested in iOS and Android, both works
             final metamaskUri =
                 Uri.https('metamask.app.link', 'wc', {'uri': uri});
 
+            // order way
+            // metamask://wc?uri=wc%3A75fc02ac-b8a0-4761-91f7-5addfb414f3d%401%3Fbridge%3Dhttps%253A%252F%252Fu.bridge.walletconnect
+            // final metamaskUri2 = Uri(
+            //   scheme: 'metamask',
+            //   path: 'wc',
+            //   queryParameters: {'uri': uri},
+            // );
+            // await launchUrl(metamaskUri);
+
             await launchUrlString(
-              trustWalletUri.toString(),
+              metamaskUri.toString(),
               mode: LaunchMode.externalApplication,
             );
           },

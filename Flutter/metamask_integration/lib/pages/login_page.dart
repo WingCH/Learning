@@ -33,7 +33,19 @@ class _LoginPageState extends State<LoginPage> {
           onDisplayUri: (uri) async {
             // e.g: wc:6fabddfa-5353-4011-8f08-f458f4f877bf@1?bridge=https%3A%2F%2Ft.bridge.walletconnect.org&key=a00825511cb421c5e6c9f4a4f9142797a0667a96516a82293a2adf7513a5b441
             _uri = uri;
-            await launchUrlString(uri, mode: LaunchMode.externalApplication);
+
+            // trustwallet, https://link.trustwallet.com
+            // https://developer.trustwallet.com/deeplinking#connect-to-a-walletconnect-session
+            final trustwalletUri = Uri.https('link.trustwallet.com', 'wc', {
+              'uri': uri
+            });
+            print(trustwalletUri);
+            // https://metamask.app.link/
+
+            await launchUrlString(
+              trustwalletUri.toString(),
+              mode: LaunchMode.externalApplication,
+            );
           },
         );
         print(session.accounts[0]);

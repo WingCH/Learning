@@ -10,7 +10,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  var connector = WalletConnect(
+  final WalletConnect connector = WalletConnect(
     bridge: 'https://bridge.walletconnect.org',
     clientMeta: const PeerMeta(
       name: 'My App',
@@ -22,17 +22,20 @@ class _LoginPageState extends State<LoginPage> {
     ),
   );
 
-  SessionStatus? _session;
   String? _uri;
+  SessionStatus? _session;
+  WCSessionUpdateResponse? _payload;
 
   void loginUsingMetamask(BuildContext context) async {
     if (!connector.connected) {
       try {
-        var session = await connector.createSession(onDisplayUri: (uri) async {
-          // e.g: wc:6fabddfa-5353-4011-8f08-f458f4f877bf@1?bridge=https%3A%2F%2Ft.bridge.walletconnect.org&key=a00825511cb421c5e6c9f4a4f9142797a0667a96516a82293a2adf7513a5b441
-          _uri = uri;
-          await launchUrlString(uri, mode: LaunchMode.externalApplication);
-        });
+        var session = await connector.createSession(
+          onDisplayUri: (uri) async {
+            // e.g: wc:6fabddfa-5353-4011-8f08-f458f4f877bf@1?bridge=https%3A%2F%2Ft.bridge.walletconnect.org&key=a00825511cb421c5e6c9f4a4f9142797a0667a96516a82293a2adf7513a5b441
+            _uri = uri;
+            await launchUrlString(uri, mode: LaunchMode.externalApplication);
+          },
+        );
         print(session.accounts[0]);
         print(session.chainId);
         setState(() {
@@ -45,24 +48,77 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    connector.on<SessionStatus>(
+      'connect',
+      (session) => setState(() {
+        _session = session;
+      }),
+    );
+    connector.on<WCSessionUpdateResponse>(
+      'session_update',
+      (payload) => setState(() {
+        _payload = payload;
+        // print(payload.accounts[0]);
+        // print(payload.chainId);
+      }),
+    );
+    connector.on<SessionStatus>(
+      'disconnect',
+      (session) => setState(() {
+        _session = session;
+      }),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login Page'),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/main_page_image.png',
-              fit: BoxFit.fitHeight,
-            ),
-            ElevatedButton(
-              onPressed: () => loginUsingMetamask(context),
-              child: const Text("Connect with Metamask"),
-            )
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/main_page_image.png',
+                fit: BoxFit.fitHeight,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Uri:',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              ),
+              Text('$_uri'),
+              ElevatedButton(
+                onPressed: () => loginUsingMetamask(context),
+                child: const Text("Connect with Metamask"),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Session:',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              ),
+              Text('$_session'),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Payload:',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              ),
+              Text('$_payload'),
+            ],
+          ),
         ),
       ),
     );

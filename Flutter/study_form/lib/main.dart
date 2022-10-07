@@ -51,6 +51,8 @@ class _Form1PageState extends State<Form1Page> {
                   key: _emailFieldKey,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
+                    floatingLabelStyle: TextStyle(color: Colors.blue, fontSize: 16),
+                    labelStyle: TextStyle(color: Colors.black, fontSize: 8),
                     label: ColoredBox(
                       color: Colors.yellow,
                       child: Text('Enter your email'),

@@ -1,5 +1,21 @@
 import 'package:flutter/material.dart';
 
+/*
+ Issue: On iOS, the back swipe gesture does not appear to work on the subclass NoAnimationPageRoutes.
+ Seems need  CupertinoPageTransitionsBuilder
+ */
+// https://stackoverflow.com/questions/46259751/how-to-push-multiple-routes-with-flutter-navigator
+class NoAnimationPageRoute<T> extends MaterialPageRoute<T> {
+  NoAnimationPageRoute({required WidgetBuilder builder})
+      : super(builder: builder);
+
+  @override
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    return child;
+  }
+}
+
 void main() {
   runApp(const MyApp());
 }
@@ -22,7 +38,8 @@ class MyApp extends StatelessWidget {
           );
         }
         if (settings.name == '/second') {
-          return MaterialPageRoute(
+          // On iOS, the back swipe gesture does not appear to work on the subclass NoAnimationPageRoutes.
+          return NoAnimationPageRoute(
             builder: (context) => const SecondPage(),
           );
         }
@@ -62,6 +79,7 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               child: const Text('Go to third page'),
               onPressed: () {
+                Navigator.of(context).pushNamed('/second');
                 Navigator.of(context).pushNamed('/third');
               },
             ),

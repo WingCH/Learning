@@ -15,10 +15,23 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      routes: {
-        '/': (context) => const HomePage(),
-        '/second': (context) => const SecondPage(),
-        '/third': (context) => const ThirdPage(),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/') {
+          return MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          );
+        }
+        if (settings.name == '/second') {
+          return MaterialPageRoute(
+            builder: (context) => const SecondPage(),
+          );
+        }
+        if (settings.name == '/third') {
+          return MaterialPageRoute(
+            builder: (context) => const ThirdPage(),
+          );
+        }
+        return null;
       },
     );
   }

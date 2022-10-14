@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,13 +28,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  AuthorizationCredentialAppleID? credential;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Demo Home Page'),
       ),
-      body: Container(),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SignInWithAppleButton(
+              onPressed: () async {
+                final credential = await SignInWithApple.getAppleIDCredential(
+                  scopes: [
+                    // AppleIDAuthorizationScopes.email,
+                    // AppleIDAuthorizationScopes.fullName,
+                  ],
+                );
+                setState(() {
+                  this.credential = credential;
+                });
+              },
+            ),
+            Text('Result', style: Theme.of(context).textTheme.headline6),
+            Text('Credential: ${credential?.toString()}'),
+          ],
+        ),
+      ),
     );
   }
 }

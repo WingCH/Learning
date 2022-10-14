@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         }
         if (settings.name == '/second') {
           // On iOS, the back swipe gesture does not appear to work on the subclass NoAnimationPageRoutes.
-          return NoAnimationPageRoute(
+          return MaterialPageRoute(
             builder: (context) => const SecondPage(),
           );
         }

@@ -51,13 +51,20 @@ class _LoginPageState extends State<LoginPage> {
                 Uri.https('metamask.app.link', 'wc', {'uri': uri});
 
             // other way
+            // metamask, work in ios and android
             // metamask://wc?uri=wc%3A75fc02ac-b8a0-4761-91f7-5addfb414f3d%401%3Fbridge%3Dhttps%253A%252F%252Fu.bridge.walletconnect
-            // final metamaskUri2 = Uri(
-            //   scheme: 'metamask',
-            //   path: 'wc',
-            //   queryParameters: {'uri': uri},
-            // );
-            // await launchUrl(metamaskUri);
+            final metamaskUri2 = 'metamask://wc?uri=$uri';
+
+            // trustwallet, not work in ios and android (can open app, but not auth popup)
+            final trustWalletUri2 = 'trust://wc?uri=$uri';
+
+            // exodus, not work in android and ios (can open app, but not auth popup)
+            final exodusWalletUri = 'exodus://wc?uri=$uri';
+
+            // crypto.com defi wallet, not work in android and ios (can open app, but not auth popup)
+            // ios first time not have popup , second time have,
+            // android not work (can open app, but not auth popup)
+            final cryptoComWalletUri = 'dfw://wc?uri=$uri';
 
             await launchUrlString(
               metamaskUri.toString(),

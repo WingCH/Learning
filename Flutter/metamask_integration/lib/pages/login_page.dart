@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
           final cryptoComWalletUri = 'dfw://wc?uri=$uri';
 
           await launchUrlString(
-            metamaskUri.toString(),
+            trustWalletUri.toString(),
             mode: LaunchMode.externalApplication,
           );
         },

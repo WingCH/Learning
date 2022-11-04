@@ -15,6 +15,7 @@ class _LoginPageState extends State<LoginPage> {
     bridge: 'https://bridge.walletconnect.org',
     clientMeta: const PeerMeta(
       name: 'My App',
+      // if description is null, trust wallet (iOS 7.20 (691)) will not show the connection request
       description: 'An app for converting pictures to NFT',
       url: 'https://walletconnect.org',
       icons: [

@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+// Issue: cannot get when second time call launchUrlString
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -68,18 +69,27 @@ class _LoginPageState extends State<LoginPage> {
             final cryptoComWalletUri = 'dfw://wc?uri=$uri';
 
             await launchUrlString(
-              metamaskUri.toString(),
+              trustWalletUri.toString(),
               mode: LaunchMode.externalApplication,
             );
           },
         );
+
         print(session.accounts[0]);
         print(session.chainId);
+        await connector.killSession();
+        print('[debug] done => killSession');
+        await connector.close(forceClose: true);
+        print('[debug] done => close');
         setState(() {
           _session = session;
         });
       } catch (exp) {
         print(exp);
+        // await connector.killSession();
+        // print('[debug] catch => killSession');
+        // await connector.close(forceClose: true);
+        // print('[debug] catch =>  close');
       }
     }
   }

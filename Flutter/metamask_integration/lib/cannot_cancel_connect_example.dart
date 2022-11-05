@@ -49,9 +49,6 @@ class _HomePageState extends State<HomePage> {
       );
 
       print('address: ${session.accounts}');
-
-      // kill session
-      await connector.killSession();
     } catch (e) {}
   }
 

@@ -41,15 +41,17 @@ class _HomePageState extends State<HomePage> {
     try {
       var session = await connector.createSession(
         onDisplayUri: (uri) async {
-          await launchUrlString(
+          final result = await launchUrlString(
             uri.toString(),
             mode: LaunchMode.externalApplication,
           );
+          print('[debug] launchUrlString: $result');
         },
       );
-
-      print('address: ${session.accounts}');
-    } catch (e) {}
+      print('[debug] received session: ${session.accounts}');
+    } catch (e) {
+      print('[debug] catched error: $e');
+    }
   }
 
   @override

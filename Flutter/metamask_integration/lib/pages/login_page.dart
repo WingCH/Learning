@@ -2,23 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:walletconnect_dart/walletconnect_dart.dart';
 
-/*
-Android
-case 1:
-  - Click `Connect` button
-  - Jump to `trust wallet` app
-  - `trust wallet` app show popup
-  - cancel popup
-  - automatically jump back to `flutter app`
-  - received `JSON-RPC error -32000: Session rejected`
-  - step 1-3 again
-  - click `Connect` button in `trust wallet` app
-  - automatically jump back to `flutter app`
-  - received SessionStatus
-  - subscription callback received SessionStatus also
-  - connector.connected is true now
-
- */
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -82,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
           final cryptoComWalletUri = 'dfw://wc?uri=$uri';
 
           await launchUrlString(
-            trustWalletUri.toString(),
+            metamaskUri.toString(),
             mode: LaunchMode.externalApplication,
           );
         },
@@ -92,10 +75,8 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _session = session;
       });
-      print('[debug] killSession start');
-      // https://github.com/RootSoft/walletconnect-dart-sdk/issues/78
-      await connector.killSession();
-      print('[debug] killSession end');
+      print('[debug] killSession');
+      connector.killSession();
     } catch (exp) {
       print('[debug] catch error: $exp');
     }

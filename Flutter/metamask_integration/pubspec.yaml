@@ -37,7 +37,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   url_launcher: ^6.1.6
-  walletconnect_dart: ^0.0.11
+  # walletconnect_dart: ^0.0.11
+  # since lastest version of walletconnect_dart cannot `killSession`, so we use old version until My PR is merged
+  # https://github.com/RootSoft/walletconnect-dart-sdk/pull/85
+  walletconnect_dart: 0.0.4
   google_fonts: ^3.0.1
   slider_button: ^2.0.0
 

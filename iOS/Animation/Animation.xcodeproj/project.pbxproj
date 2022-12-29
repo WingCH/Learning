@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		662F3DCB295D41AB008E93C4 /* Animation2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662F3DCA295D41AB008E93C4 /* Animation2ViewController.swift */; };
 		66BB700F295C3FAD00BEA34B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BB700E295C3FAD00BEA34B /* AppDelegate.swift */; };
 		66BB7011295C3FAD00BEA34B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BB7010295C3FAD00BEA34B /* SceneDelegate.swift */; };
 		66BB7013295C3FAD00BEA34B /* Animation1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66BB7012295C3FAD00BEA34B /* Animation1ViewController.swift */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		662F3DCA295D41AB008E93C4 /* Animation2ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation2ViewController.swift; sourceTree = "<group>"; };
 		66BB700B295C3FAD00BEA34B /* Animation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Animation.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66BB700E295C3FAD00BEA34B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66BB7010295C3FAD00BEA34B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 				66BB700E295C3FAD00BEA34B /* AppDelegate.swift */,
 				66BB7010295C3FAD00BEA34B /* SceneDelegate.swift */,
 				66BB7012295C3FAD00BEA34B /* Animation1ViewController.swift */,
+				662F3DCA295D41AB008E93C4 /* Animation2ViewController.swift */,
 				66BB7017295C3FAE00BEA34B /* Assets.xcassets */,
 				66BB7019295C3FAE00BEA34B /* LaunchScreen.storyboard */,
 				66BB701C295C3FAE00BEA34B /* Info.plist */,
@@ -144,6 +147,7 @@
 			files = (
 				66BB7013295C3FAD00BEA34B /* Animation1ViewController.swift in Sources */,
 				66BB700F295C3FAD00BEA34B /* AppDelegate.swift in Sources */,
+				662F3DCB295D41AB008E93C4 /* Animation2ViewController.swift in Sources */,
 				66BB7011295C3FAD00BEA34B /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -10,6 +10,7 @@ import UIKit
 
 class Animation2ViewController: UIViewController {
     var topPadding: CGFloat!
+    var indicatorLayer: CAShapeLayer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,7 +55,34 @@ class Animation2ViewController: UIViewController {
         layer3.strokeColor = UIColor.red.cgColor
         layer3.fillColor = UIColor.clear.cgColor
         self.view.layer.addSublayer(layer3)
+        
+        //
+        indicatorLayer = CAShapeLayer()
+        self.view.layer.addSublayer(indicatorLayer)
+        indicatorLayer.lineWidth = 4
+        indicatorLayer.lineCap = .round
+        indicatorLayer.fillColor = UIColor.clear.cgColor
+        indicatorLayer.strokeColor = UIColor.blue.cgColor
+        
+        indicatorLayer.path = path3.cgPath
+        
+        indicatorLayer.strokeStart = 0.1
+        indicatorLayer.strokeEnd = 0.2
+        indicatorLayer.speed = 0.5
+        
+        //
+        let button = UIButton(type: .system)
+        button.setTitle("Go", for: .normal)
+        button.addTarget(self, action: #selector(Animation2ViewController.onTap(sender:)), for: .touchUpInside)
+        self.view.addSubview(button)
+        button.centerInSuperview()
+        
+        self.view.setNeedsLayout()
+        self.view.layoutIfNeeded()
     }
 
-    @objc func onTap(_ sender: UITapGestureRecognizer) {}
+    @objc func onTap(sender: UIButton) {
+        indicatorLayer.strokeStart = 0.8
+        indicatorLayer.strokeEnd = 0.9
+    }
 }

@@ -65,10 +65,10 @@ class Animation2ViewController: UIViewController {
         indicatorLayer.strokeColor = UIColor.blue.cgColor
         
         indicatorLayer.path = path3.cgPath
+        indicatorLayer.speed = 0.5
         
         indicatorLayer.strokeStart = 0.1
         indicatorLayer.strokeEnd = 0.2
-        indicatorLayer.speed = 0.5
         
         //
         let button = UIButton(type: .system)
@@ -76,9 +76,6 @@ class Animation2ViewController: UIViewController {
         button.addTarget(self, action: #selector(Animation2ViewController.onTap(sender:)), for: .touchUpInside)
         self.view.addSubview(button)
         button.centerInSuperview()
-        
-        self.view.setNeedsLayout()
-        self.view.layoutIfNeeded()
     }
 
     @objc func onTap(sender: UIButton) {

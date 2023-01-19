@@ -10,4 +10,5 @@ Following [Flutter CI/CD 全自動化詳細解析：一個產品 App 的環境�
    yarn create @klearthinkk/ynest
    ```
 
-2. 
+2. update to null safety, [commit](https://github.com/WingCH/Learning/commit/7eaf767d5b5f3f3427bcea3ce16df6f6c6a71ea5)
+3. 

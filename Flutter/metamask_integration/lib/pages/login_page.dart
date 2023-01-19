@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
           // trustwallet, https://link.trustwallet.com.
           // https://developer.trustwallet.com/deeplinking#connect-to-a-walletconnect-session
-          // e.g: https://link.trustwallet.com/wc?uri=wc%3A0c1773eb-33d5-4e10-96ce-61ecca6469e6%401%3Fbridge%3Dhttps%253A%252F%252Fs.bridge.walletconnect.org%26key%3D5d6d84b2fb06829f38fb5f5d2e23f96e361bbf895f1d896a9cfbf8b38fed32c3
+          // e.g: https://link.trustwallet.com/wc?uri=wc%3A29357d45-38b7-4028-ba6b-d984fa987b9c%401%3Fbridge%3Dhttps%253A%252F%252Fx.bridge.walletconnect.org%26key%3D4c8f4a6f2c93cc597137ff6a30721757eeb1931112806a53a33e14d0a16f2a62
           // tested in iOS and Android, both works
           final trustWalletUri = Uri.https('link.trustwallet.com', 'wc', {'uri': uri});
           print('[debug] trustWalletUri: $trustWalletUri');

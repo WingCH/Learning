@@ -7,8 +7,45 @@
 
 import RxDataSources
 import RxSwift
+import Then
 import TinyConstraints
 import UIKit
+
+class CutomCell: UITableViewCell {
+    let myView: UIView = .init()
+    var sizeConstraints: Constraints?
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.contentView.do {
+            $0.addSubview(myView)
+        }
+
+        myView.do {
+            $0.edgesToSuperview()
+        }
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func configure(size: CGFloat) {
+        sizeConstraints?.deActivate()
+        sizeConstraints = nil
+        // 100 實際會變左 100.33 why???, 所以要加equalOrGreater
+        sizeConstraints = [myView.height(size * 25, relation: .equalOrGreater)]
+        myView.backgroundColor = randomColor()
+    }
+
+    func randomColor() -> UIColor {
+        let red = CGFloat(arc4random_uniform(256)) / 255.0
+        let green = CGFloat(arc4random_uniform(256)) / 255.0
+        let blue = CGFloat(arc4random_uniform(256)) / 255.0
+
+        return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
+    }
+}
 
 struct MySection {
     var header: String
@@ -40,17 +77,13 @@ class ViewController: UIViewController {
 
         tableView.edgesToSuperview()
 
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.register(CutomCell.self, forCellReuseIdentifier: String(describing: CutomCell.self))
         dataSource = ViewController.dataSource()
         let sections = [
-            MySection(header: "First section", items: [
-                1,
-                2
-            ]),
-            MySection(header: "Second section", items: [
-                3,
-                4
-            ])
+            MySection(
+                header: "First section",
+                items: Array(0 ... 5)
+            )
         ]
         Observable.just(sections)
             .bind(to: tableView.rx.items(dataSource: dataSource!))
@@ -62,9 +95,10 @@ extension ViewController {
     static func dataSource() -> RxTableViewSectionedAnimatedDataSource<MySection> {
         return RxTableViewSectionedAnimatedDataSource<MySection>(
             configureCell: { _, table, _, item in
-                let cell = table.dequeueReusableCell(withIdentifier: "Cell") ?? UITableViewCell(style: .default, reuseIdentifier: "Cell")
-                cell.textLabel?.text = "Item \(item)"
-
+                guard let cell = table.dequeueReusableCell(withIdentifier: String(describing: CutomCell.self)) as? CutomCell else {
+                    return UITableViewCell()
+                }
+                cell.configure(size: CGFloat(item))
                 return cell
             },
             titleForHeaderInSection: { dataSource, index in
@@ -76,14 +110,6 @@ extension ViewController {
 
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        // you can also fetch item
-        guard let item = dataSource?[indexPath],
-              // .. or section and customize what you like
-              dataSource?[indexPath.section] != nil
-        else {
-            return 0.0
-        }
-
-        return CGFloat(40 + item * 10)
+        return UITableView.automaticDimension
     }
 }

@@ -16,6 +16,7 @@
 		0ED8C15729AE4435004ED4FF /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 0ED8C15629AE4435004ED4FF /* Differentiator */; };
 		0ED8C15929AE4435004ED4FF /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 0ED8C15829AE4435004ED4FF /* RxDataSources */; };
 		0ED8C15C29AE444D004ED4FF /* TinyConstraints in Frameworks */ = {isa = PBXBuildFile; productRef = 0ED8C15B29AE444D004ED4FF /* TinyConstraints */; };
+		0ED8C15F29AE4B7F004ED4FF /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 0ED8C15E29AE4B7F004ED4FF /* Then */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 				0ED8C15729AE4435004ED4FF /* Differentiator in Frameworks */,
 				0ED8C15929AE4435004ED4FF /* RxDataSources in Frameworks */,
 				0ED8C15C29AE444D004ED4FF /* TinyConstraints in Frameworks */,
+				0ED8C15F29AE4B7F004ED4FF /* Then in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +95,7 @@
 				0ED8C15629AE4435004ED4FF /* Differentiator */,
 				0ED8C15829AE4435004ED4FF /* RxDataSources */,
 				0ED8C15B29AE444D004ED4FF /* TinyConstraints */,
+				0ED8C15E29AE4B7F004ED4FF /* Then */,
 			);
 			productName = "dynamic-height-RxDataSources";
 			productReference = 0ED8C13E29AE4370004ED4FF /* dynamic-height-RxDataSources.app */;
@@ -125,6 +128,7 @@
 			packageReferences = (
 				0ED8C15529AE4435004ED4FF /* XCRemoteSwiftPackageReference "RxDataSources" */,
 				0ED8C15A29AE444D004ED4FF /* XCRemoteSwiftPackageReference "TinyConstraints" */,
+				0ED8C15D29AE4B7F004ED4FF /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			productRefGroup = 0ED8C13F29AE4370004ED4FF /* Products */;
 			projectDirPath = "";
@@ -389,6 +393,14 @@
 				minimumVersion = 4.0.0;
 			};
 		};
+		0ED8C15D29AE4B7F004ED4FF /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -406,6 +418,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0ED8C15A29AE444D004ED4FF /* XCRemoteSwiftPackageReference "TinyConstraints" */;
 			productName = TinyConstraints;
+		};
+		0ED8C15E29AE4B7F004ED4FF /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0ED8C15D29AE4B7F004ED4FF /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

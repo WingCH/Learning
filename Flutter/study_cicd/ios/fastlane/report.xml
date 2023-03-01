@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+    
+    
+    
+      
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000321">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: pod repo update" time="2.709401">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: number_of_commits" time="0.021282">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: flutter packages get" time="0.657342">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: flutter clean" time="5.74739">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="5: flutter build ios -t lib/main_staging.dart --flavor\=Staging --no-codesign --build-number\=" time="24.642508">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>

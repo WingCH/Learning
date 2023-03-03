@@ -13,6 +13,8 @@ class ProgressBar: UIView {
     var progressColor: UIColor = .red
     private let progressLayer = CALayer()
     private let backgroundMask = CAShapeLayer()
+    private let innerShadow = CALayer()
+
     var progress: CGFloat = 0.0 {
         didSet {
             // trigger `draw`
@@ -23,11 +25,13 @@ class ProgressBar: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.addSublayer(progressLayer)
+        layer.addSublayer(innerShadow)
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         layer.addSublayer(progressLayer)
+        layer.addSublayer(innerShadow)
     }
 
     override func draw(_ rect: CGRect) {
@@ -36,6 +40,21 @@ class ProgressBar: UIView {
             cornerRadius: rect.height * 0.25
         ).cgPath
         layer.mask = backgroundMask
+
+        // https://stackoverflow.com/a/47791243/5588637
+        innerShadow.frame = rect
+        let cornerRadius = rect.height * 0.25
+        let path = UIBezierPath(roundedRect: innerShadow.bounds.offsetBy(dx: -1, dy: 1).insetBy(dx: 1, dy: 1), cornerRadius: cornerRadius)
+        let cutout = UIBezierPath(roundedRect: innerShadow.bounds, cornerRadius: cornerRadius).reversing()
+
+        path.append(cutout)
+        innerShadow.shadowPath = path.cgPath
+        innerShadow.masksToBounds = true
+        innerShadow.shadowColor = UIColor.yellow.cgColor
+        innerShadow.shadowOffset = CGSize(width: -1, height: 0)
+        innerShadow.shadowOpacity = 1
+        innerShadow.shadowRadius = 1
+        innerShadow.cornerRadius = cornerRadius
 
         let progressRect = CGRect(
             origin: .zero,

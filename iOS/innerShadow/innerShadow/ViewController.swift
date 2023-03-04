@@ -15,24 +15,34 @@ class ViewController: UIViewController {
         let topPadding: CGFloat = 100
 
         let rect = CGRect(x: 50, y: 100, width: 200, height: 100)
-        let layer = CALayer()
-        layer.frame = rect
-        layer.backgroundColor = UIColor.white.cgColor
-        view.layer.addSublayer(layer)
-
-        let innerShadowPath = UIBezierPath(
-            roundedRect: rect.offsetBy(dx: -10, dy: 10).insetBy(dx: 10, dy: 10),
-            cornerRadius: 0
-        )
-        let cutout = UIBezierPath(roundedRect: rect, cornerRadius: 0).reversing()
-        innerShadowPath.append(cutout)
+        
+        let layer1 = CALayer()
+        layer1.frame = rect
+        layer1.backgroundColor = UIColor.white.cgColor
+        view.layer.addSublayer(layer1)
+        
+        let layer2 = CALayer()
+        layer2.frame = rect.offsetBy(dx: -5, dy: 5).insetBy(dx: 5, dy: 5)
+        layer2.backgroundColor = UIColor.white.cgColor
+        view.layer.addSublayer(layer2)
+        
+        
+        let layer2Path = UIBezierPath(rect: layer2.frame)
+        let layer1Path = UIBezierPath(rect: layer1.frame).reversing()
+        layer2Path.append(layer1Path)
+        
+        
+//        let shapeLayer = CAShapeLayer()
+//        shapeLayer.path = layer2Path.cgPath
+//        shapeLayer.fillColor = UIColor.yellow.cgColor
+//        view.layer.addSublayer(shapeLayer)
+        
         let innerShadowLayer = CALayer()
-        innerShadowLayer.shadowPath = innerShadowPath.cgPath
+        innerShadowLayer.shadowPath = layer2Path.cgPath
         innerShadowLayer.shadowColor = UIColor.yellow.cgColor
         innerShadowLayer.shadowOffset = CGSize(width: -1, height: 0)
         innerShadowLayer.shadowOpacity = 0.5
-        innerShadowLayer.shadowRadius = 1
-
+        innerShadowLayer.shadowRadius = 10
         view.layer.addSublayer(innerShadowLayer)
     }
 }

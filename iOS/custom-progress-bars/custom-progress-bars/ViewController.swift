@@ -50,11 +50,13 @@ class ProgressBar: UIView {
         path.append(cutout)
         innerShadow.shadowPath = path.cgPath
         innerShadow.masksToBounds = true
-        innerShadow.shadowColor = UIColor.yellow.cgColor
+        innerShadow.shadowColor = UIColor.black.cgColor
         innerShadow.shadowOffset = CGSize(width: -1, height: 0)
         innerShadow.shadowOpacity = 1
         innerShadow.shadowRadius = 1
         innerShadow.cornerRadius = cornerRadius
+        
+        innerShadow.backgroundColor = UIColor.blue.cgColor
 
         let progressRect = CGRect(
             origin: .zero,

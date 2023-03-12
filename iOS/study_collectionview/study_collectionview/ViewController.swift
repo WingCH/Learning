@@ -33,6 +33,11 @@ class CustomCell: UICollectionViewCell {
 
         return size
     }
+    
+    override func draw(_ rect: CGRect) {
+        print(#function)
+        super.draw(rect)
+    }
 
     let myView: UIView = .init()
     var sizeConstraints: Constraints?

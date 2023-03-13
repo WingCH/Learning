@@ -25,7 +25,7 @@ class ViewController: UIViewController {
 
     let labelC: UILabel = {
         let label: UILabel = .init()
-        label.lineBreakMode = .byWordWrapping
+        label.lineBreakMode = .byCharWrapping
         label.numberOfLines = 0
         return label
     }()
@@ -52,12 +52,12 @@ class ViewController: UIViewController {
         labelB.topToBottom(of: labelA)
         labelB.leftToSuperview()
         labelB.rightToSuperview()
-        labelB.attributedText = createAttrString(key: "product", value: "macbook pro m2")
+        labelB.attributedText = createAttrString(key: "product", value: "macbook pro mm2")
 
         labelC.topToBottom(of: labelB)
         labelC.leftToSuperview()
         labelC.rightToSuperview()
-        labelC.attributedText = createAttrString(key: "product", value: "macbook pro m2 pro")
+        labelC.attributedText = createAttrString(key: "product", value: "macbook pro mmm2 pro")
     }
 
     private func createAttrString(key: String, value: String) -> NSAttributedString {
@@ -68,7 +68,7 @@ class ViewController: UIViewController {
             ])
         )
 
-        let v: String = value
+        let v: String = value.replacingOccurrences(of: " ", with: "\u{00A0}")
         attrStr.append(
             NSAttributedString(string: v, attributes: [
                 .font: UIFont.systemFont(ofSize: 12),

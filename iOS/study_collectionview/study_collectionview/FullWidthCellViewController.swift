@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  FullWidthCellViewController.swift
 //  study_collectionview
 //
 //  Created by Wing on 10/3/2023.
@@ -75,7 +75,7 @@ class CustomCell: UICollectionViewCell {
     }
 }
 
-class ViewController: UIViewController {
+class FullWidthCellViewController: UIViewController {
     private let collectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -120,7 +120,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: UICollectionViewDataSource {
+extension FullWidthCellViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         dataArray.count
     }
@@ -132,7 +132,7 @@ extension ViewController: UICollectionViewDataSource {
     }
 }
 
-extension ViewController: UICollectionViewDelegate {
+extension FullWidthCellViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("didSelectItemAt: \(indexPath)")
     }

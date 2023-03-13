@@ -10,7 +10,7 @@ import Then
 import TinyConstraints
 import UIKit
 
-class CustomCell: UICollectionViewCell {
+private class CustomCell: UICollectionViewCell {
     override func systemLayoutSizeFitting(
         _ targetSize: CGSize,
         withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
@@ -24,7 +24,7 @@ class CustomCell: UICollectionViewCell {
          */
         var targetSize = targetSize
         targetSize.height = CGFloat.greatestFiniteMagnitude
-        
+
         let size = super.systemLayoutSizeFitting(
             targetSize,
             withHorizontalFittingPriority: .required,
@@ -33,7 +33,7 @@ class CustomCell: UICollectionViewCell {
 
         return size
     }
-    
+
     override func draw(_ rect: CGRect) {
         print(#function)
         super.draw(rect)

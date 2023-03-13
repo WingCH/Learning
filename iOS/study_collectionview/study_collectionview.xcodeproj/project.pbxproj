@@ -15,6 +15,8 @@
 		0E62C8B629BB6D4800527916 /* TinyConstraints in Frameworks */ = {isa = PBXBuildFile; productRef = 0E62C8B529BB6D4800527916 /* TinyConstraints */; };
 		0E62C8B929BB6D6100527916 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 0E62C8B829BB6D6100527916 /* Then */; };
 		0ED293E229BF5E2E001CC85B /* Animation1ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED293E129BF5E2E001CC85B /* Animation1ViewController.swift */; };
+		0ED293E529BF6EA3001CC85B /* Animation1ViewController + FlowLayout1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED293E429BF6EA3001CC85B /* Animation1ViewController + FlowLayout1.swift */; };
+		0ED293E729BF6EE3001CC85B /* Animation1ViewController + FlowLayout2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED293E629BF6EE3001CC85B /* Animation1ViewController + FlowLayout2.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		0E62C8AB29BB62BC00527916 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0E62C8AD29BB62BC00527916 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0ED293E129BF5E2E001CC85B /* Animation1ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation1ViewController.swift; sourceTree = "<group>"; };
+		0ED293E429BF6EA3001CC85B /* Animation1ViewController + FlowLayout1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Animation1ViewController + FlowLayout1.swift"; sourceTree = "<group>"; };
+		0ED293E629BF6EE3001CC85B /* Animation1ViewController + FlowLayout2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Animation1ViewController + FlowLayout2.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,15 +64,25 @@
 		0E62C89E29BB62BB00527916 /* study_collectionview */ = {
 			isa = PBXGroup;
 			children = (
+				0ED293E329BF6E56001CC85B /* Animation1 */,
 				0E62C89F29BB62BB00527916 /* AppDelegate.swift */,
 				0E62C8A129BB62BB00527916 /* SceneDelegate.swift */,
 				0E62C8A329BB62BB00527916 /* FullWidthCellViewController.swift */,
-				0ED293E129BF5E2E001CC85B /* Animation1ViewController.swift */,
 				0E62C8A829BB62BC00527916 /* Assets.xcassets */,
 				0E62C8AA29BB62BC00527916 /* LaunchScreen.storyboard */,
 				0E62C8AD29BB62BC00527916 /* Info.plist */,
 			);
 			path = study_collectionview;
+			sourceTree = "<group>";
+		};
+		0ED293E329BF6E56001CC85B /* Animation1 */ = {
+			isa = PBXGroup;
+			children = (
+				0ED293E129BF5E2E001CC85B /* Animation1ViewController.swift */,
+				0ED293E429BF6EA3001CC85B /* Animation1ViewController + FlowLayout1.swift */,
+				0ED293E629BF6EE3001CC85B /* Animation1ViewController + FlowLayout2.swift */,
+			);
+			path = Animation1;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -151,7 +165,9 @@
 			files = (
 				0E62C8A429BB62BB00527916 /* FullWidthCellViewController.swift in Sources */,
 				0ED293E229BF5E2E001CC85B /* Animation1ViewController.swift in Sources */,
+				0ED293E529BF6EA3001CC85B /* Animation1ViewController + FlowLayout1.swift in Sources */,
 				0E62C8A029BB62BB00527916 /* AppDelegate.swift in Sources */,
+				0ED293E729BF6EE3001CC85B /* Animation1ViewController + FlowLayout2.swift in Sources */,
 				0E62C8A229BB62BB00527916 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

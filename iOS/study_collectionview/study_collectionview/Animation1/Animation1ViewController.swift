@@ -25,6 +25,7 @@ class Animation1ViewController: UIViewController {
         collectionView.do {
             $0.edgesToSuperview()
             $0.register(CustomCell.self, forCellWithReuseIdentifier: String(describing: CustomCell.self))
+            $0.register(SupplementaryView.self, forSupplementaryViewOfKind: LandingCarListViewLayout.supplementaryViewKindCarInfo, withReuseIdentifier: String(describing: SupplementaryView.self))
             $0.dataSource = self
         }
     }
@@ -39,17 +40,33 @@ extension Animation1ViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: CustomCell.self), for: indexPath) as! CustomCell
         return cell
     }
+
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: String(describing: SupplementaryView.self), for: indexPath)
+        return view
+    }
 }
 
 private class CustomCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
-
         contentView.backgroundColor = .green
     }
 
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+private class SupplementaryView: UICollectionReusableView {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .red
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }

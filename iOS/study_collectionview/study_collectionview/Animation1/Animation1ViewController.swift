@@ -43,6 +43,11 @@ extension Animation1ViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: String(describing: SupplementaryView.self), for: indexPath)
+        // random color
+        let red = CGFloat(arc4random_uniform(256)) / 255.0
+        let green = CGFloat(arc4random_uniform(256)) / 255.0
+        let blue = CGFloat(arc4random_uniform(256)) / 255.0
+        view.backgroundColor = UIColor(red: red, green: green, blue: blue, alpha: 1.0)
         return view
     }
 }
@@ -62,7 +67,6 @@ private class CustomCell: UICollectionViewCell {
 private class SupplementaryView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .red
     }
 
     @available(*, unavailable)

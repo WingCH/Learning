@@ -51,9 +51,8 @@ extension Animation1ViewController {
                 
                 // For info view
                 let infoViewAttr = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: Self.supplementaryViewKindCarInfo, with: IndexPath(item: i, section: 0))
-                infoViewAttr.frame = CGRect(origin: CGPoint(x: offsetX, y: infoViewYOffset), size: CGSize(width: cv.frame.width, height: infoViewHeight))
-                infoViewAttr.alpha = 1 - min(abs(currentPage - CGFloat(i)) * 2, 1)
-                infoViewAttr.isHidden = (infoViewAttr.alpha == 0)
+                let infoViewXOffset: CGFloat = CGFloat(i) * cv.frame.width
+                infoViewAttr.frame = CGRect(origin: CGPoint(x: infoViewXOffset, y: infoViewYOffset), size: CGSize(width: cv.frame.width, height: infoViewHeight))
                 carInfoAttributes.append(infoViewAttr)
             }
         }

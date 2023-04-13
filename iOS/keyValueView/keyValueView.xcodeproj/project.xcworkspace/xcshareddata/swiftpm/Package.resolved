@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "then",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/devxoul/Then",
+      "state" : {
+        "revision" : "d41ef523faef0f911369f79c0b96815d9dbb6d7a",
+        "version" : "3.0.0"
+      }
+    },
+    {
+      "identity" : "tinyconstraints",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/roberthein/TinyConstraints",
+      "state" : {
+        "revision" : "3262e5c591d4ab6272255df2087a01bbebd138dc",
+        "version" : "4.0.2"
+      }
+    }
+  ],
+  "version" : 2
+}

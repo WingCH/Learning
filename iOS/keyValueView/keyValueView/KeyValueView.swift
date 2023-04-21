@@ -67,7 +67,11 @@ public class KeyValueView: UIView {
         // Set the frame of valueLabel
         if remainingWidth >= valueLabelSizeInLine.width, !isKeyLabelMoreThanOneLine {
             let newSize = valueLabel.sizeThatFits(.init(width: remainingWidth, height: 0))
-            valueLabel.frame = CGRect(x: keyLabel.frame.width, y: 0, width: newSize.width, height: newSize.height)
+            // Calculate the centerY position for vertically centering the labels
+            let centerY = (keyLabel.frame.height > newSize.height) ? keyLabel.frame.height / 2 : newSize.height / 2
+            // Update the frames with centerY calculated
+            keyLabel.frame.origin.y = centerY - keyLabel.frame.height / 2
+            valueLabel.frame = CGRect(x: keyLabel.frame.width, y: centerY - newSize.height / 2, width: newSize.width, height: newSize.height)
         } else {
             let valueLabelSizeInMultiline = valueLabel.sizeThatFits(.init(width: preferredMaxLayoutWidth, height: 0))
             valueLabel.frame = CGRect(x: 0, y: keyLabel.frame.height, width: valueLabelSizeInMultiline.width, height: valueLabelSizeInMultiline.height)
@@ -79,14 +83,15 @@ public class KeyValueView: UIView {
     
     override public var intrinsicContentSize: CGSize {
         // Calculate the intrinsic content size based on the preferred maximum layout width
-        // and the height up to the maximum y-coordinate of the valueLabel frame
-        let size = CGSize(width: preferredMaxLayoutWidth, height: valueLabel.frame.maxY)
+        // and the height up to the maximum y-coordinate of the valueLabel or keyLabel frame
+        let size = CGSize(width: preferredMaxLayoutWidth, height: max(keyLabel.frame.maxY, valueLabel.frame.maxY))
         return size
     }
     
     public func config(key: String, value: String) {
         print(#function)
         keyLabel.text = key
+        valueLabel.font = valueLabel.font.withSize(30)
         valueLabel.text = value
         
         // trigger `layoutSubviews`

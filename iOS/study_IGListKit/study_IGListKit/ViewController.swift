@@ -96,7 +96,6 @@ class CustomSectionController: ListSectionController {
         }
         let cell = CustomCell()
         cell.bindViewModel(viewModel)
-        cell.layoutIfNeeded()
         let size = cell.contentView.systemLayoutSizeFitting(
             CGSize(width: context.containerSize.width, height: .greatestFiniteMagnitude),
             withHorizontalFittingPriority: .required,

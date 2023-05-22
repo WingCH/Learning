@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E2682A62A1B9F2000074C6E /* WalletAnimationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2682A52A1B9F2000074C6E /* WalletAnimationViewController.swift */; };
+		0E2682A82A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2682A72A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift */; };
 		0E62C8A029BB62BB00527916 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E62C89F29BB62BB00527916 /* AppDelegate.swift */; };
 		0E62C8A229BB62BB00527916 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E62C8A129BB62BB00527916 /* SceneDelegate.swift */; };
 		0E62C8A429BB62BB00527916 /* FullWidthCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E62C8A329BB62BB00527916 /* FullWidthCellViewController.swift */; };
@@ -20,6 +22,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E2682A52A1B9F2000074C6E /* WalletAnimationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletAnimationViewController.swift; sourceTree = "<group>"; };
+		0E2682A72A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletAnimationViewController + FlowLayout.swift"; sourceTree = "<group>"; };
 		0E62C89C29BB62BB00527916 /* study_collectionview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = study_collectionview.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E62C89F29BB62BB00527916 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0E62C8A129BB62BB00527916 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -45,6 +49,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E2682A42A1B99C000074C6E /* WalletAnimation */ = {
+			isa = PBXGroup;
+			children = (
+				0E2682A52A1B9F2000074C6E /* WalletAnimationViewController.swift */,
+				0E2682A72A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift */,
+			);
+			path = WalletAnimation;
+			sourceTree = "<group>";
+		};
 		0E62C89329BB62BB00527916 = {
 			isa = PBXGroup;
 			children = (
@@ -64,6 +77,7 @@
 		0E62C89E29BB62BB00527916 /* study_collectionview */ = {
 			isa = PBXGroup;
 			children = (
+				0E2682A42A1B99C000074C6E /* WalletAnimation */,
 				0ED293E329BF6E56001CC85B /* Animation1 */,
 				0E62C89F29BB62BB00527916 /* AppDelegate.swift */,
 				0E62C8A129BB62BB00527916 /* SceneDelegate.swift */,
@@ -164,8 +178,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				0E62C8A429BB62BB00527916 /* FullWidthCellViewController.swift in Sources */,
+				0E2682A62A1B9F2000074C6E /* WalletAnimationViewController.swift in Sources */,
 				0ED293E229BF5E2E001CC85B /* Animation1ViewController.swift in Sources */,
 				0ED293E529BF6EA3001CC85B /* Animation1ViewController + FlowLayout1.swift in Sources */,
+				0E2682A82A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift in Sources */,
 				0E62C8A029BB62BB00527916 /* AppDelegate.swift in Sources */,
 				0ED293E729BF6EE3001CC85B /* Animation1ViewController + FlowLayout2.swift in Sources */,
 				0E62C8A229BB62BB00527916 /* SceneDelegate.swift in Sources */,

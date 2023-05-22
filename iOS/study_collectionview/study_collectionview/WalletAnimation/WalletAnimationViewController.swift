@@ -48,8 +48,7 @@ extension WalletAnimationViewController: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: CustomCell.self), for: indexPath) as! CustomCell
-        cell.backgroundColor = modelArray[indexPath.row].color
-
+        cell.contentView.backgroundColor = modelArray[indexPath.row].color
         return cell
     }
 }
@@ -57,6 +56,9 @@ extension WalletAnimationViewController: UICollectionViewDataSource {
 private class CustomCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
+        contentView.layer.cornerRadius = 20
+        contentView.layer.masksToBounds = true
+        backgroundColor = .clear
     }
 
     @available(*, unavailable)

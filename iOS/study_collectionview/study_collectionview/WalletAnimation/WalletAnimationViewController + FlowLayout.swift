@@ -25,8 +25,8 @@ extension WalletAnimationViewController {
 
             var _itemAttributes: [UICollectionViewLayoutAttributes] = []
 
-            // The size and location of each item
             for item in 0 ..< numberOfItems {
+                // The size and location of each item
                 let indexPath = IndexPath(item: item, section: 0)
                 let itemSizeWidth = collectionViewWidth - horizontalPadding * 2
                 let itemSizeHeight = itemSizeWidth / CGFloat(itemRatio)
@@ -35,17 +35,23 @@ extension WalletAnimationViewController {
                 let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
                 attributes.frame = frame
 
-                _itemAttributes.append(attributes)
+                // Overlap for each item
+                let offsetY = attributes.frame.height * overlapRatio * CGFloat(attributes.indexPath.row)
+                attributes.frame.origin.y += offsetY
+                // Set the z-index of the item to its row number, so items in higher rows appear on top of items in lower rows
+                attributes.zIndex = attributes.indexPath.row
+
+                // bounce effect
+                let stretchMultiplier: CGFloat = (1 + (CGFloat(item + 1) * -0.2))
+                let contentOffsetTop = collectionView.contentOffset.y + collectionView.adjustedContentInset.top
+                attributes.frame.origin.y = attributes.frame.origin.y + CGFloat(contentOffsetTop * stretchMultiplier)
+
+                //
+                
                 yOffset += itemSizeHeight
+                _itemAttributes.append(attributes)
             }
 
-            // Overlap for each item
-            _itemAttributes.forEach { attribute in
-                let offsetY = attribute.frame.height * overlapRatio * CGFloat(attribute.indexPath.row)
-                attribute.frame.origin.y += offsetY
-                // Set the z-index of the item to its row number, so items in higher rows appear on top of items in lower rows
-                attribute.zIndex = attribute.indexPath.row
-            }
             itemAttributes = _itemAttributes
         }
 
@@ -55,6 +61,10 @@ extension WalletAnimationViewController {
 
         override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
             return itemAttributes[indexPath.item]
+        }
+        
+        override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+            return true
         }
 
         override var collectionViewContentSize: CGSize {

@@ -8,22 +8,82 @@
 import UIKit
 
 extension WalletAnimationViewController {
+    open class CardsLayoutAttributes: UICollectionViewLayoutAttributes {
+        /// Specifies if the CardCell is revealed.
+        public var isRevealed = false
+
+        override open func copy(with zone: NSZone? = nil) -> Any {
+            let copy = super.copy(with: zone) as! CardsLayoutAttributes
+            copy.isRevealed = isRevealed
+            return copy
+        }
+    }
+
     class CardsLayout: UICollectionViewLayout {
         let itemRatio: Double = 335 / 209
         let horizontalPadding: Double = 20.0
-        private var itemAttributes: [UICollectionViewLayoutAttributes] = []
+        private var itemAttributes: [CardsLayoutAttributes] = []
         private let overlapRatio: CGFloat = -(96 / 209)
 
-        override func prepare() {
-            guard let collectionView = collectionView else { return }
+        private var revealedIndex: Int?
 
+        func revealCardAt(index: Int) {
+            if revealedIndex == index {
+                revealedIndex = nil
+            } else {
+                revealedIndex = index
+            }
+            self.collectionView?.performBatchUpdates({ self.collectionView?.reloadData() })
+        }
+
+        override func prepare() {
+            if let revealedIndex = revealedIndex {
+                // revealed card
+                generateRevealedCardAttribute(revealedIndex: revealedIndex)
+            } else {
+                // no any card revealed
+                generateNonRevealedCardsAttribute()
+            }
+        }
+
+        private func generateRevealedCardAttribute(revealedIndex: Int) {
+            guard let collectionView = collectionView else { return }
+            let collectionViewWidth = collectionView.bounds.width
+
+            let revealedItemAttribute = itemAttributes[revealedIndex]
+            let itemAttributesWithoutRevealed = itemAttributes.filter { $0 != revealedItemAttribute }
+
+            let itemSizeWidth = collectionViewWidth - horizontalPadding * 2
+            let itemSizeHeight = itemSizeWidth / CGFloat(itemRatio)
+            let frame = CGRect(x: horizontalPadding, y: 0, width: itemSizeWidth, height: itemSizeHeight)
+
+            revealedItemAttribute.isRevealed = true
+            revealedItemAttribute.frame = frame
+
+            // print revealedItemAttribute
+            print("revealedItemAttribute: \(revealedItemAttribute)")
+
+            // loop itemAttributesWithoutRevealed
+            itemAttributesWithoutRevealed.enumerated().forEach { index, itemAttribute in
+                itemAttribute.isRevealed = false
+                if index == 0 {
+                    itemAttribute.frame.origin.y = revealedItemAttribute.frame.maxY + 48
+                } else {
+                    let previousItemAttribute = itemAttributesWithoutRevealed[index - 1]
+                    itemAttribute.frame.origin.y = previousItemAttribute.frame.maxY + previousItemAttribute.frame.height * overlapRatio
+                }
+            }
+        }
+
+        private func generateNonRevealedCardsAttribute() {
+            guard let collectionView = collectionView else { return }
             itemAttributes = []
             let numberOfItems = collectionView.numberOfItems(inSection: 0)
             let collectionViewWidth = collectionView.bounds.width
 
             var yOffset: CGFloat = 0
 
-            var _itemAttributes: [UICollectionViewLayoutAttributes] = []
+            var _itemAttributes: [CardsLayoutAttributes] = []
 
             for item in 0 ..< numberOfItems {
                 // The size and location of each item
@@ -32,7 +92,7 @@ extension WalletAnimationViewController {
                 let itemSizeHeight = itemSizeWidth / CGFloat(itemRatio)
                 let frame = CGRect(x: horizontalPadding, y: yOffset, width: itemSizeWidth, height: itemSizeHeight)
 
-                let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+                let attributes = CardsLayoutAttributes(forCellWith: indexPath)
                 attributes.frame = frame
 
                 // Overlap for each item
@@ -42,12 +102,12 @@ extension WalletAnimationViewController {
                 attributes.zIndex = attributes.indexPath.row
 
                 // bounce effect
-                let stretchMultiplier: CGFloat = (1 + (CGFloat(item + 1) * -0.2))
-                let contentOffsetTop = collectionView.contentOffset.y + collectionView.adjustedContentInset.top
-                attributes.frame.origin.y = attributes.frame.origin.y + CGFloat(contentOffsetTop * stretchMultiplier)
+//                let stretchMultiplier: CGFloat = (1 + (CGFloat(item + 1) * -0.2))
+//                let contentOffsetTop = collectionView.contentOffset.y + collectionView.adjustedContentInset.top
+//                attributes.frame.origin.y = attributes.frame.origin.y + CGFloat(contentOffsetTop * stretchMultiplier)
 
                 //
-                
+
                 yOffset += itemSizeHeight
                 _itemAttributes.append(attributes)
             }
@@ -62,7 +122,7 @@ extension WalletAnimationViewController {
         override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
             return itemAttributes[indexPath.item]
         }
-        
+
         override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
             return true
         }

@@ -37,6 +37,7 @@ class WalletAnimationViewController: UIViewController {
             $0.edgesToSuperview()
             $0.register(CustomCell.self, forCellWithReuseIdentifier: String(describing: CustomCell.self))
             $0.dataSource = self
+            $0.delegate = self
         }
     }
 }
@@ -50,6 +51,12 @@ extension WalletAnimationViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: CustomCell.self), for: indexPath) as! CustomCell
         cell.contentView.backgroundColor = modelArray[indexPath.row].color
         return cell
+    }
+}
+
+extension WalletAnimationViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionViewLayout.revealCardAt(index: indexPath.item)
     }
 }
 

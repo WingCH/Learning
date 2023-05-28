@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E1C97562A221E240085C37C /* SimpleListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1C97552A221E240085C37C /* SimpleListViewController.swift */; };
 		0E2682A62A1B9F2000074C6E /* WalletAnimationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2682A52A1B9F2000074C6E /* WalletAnimationViewController.swift */; };
 		0E2682A82A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2682A72A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift */; };
 		0E62C8A029BB62BB00527916 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E62C89F29BB62BB00527916 /* AppDelegate.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E1C97552A221E240085C37C /* SimpleListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleListViewController.swift; sourceTree = "<group>"; };
 		0E2682A52A1B9F2000074C6E /* WalletAnimationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletAnimationViewController.swift; sourceTree = "<group>"; };
 		0E2682A72A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WalletAnimationViewController + FlowLayout.swift"; sourceTree = "<group>"; };
 		0E62C89C29BB62BB00527916 /* study_collectionview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = study_collectionview.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,6 +87,7 @@
 				0E62C8A829BB62BC00527916 /* Assets.xcassets */,
 				0E62C8AA29BB62BC00527916 /* LaunchScreen.storyboard */,
 				0E62C8AD29BB62BC00527916 /* Info.plist */,
+				0E1C97552A221E240085C37C /* SimpleListViewController.swift */,
 			);
 			path = study_collectionview;
 			sourceTree = "<group>";
@@ -179,6 +182,7 @@
 			files = (
 				0E62C8A429BB62BB00527916 /* FullWidthCellViewController.swift in Sources */,
 				0E2682A62A1B9F2000074C6E /* WalletAnimationViewController.swift in Sources */,
+				0E1C97562A221E240085C37C /* SimpleListViewController.swift in Sources */,
 				0ED293E229BF5E2E001CC85B /* Animation1ViewController.swift in Sources */,
 				0ED293E529BF6EA3001CC85B /* Animation1ViewController + FlowLayout1.swift in Sources */,
 				0E2682A82A1B9F8700074C6E /* WalletAnimationViewController + FlowLayout.swift in Sources */,

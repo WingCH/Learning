@@ -38,6 +38,8 @@ class WalletAnimationViewController: UIViewController {
             $0.register(CustomCell.self, forCellWithReuseIdentifier: String(describing: CustomCell.self))
             $0.dataSource = self
             $0.delegate = self
+            $0.contentInsetAdjustmentBehavior = .never
+            $0.alwaysBounceVertical = true
         }
     }
 }
@@ -54,9 +56,14 @@ extension WalletAnimationViewController: UICollectionViewDataSource {
     }
 }
 
-extension WalletAnimationViewController: UICollectionViewDelegate {
+extension WalletAnimationViewController: CardCollectionViewLayoutDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionViewLayout.revealCardAt(index: indexPath.item)
+    }
+    
+    func cardCollectionViewLayout(_ collectionView: UICollectionView, didRevealCardAtIndex index: Int) {
+        collectionView.setContentOffset(.init(x: 0, y: -collectionView.adjustedContentInset.top), animated: true)
+
     }
 }
 

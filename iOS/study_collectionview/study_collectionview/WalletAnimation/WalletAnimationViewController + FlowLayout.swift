@@ -7,6 +7,11 @@
 
 import UIKit
 
+/// Extended delegate.
+@objc public protocol CardCollectionViewLayoutDelegate: UICollectionViewDelegate {
+    @objc optional func cardCollectionViewLayout(_ collectionView: UICollectionView, didRevealCardAtIndex index: Int)
+}
+
 extension WalletAnimationViewController {
     open class CardsLayoutAttributes: UICollectionViewLayoutAttributes {
         /// Specifies if the CardCell is revealed.
@@ -28,12 +33,20 @@ extension WalletAnimationViewController {
         private var revealedIndex: Int?
 
         func revealCardAt(index: Int) {
+            let collectionViewLayoutDelegate = self.collectionView?.delegate as? CardCollectionViewLayoutDelegate
+
             if revealedIndex == index {
                 revealedIndex = nil
             } else {
                 revealedIndex = index
             }
-            self.collectionView?.performBatchUpdates({ self.collectionView?.reloadData() })
+
+            self.collectionView?.performBatchUpdates({ self.collectionView?.reloadData() }, completion: { [weak self] _ in
+                guard let collectionView = self?.collectionView else { return }
+                if let revealedIndex = self?.revealedIndex {
+                    collectionViewLayoutDelegate?.cardCollectionViewLayout?(collectionView, didRevealCardAtIndex: revealedIndex)
+                }
+            })
         }
 
         override func prepare() {
@@ -55,7 +68,7 @@ extension WalletAnimationViewController {
 
             let itemSizeWidth = collectionViewWidth - horizontalPadding * 2
             let itemSizeHeight = itemSizeWidth / CGFloat(itemRatio)
-            let frame = CGRect(x: horizontalPadding, y: 0, width: itemSizeWidth, height: itemSizeHeight)
+            let frame = CGRect(x: horizontalPadding, y: 48, width: itemSizeWidth, height: itemSizeHeight)
 
             revealedItemAttribute.isRevealed = true
             revealedItemAttribute.frame = frame
@@ -81,8 +94,7 @@ extension WalletAnimationViewController {
             let numberOfItems = collectionView.numberOfItems(inSection: 0)
             let collectionViewWidth = collectionView.bounds.width
 
-            var yOffset: CGFloat = 0
-
+            var yOffset: CGFloat = 48
             var _itemAttributes: [CardsLayoutAttributes] = []
 
             for item in 0 ..< numberOfItems {

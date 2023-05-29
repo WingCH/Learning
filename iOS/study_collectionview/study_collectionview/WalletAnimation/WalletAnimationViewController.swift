@@ -38,6 +38,8 @@ class WalletAnimationViewController: UIViewController {
             $0.register(CustomCell.self, forCellWithReuseIdentifier: String(describing: CustomCell.self))
             $0.dataSource = self
             $0.delegate = self
+            $0.contentInsetAdjustmentBehavior = .never
+            $0.alwaysBounceVertical = true
         }
     }
 }

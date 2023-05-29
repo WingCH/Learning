@@ -68,7 +68,7 @@ extension WalletAnimationViewController {
 
             let itemSizeWidth = collectionViewWidth - horizontalPadding * 2
             let itemSizeHeight = itemSizeWidth / CGFloat(itemRatio)
-            let frame = CGRect(x: horizontalPadding, y: 0, width: itemSizeWidth, height: itemSizeHeight)
+            let frame = CGRect(x: horizontalPadding, y: 48, width: itemSizeWidth, height: itemSizeHeight)
 
             revealedItemAttribute.isRevealed = true
             revealedItemAttribute.frame = frame
@@ -94,8 +94,7 @@ extension WalletAnimationViewController {
             let numberOfItems = collectionView.numberOfItems(inSection: 0)
             let collectionViewWidth = collectionView.bounds.width
 
-            var yOffset: CGFloat = 0
-
+            var yOffset: CGFloat = 48
             var _itemAttributes: [CardsLayoutAttributes] = []
 
             for item in 0 ..< numberOfItems {

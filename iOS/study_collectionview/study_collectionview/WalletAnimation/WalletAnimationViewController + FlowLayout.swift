@@ -7,6 +7,11 @@
 
 import UIKit
 
+/// Extended delegate.
+@objc public protocol CardCollectionViewLayoutDelegate: UICollectionViewDelegate {
+    @objc optional func cardCollectionViewLayout(_ collectionView: UICollectionView, didRevealCardAtIndex index: Int)
+}
+
 extension WalletAnimationViewController {
     open class CardsLayoutAttributes: UICollectionViewLayoutAttributes {
         /// Specifies if the CardCell is revealed.
@@ -28,12 +33,20 @@ extension WalletAnimationViewController {
         private var revealedIndex: Int?
 
         func revealCardAt(index: Int) {
+            let collectionViewLayoutDelegate = self.collectionView?.delegate as? CardCollectionViewLayoutDelegate
+
             if revealedIndex == index {
                 revealedIndex = nil
             } else {
                 revealedIndex = index
             }
-            self.collectionView?.performBatchUpdates({ self.collectionView?.reloadData() })
+
+            self.collectionView?.performBatchUpdates({ self.collectionView?.reloadData() }, completion: { [weak self] _ in
+                guard let collectionView = self?.collectionView else { return }
+                if let revealedIndex = self?.revealedIndex {
+                    collectionViewLayoutDelegate?.cardCollectionViewLayout?(collectionView, didRevealCardAtIndex: revealedIndex)
+                }
+            })
         }
 
         override func prepare() {

@@ -8,9 +8,21 @@
 import UIKit
 
 class ViewController: UIViewController {
+    let button = UIButton(type: .system)
+    
+    var onTapButton: (() -> Void)?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        view.backgroundColor = .red
+        
+        button.setTitle("Go to second view", for: .normal)
+        button.sizeToFit()
+        button.center = view.center
+        button.addTarget(self, action: #selector(onClickButton), for: .touchUpInside)
+        view.addSubview(button)
+    }
+    
+    @objc private func onClickButton() {
+        onTapButton?()
     }
 }

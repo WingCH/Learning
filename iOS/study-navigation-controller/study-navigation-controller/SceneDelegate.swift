@@ -17,8 +17,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = ViewController()
+
+        let navigationController = UINavigationController()
+        let vc1 = ViewController()
+        let vc2 = ViewController()
+
+        vc1.view.backgroundColor = .yellow
+        vc2.view.backgroundColor = .red
+
+        vc1.onTapButton = {
+            navigationController.pushViewController(vc2, animated: true)
+        }
+        vc2.onTapButton = {
+            navigationController.popViewController(animated: true)
+        }
+
+        navigationController.setViewControllers([vc1, vc2], animated: true)
+
+        window.rootViewController = navigationController
         self.window = window
+
         window.makeKeyAndVisible()
     }
 

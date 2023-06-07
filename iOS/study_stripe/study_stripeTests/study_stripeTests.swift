@@ -67,6 +67,9 @@ final class study_stripeTests: XCTestCase {
         let validCVC = "123"
         let invalidCVC = "9999"
         let incompleteCVC = "1"
+        
+        
+        let cvcMax = STPCardValidator.maxCVCLength(for: .visa)
 
         let validValidationResult = STPCardValidator.validationState(forCVC: validCVC, cardBrand: .visa)
         let invalidValidationResult = STPCardValidator.validationState(forCVC: invalidCVC, cardBrand: .visa)

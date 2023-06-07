@@ -20,9 +20,9 @@ final class study_stripeTests: XCTestCase {
     func testCardNumber() throws {
         let validCardNumber = "4242424242424242"
         let invalidCardNumber = "1111111111111111"
-        let incompleteCardNumber = "424242"
+        let incompleteCardNumber = "4"
 
-        let validCardBrand = STPCardValidator.brand(forNumber: validCardNumber)
+        let validCardBrand = STPCardValidator.brand(forNumber: incompleteCardNumber)
 
         let validValidationResult = STPCardValidator.validationState(forNumber: validCardNumber, validatingCardBrand: true)
         let invalidValidationResult = STPCardValidator.validationState(forNumber: invalidCardNumber, validatingCardBrand: true)

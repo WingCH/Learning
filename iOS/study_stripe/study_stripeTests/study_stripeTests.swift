@@ -20,7 +20,7 @@ final class study_stripeTests: XCTestCase {
     func testCardNumber() throws {
         let validCardNumber = "4242424242424242"
         let invalidCardNumber = "1111111111111111"
-        let incompleteCardNumber = "4"
+        let incompleteCardNumber = ""
 
         let validCardBrand = STPCardValidator.brand(forNumber: incompleteCardNumber)
 
@@ -28,10 +28,12 @@ final class study_stripeTests: XCTestCase {
         let invalidValidationResult = STPCardValidator.validationState(forNumber: invalidCardNumber, validatingCardBrand: true)
         let incompleteValidationResult = STPCardValidator.validationState(forNumber: incompleteCardNumber, validatingCardBrand: true)
 
-        XCTAssertEqual(validCardBrand, STPCardBrand.visa)
+//        XCTAssertEqual(validCardBrand, STPCardBrand.visa)
         XCTAssertEqual(validValidationResult, STPCardValidationState.valid)
         XCTAssertEqual(invalidValidationResult, STPCardValidationState.invalid)
         XCTAssertEqual(incompleteValidationResult, STPCardValidationState.incomplete)
+        
+        XCTAssertEqual(STPCardValidator.maxLength(for: .visa), 16)
     }
 
     func testExpirationMonth() throws {

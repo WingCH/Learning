@@ -15,6 +15,19 @@ class ViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let text = "1234 "
+        
+        let range1 = NSRange(location: 1, length: 1)
+        if let range = Range(range1, in: text) {
+            // to string
+            print(range)
+            print(text[range])
+        }else {
+            print("error")
+        }
+       
+        
+        
         // 初始化文字輸入框
         textField = UITextField(frame: CGRect(x: 50, y: 100, width: 300, height: 40))
         textField.backgroundColor = .lightGray
@@ -31,6 +44,9 @@ class ViewController: UIViewController, UITextFieldDelegate {
         print("range: \(range)")
         print("replacementString: \(string)")
         print("------------")
+        if let newPosition = textField.position(from: textField.beginningOfDocument, offset: 1) {
+            textField.selectedTextRange = textField.textRange(from: newPosition, to: newPosition)
+        }
         return true
     }
 

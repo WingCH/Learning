@@ -1,16 +1,17 @@
 import Combine
 
-//let myPublisher = [1, 2, 3, 4, 5].publisher
+// let myPublisher = [1, 2, 3, 4, 5].publisher
 //
-//let mySubscriber = myPublisher
+// let mySubscriber = myPublisher
 //    .sink { print("Square of received value is \($0)") }
 //
-//let myPublisher2 = myPublisher
+// let myPublisher2 = myPublisher
 //    .map { $0 * $0 }
 //    .sink { print("Square2 of received value is \($0)") }
 //
 
 let subject = PassthroughSubject<Int, Never>()
+let cancellable = Set<AnyCancellable>()
 
 
 let subscription = subject.sink(
@@ -30,4 +31,3 @@ let subscription2 = subject.sink(
 
 // Send completion event
 subject.send(completion: .finished)
-

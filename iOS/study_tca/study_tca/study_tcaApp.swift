@@ -8,10 +8,26 @@
 import ComposableArchitecture
 import SwiftUI
 
+//@main
+//struct study_tcaApp: App {
+//    static let store = Store(initialState: CounterFeature.State()) {
+//        CounterFeature()
+//            ._printChanges()
+//    }
+//
+//    var body: some Scene {
+//        WindowGroup {
+//            CounterView(
+//                store: study_tcaApp.store
+//            )
+//        }
+//    }
+//}
+
 @main
 struct study_tcaApp: App {
-    static let store = Store(initialState: CounterFeature.State()) {
-        CounterFeature()
+    static let store = Store(initialState: ContactsFeature.State()) {
+        ContactsFeature()
             ._printChanges()
     }
 

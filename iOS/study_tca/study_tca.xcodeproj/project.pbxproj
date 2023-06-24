@@ -15,6 +15,7 @@
 		0E0D07972A446FFD008EF8FC /* study_tcaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0D07962A446FFD008EF8FC /* study_tcaUITests.swift */; };
 		0E0D07992A446FFD008EF8FC /* study_tcaUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0D07982A446FFD008EF8FC /* study_tcaUITestsLaunchTests.swift */; };
 		0E0D07A72A447010008EF8FC /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 0E0D07A62A447010008EF8FC /* ComposableArchitecture */; };
+		0ED701022A467F9B006760FB /* NumberFactClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED701012A467F9B006760FB /* NumberFactClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		0E0D07962A446FFD008EF8FC /* study_tcaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = study_tcaUITests.swift; sourceTree = "<group>"; };
 		0E0D07982A446FFD008EF8FC /* study_tcaUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = study_tcaUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		0E59D5382A447FF6009B347E /* study-tca-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "study-tca-Info.plist"; sourceTree = SOURCE_ROOT; };
+		0ED701012A467F9B006760FB /* NumberFactClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFactClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 				0E0D077D2A446FFC008EF8FC /* ContentView.swift */,
 				0E0D077F2A446FFC008EF8FC /* Assets.xcassets */,
 				0E0D07812A446FFC008EF8FC /* Preview Content */,
+				0ED701012A467F9B006760FB /* NumberFactClient.swift */,
 			);
 			path = study_tca;
 			sourceTree = "<group>";
@@ -267,6 +270,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0ED701022A467F9B006760FB /* NumberFactClient.swift in Sources */,
 				0E0D077E2A446FFC008EF8FC /* ContentView.swift in Sources */,
 				0E0D077C2A446FFC008EF8FC /* study_tcaApp.swift in Sources */,
 			);

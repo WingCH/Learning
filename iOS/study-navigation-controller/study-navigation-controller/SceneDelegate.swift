@@ -5,6 +5,7 @@
 //  Created by Wing on 1/6/2023.
 //
 
+import SwiftUI
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -20,15 +21,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let navigationController = UINavigationController()
         let vc1 = ViewController()
-        let vc2 = ViewController()
+
+        var swiftUIPage = SwiftUIPage()
+        let vc2 = UIHostingController(rootView: swiftUIPage)
 
         vc1.view.backgroundColor = .yellow
-        vc2.view.backgroundColor = .red
 
         vc1.onTapButton = {
             navigationController.pushViewController(vc2, animated: true)
         }
-        vc2.onTapButton = {
+        vc2.rootView.onTapButton = {
             navigationController.popViewController(animated: true)
         }
 

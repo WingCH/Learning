@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "rxcombine",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/CombineCommunity/RxCombine.git",
+      "state" : {
+        "revision" : "19474c2ac9fde613bba8513bf98990e1aa9831cd",
+        "version" : "2.0.1"
+      }
+    },
+    {
+      "identity" : "rxswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ReactiveX/RxSwift",
+      "state" : {
+        "branch" : "main",
+        "revision" : "95917a57a58734cd7b747361add398906e8b255c"
+      }
+    }
+  ],
+  "version" : 2
+}

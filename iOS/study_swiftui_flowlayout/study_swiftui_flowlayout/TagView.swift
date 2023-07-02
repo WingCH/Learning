@@ -7,20 +7,36 @@
 
 import SwiftUI
 
-struct TagView: View {
+struct TagModel: Identifiable {
+    let id: UUID
     let text: String
+    let isSelected: Bool
+    
+    init(id: UUID = UUID(), text: String, isSelected: Bool) {
+        self.id = id
+        self.text = text
+        self.isSelected = isSelected
+    }
+
+    func copyWith(isSelected: Bool) -> TagModel {
+        return TagModel(id: id, text: text, isSelected: isSelected)
+    }
+}
+
+struct TagView: View {
+    let tag: TagModel
     var body: some View {
-        Text(text)
+        Text(tag.text)
             .padding()
             .background(.regularMaterial)
+            .background(tag.isSelected ? .blue : .clear)
             .cornerRadius(15)
     }
 }
 
 struct TagView_Previews: PreviewProvider {
     static var previews: some View {
-        TagView(text: "Hello, World!")
-            .frame(width: 200, height: 200)
-            .background(Color.red)
+        TagView(tag: TagModel(text: "Hello, World!", isSelected: true))
+        TagView(tag: TagModel(text: "Hello, World!", isSelected: false))
     }
 }

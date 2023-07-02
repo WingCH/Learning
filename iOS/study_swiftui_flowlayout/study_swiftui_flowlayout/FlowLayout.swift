@@ -1,4 +1,5 @@
-// https://github.com/apple/sample-food-truck/blob/3954a769e99f3cc53297d94f2b960ceb2665b3d6/App/General/FlowLayout.swift#L10
+// copy form: https://github.com/apple/sample-food-truck/blob/3954a769e99f3cc53297d94f2b960ceb2665b3d6/App/General/FlowLayout.swift#L10
+// https://sarunw.com/posts/swiftui-custom-layout/
 import SwiftUI
 
 struct FlowLayout: Layout {
@@ -45,7 +46,6 @@ struct FlowLayout: Layout {
         }
         
         init(in maxPossibleWidth: Double, subviews: Subviews, alignment: Alignment, spacing: CGFloat?) {
-            print("maxPossibleWidth: \(maxPossibleWidth)")
             var itemsInRow = 0
             var remainingWidth = maxPossibleWidth.isFinite ? maxPossibleWidth : .greatestFiniteMagnitude
             var rowMinY = 0.0

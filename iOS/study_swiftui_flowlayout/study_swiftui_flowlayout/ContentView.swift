@@ -27,7 +27,7 @@ struct ContentView: View {
             }.gesture(
                 // TODO: custom gesture
                 // https://betterprogramming.pub/custom-gestures-in-swiftui-2-0-132590d66ee7
-                DragGesture(minimumDistance: 1, coordinateSpace: .local)
+                DragGesture(minimumDistance: 0, coordinateSpace: .local)
                     .onChanged { dragValue in
                         // Check if drag location is within any tag rects
                         for (index, rect) in tagRects.enumerated() {
@@ -78,3 +78,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+

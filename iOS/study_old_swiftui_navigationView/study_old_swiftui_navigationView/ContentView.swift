@@ -30,9 +30,19 @@ struct SheetView: View {
 struct ChildView: View {
     var body: some View {
         Text("You cannot swipe back")
+//            .navigationBarItems(leading: btnBack)
             // navigationBarBackButtonHidden will block swipe back gesture
             // search `UIGestureRecognizerDelegate` to fix this issue
-            .navigationBarBackButtonHidden(true)
+//            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        print("fafafa")
+                    } label: {
+                        Text("Back")
+                    }
+                }
+            }
     }
 }
 

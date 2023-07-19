@@ -80,7 +80,7 @@ class ViewController: UIViewController {
 
     @objc func saveToImage() {
         let image = stackView.asImage()
-        print(image)
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
     }
 }
 

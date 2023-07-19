@@ -7,26 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0E79191A2A515AE5000A51BB /* study_swiftui_flowlayoutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7919192A515AE5000A51BB /* study_swiftui_flowlayoutApp.swift */; };
-		0E79191C2A515AE5000A51BB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E79191B2A515AE5000A51BB /* ContentView.swift */; };
-		0E79191E2A515AE6000A51BB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E79191D2A515AE6000A51BB /* Assets.xcassets */; };
-		0E7919212A515AE6000A51BB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E7919202A515AE6000A51BB /* Preview Assets.xcassets */; };
-		0E7919282A516150000A51BB /* TagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7919272A516150000A51BB /* TagView.swift */; };
-		0E79192A2A5164AC000A51BB /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7919292A5164AC000A51BB /* FlowLayout.swift */; };
+		0EEB15702A66BE8E0065582A /* study_swiftui_to_imageApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EEB156F2A66BE8E0065582A /* study_swiftui_to_imageApp.swift */; };
+		0EEB15722A66BE8E0065582A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EEB15712A66BE8E0065582A /* ContentView.swift */; };
+		0EEB15742A66BE8F0065582A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0EEB15732A66BE8F0065582A /* Assets.xcassets */; };
+		0EEB15772A66BE8F0065582A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0EEB15762A66BE8F0065582A /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0E7919162A515AE5000A51BB /* study_swiftui_flowlayout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = study_swiftui_flowlayout.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		0E7919192A515AE5000A51BB /* study_swiftui_flowlayoutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = study_swiftui_flowlayoutApp.swift; sourceTree = "<group>"; };
-		0E79191B2A515AE5000A51BB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		0E79191D2A515AE6000A51BB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0E7919202A515AE6000A51BB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		0E7919272A516150000A51BB /* TagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagView.swift; sourceTree = "<group>"; };
-		0E7919292A5164AC000A51BB /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		0EEB156C2A66BE8E0065582A /* study_swiftui_to_image.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = study_swiftui_to_image.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0EEB156F2A66BE8E0065582A /* study_swiftui_to_imageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = study_swiftui_to_imageApp.swift; sourceTree = "<group>"; };
+		0EEB15712A66BE8E0065582A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0EEB15732A66BE8F0065582A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0EEB15762A66BE8F0065582A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		0E7919132A515AE5000A51BB /* Frameworks */ = {
+		0EEB15692A66BE8E0065582A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -36,39 +32,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0E79190D2A515AE5000A51BB = {
+		0EEB15632A66BE8E0065582A = {
 			isa = PBXGroup;
 			children = (
-				0E7919182A515AE5000A51BB /* study_swiftui_flowlayout */,
-				0E7919172A515AE5000A51BB /* Products */,
+				0EEB156E2A66BE8E0065582A /* study_swiftui_to_image */,
+				0EEB156D2A66BE8E0065582A /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		0E7919172A515AE5000A51BB /* Products */ = {
+		0EEB156D2A66BE8E0065582A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0E7919162A515AE5000A51BB /* study_swiftui_flowlayout.app */,
+				0EEB156C2A66BE8E0065582A /* study_swiftui_to_image.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0E7919182A515AE5000A51BB /* study_swiftui_flowlayout */ = {
+		0EEB156E2A66BE8E0065582A /* study_swiftui_to_image */ = {
 			isa = PBXGroup;
 			children = (
-				0E7919192A515AE5000A51BB /* study_swiftui_flowlayoutApp.swift */,
-				0E79191B2A515AE5000A51BB /* ContentView.swift */,
-				0E79191D2A515AE6000A51BB /* Assets.xcassets */,
-				0E79191F2A515AE6000A51BB /* Preview Content */,
-				0E7919272A516150000A51BB /* TagView.swift */,
-				0E7919292A5164AC000A51BB /* FlowLayout.swift */,
+				0EEB156F2A66BE8E0065582A /* study_swiftui_to_imageApp.swift */,
+				0EEB15712A66BE8E0065582A /* ContentView.swift */,
+				0EEB15732A66BE8F0065582A /* Assets.xcassets */,
+				0EEB15752A66BE8F0065582A /* Preview Content */,
 			);
-			path = study_swiftui_flowlayout;
+			path = study_swiftui_to_image;
 			sourceTree = "<group>";
 		};
-		0E79191F2A515AE6000A51BB /* Preview Content */ = {
+		0EEB15752A66BE8F0065582A /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				0E7919202A515AE6000A51BB /* Preview Assets.xcassets */,
+				0EEB15762A66BE8F0065582A /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -76,39 +70,39 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0E7919152A515AE5000A51BB /* study_swiftui_flowlayout */ = {
+		0EEB156B2A66BE8E0065582A /* study_swiftui_to_image */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0E7919242A515AE6000A51BB /* Build configuration list for PBXNativeTarget "study_swiftui_flowlayout" */;
+			buildConfigurationList = 0EEB157A2A66BE8F0065582A /* Build configuration list for PBXNativeTarget "study_swiftui_to_image" */;
 			buildPhases = (
-				0E7919122A515AE5000A51BB /* Sources */,
-				0E7919132A515AE5000A51BB /* Frameworks */,
-				0E7919142A515AE5000A51BB /* Resources */,
+				0EEB15682A66BE8E0065582A /* Sources */,
+				0EEB15692A66BE8E0065582A /* Frameworks */,
+				0EEB156A2A66BE8E0065582A /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = study_swiftui_flowlayout;
-			productName = study_swiftui_flowlayout;
-			productReference = 0E7919162A515AE5000A51BB /* study_swiftui_flowlayout.app */;
+			name = study_swiftui_to_image;
+			productName = study_swiftui_to_image;
+			productReference = 0EEB156C2A66BE8E0065582A /* study_swiftui_to_image.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		0E79190E2A515AE5000A51BB /* Project object */ = {
+		0EEB15642A66BE8E0065582A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					0E7919152A515AE5000A51BB = {
+					0EEB156B2A66BE8E0065582A = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
 				};
 			};
-			buildConfigurationList = 0E7919112A515AE5000A51BB /* Build configuration list for PBXProject "study_swiftui_flowlayout" */;
+			buildConfigurationList = 0EEB15672A66BE8E0065582A /* Build configuration list for PBXProject "study_swiftui_to_image" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -116,44 +110,42 @@
 				en,
 				Base,
 			);
-			mainGroup = 0E79190D2A515AE5000A51BB;
-			productRefGroup = 0E7919172A515AE5000A51BB /* Products */;
+			mainGroup = 0EEB15632A66BE8E0065582A;
+			productRefGroup = 0EEB156D2A66BE8E0065582A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0E7919152A515AE5000A51BB /* study_swiftui_flowlayout */,
+				0EEB156B2A66BE8E0065582A /* study_swiftui_to_image */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		0E7919142A515AE5000A51BB /* Resources */ = {
+		0EEB156A2A66BE8E0065582A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0E7919212A515AE6000A51BB /* Preview Assets.xcassets in Resources */,
-				0E79191E2A515AE6000A51BB /* Assets.xcassets in Resources */,
+				0EEB15772A66BE8F0065582A /* Preview Assets.xcassets in Resources */,
+				0EEB15742A66BE8F0065582A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		0E7919122A515AE5000A51BB /* Sources */ = {
+		0EEB15682A66BE8E0065582A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0E79191C2A515AE5000A51BB /* ContentView.swift in Sources */,
-				0E79191A2A515AE5000A51BB /* study_swiftui_flowlayoutApp.swift in Sources */,
-				0E79192A2A5164AC000A51BB /* FlowLayout.swift in Sources */,
-				0E7919282A516150000A51BB /* TagView.swift in Sources */,
+				0EEB15722A66BE8E0065582A /* ContentView.swift in Sources */,
+				0EEB15702A66BE8E0065582A /* study_swiftui_to_imageApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		0E7919222A515AE6000A51BB /* Debug */ = {
+		0EEB15782A66BE8F0065582A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -213,7 +205,7 @@
 			};
 			name = Debug;
 		};
-		0E7919232A515AE6000A51BB /* Release */ = {
+		0EEB15792A66BE8F0065582A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -267,28 +259,29 @@
 			};
 			name = Release;
 		};
-		0E7919252A515AE6000A51BB /* Debug */ = {
+		0EEB157B2A66BE8F0065582A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"study_swiftui_flowlayout/Preview Content\"";
-				DEVELOPMENT_TEAM = AL869FRMV6;
+				DEVELOPMENT_ASSET_PATHS = "\"study_swiftui_to_image/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = test;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.wingch.study-swiftui-flowlayout";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wingch.study-swiftui-to-image";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -296,28 +289,29 @@
 			};
 			name = Debug;
 		};
-		0E7919262A515AE6000A51BB /* Release */ = {
+		0EEB157C2A66BE8F0065582A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"study_swiftui_flowlayout/Preview Content\"";
-				DEVELOPMENT_TEAM = AL869FRMV6;
+				DEVELOPMENT_ASSET_PATHS = "\"study_swiftui_to_image/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = test;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.wingch.study-swiftui-flowlayout";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wingch.study-swiftui-to-image";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -328,25 +322,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0E7919112A515AE5000A51BB /* Build configuration list for PBXProject "study_swiftui_flowlayout" */ = {
+		0EEB15672A66BE8E0065582A /* Build configuration list for PBXProject "study_swiftui_to_image" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0E7919222A515AE6000A51BB /* Debug */,
-				0E7919232A515AE6000A51BB /* Release */,
+				0EEB15782A66BE8F0065582A /* Debug */,
+				0EEB15792A66BE8F0065582A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0E7919242A515AE6000A51BB /* Build configuration list for PBXNativeTarget "study_swiftui_flowlayout" */ = {
+		0EEB157A2A66BE8F0065582A /* Build configuration list for PBXNativeTarget "study_swiftui_to_image" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0E7919252A515AE6000A51BB /* Debug */,
-				0E7919262A515AE6000A51BB /* Release */,
+				0EEB157B2A66BE8F0065582A /* Debug */,
+				0EEB157C2A66BE8F0065582A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 0E79190E2A515AE5000A51BB /* Project object */;
+	rootObject = 0EEB15642A66BE8E0065582A /* Project object */;
 }

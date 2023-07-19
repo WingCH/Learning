@@ -7,11 +7,26 @@
 
 import SwiftUI
 
+struct TagAnchorModel: Equatable, Identifiable {
+    let id: UUID
+    let anchor: Anchor<CGRect>
+}
+
+struct TagAnchorPreferenceKey: PreferenceKey {
+    static var defaultValue: [TagAnchorModel] = []
+    static func reduce(
+        value: inout [TagAnchorModel],
+        nextValue: () -> [TagAnchorModel]
+    ) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
 struct TagModel: Identifiable {
     let id: UUID
     let text: String
     let isSelected: Bool
-    
+
     init(id: UUID = UUID(), text: String, isSelected: Bool) {
         self.id = id
         self.text = text
@@ -31,6 +46,9 @@ struct TagView: View {
             .background(.regularMaterial)
             .background(tag.isSelected ? .blue : .clear)
             .cornerRadius(15)
+            .anchorPreference(key: TagAnchorPreferenceKey.self, value: .bounds) { anchor in
+                [TagAnchorModel(id: tag.id, anchor: anchor)]
+            }
     }
 }
 

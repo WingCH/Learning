@@ -63,8 +63,8 @@ extension View {
 struct ContentView: View {
     var longVStack: some View {
         VStack {
-            ForEach(0 ..< 46) { _ in
-                Text("Hello, world!")
+            ForEach(0 ..< 100) { index in
+                Text("Hello, world! \(index)")
                     .foregroundColor(.white)
                     .padding()
                     .background(Color(red: Double.random(in: 0...1), green: Double.random(in: 0...1), blue: Double.random(in: 0...1)))
@@ -78,9 +78,19 @@ struct ContentView: View {
                 longVStack
             }
             Button("Save to image") {
-                let image = longVStack.edgesIgnoringSafeArea(.all).snapshot()
-                // tested in iOS 15 16, 1-45 成功，但45以上就會白晒
-                UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                if #available(iOS 16.0, *) {
+                    let renderer = ImageRenderer(content: longVStack)
+                    if let uiImage = renderer.uiImage {
+                        print(uiImage)
+                        // 太長張相會有色班，再長d仲會出唔到相
+                        UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+                    }
+                } else {
+                    // Fallback on earlier versions
+                    // tested in iOS 15 16, 1-45 成功，但45以上就會白晒
+                    let image = longVStack.edgesIgnoringSafeArea(.all).snapshot()
+                    print(image)
+                }
             }
         }
     }

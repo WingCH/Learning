@@ -11,7 +11,26 @@ import SwiftUI
 struct study_swiftui_flowlayoutApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(tags: [
+                TagModel(text: "Hello", isSelected: true),
+                TagModel(text: "World", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+                TagModel(text: "SwiftUI", isSelected: false),
+                TagModel(text: "Swift", isSelected: false),
+            ])
         }
     }
 }

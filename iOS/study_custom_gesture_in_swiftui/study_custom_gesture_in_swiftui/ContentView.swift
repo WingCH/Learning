@@ -41,7 +41,7 @@ struct ContentView: View {
                     simpleDrag
                         .simultaneously(with: fingerDrag)
                 )
-            if let fingerLocation = fingerLocation { // 5
+            if let fingerLocation = fingerLocation {
                 Circle()
                     .stroke(Color.green, lineWidth: 2)
                     .frame(width: 44, height: 44)

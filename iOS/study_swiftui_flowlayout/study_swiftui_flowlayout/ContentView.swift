@@ -21,8 +21,7 @@ struct ContentView: View {
                     ForEach(Array(tags.enumerated()), id: \.offset) { index, tag in
                         TagView(tag: tag)
                             .onTapGesture {
-                                let newTag = !tag.isSelected
-                                tags[index] = tag
+                                tags[index] = tag.copyWith(isSelected: !tag.isSelected)
                             }
                     }
                 }

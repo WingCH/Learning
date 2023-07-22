@@ -80,16 +80,21 @@ struct ContentView: View {
             Button("Save to image") {
                 if #available(iOS 16.0, *) {
                     let renderer = ImageRenderer(content: longVStack)
+                    renderer.scale = 3
                     if let uiImage = renderer.uiImage {
                         print(uiImage)
                         // 太長張相會有色班，再長d仲會出唔到相
                         UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+                    } else {
+                        print("uiImage is nil")
                     }
                 } else {
                     // Fallback on earlier versions
                     // tested in iOS 15 16, 1-45 成功，但45以上就會白晒
                     let image = longVStack.edgesIgnoringSafeArea(.all).snapshot()
                     print(image)
+                    
+                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
                 }
             }
         }

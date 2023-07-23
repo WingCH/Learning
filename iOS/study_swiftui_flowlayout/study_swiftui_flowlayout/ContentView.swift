@@ -10,59 +10,44 @@ import SwiftUI
 struct ContentView: View {
     @State var tags: [TagModel]
     @State var tagRects: [CGRect] = []
-    @State var lastInteractedTagId: UUID?
-    @GestureState var fingerLocation: CGPoint? = nil
+    @State var selectionRect: CGRect = .zero
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Color.clear // make full screen size
-            GeometryReader { geometryReader in
-                FlowLayout(alignment: .leading) {
-                    ForEach(Array(tags.enumerated()), id: \.offset) { index, tag in
-                        TagView(tag: tag)
-                            .onTapGesture {
-                                tags[index] = tag.copyWith(isSelected: !tag.isSelected)
-                            }
-                    }
-                }
-                .onPreferenceChange(TagAnchorPreferenceKey.self) { value in
-                    tagRects = value.map { geometryReader[$0.anchor] }
-                    print("tagRects: \(tagRects)")
-                }
-                .background(Color.red)
+            // Expand the ZStack to fill the entire screen
+            Color.clear
 
-                if let fingerLocation = fingerLocation {
-                    Circle()
-                        .stroke(Color.green, lineWidth: 2)
-                        .frame(width: 44, height: 44)
-                        .position(fingerLocation)
+            // Flow layout with tags
+            FlowLayout(alignment: .leading) {
+                ForEach(Array(tags.enumerated()), id: \.offset) { index, tag in
+                    // Tag view with tap gesture to toggle selection
+                    TagView(tag: tag).onTapGesture {
+                        tags[index] = tag.copyWith(isSelected: !tag.isSelected)
+                    }
                 }
             }
-        }
-        .gesture(
-            // TODO: custom gesture
-            // https://betterprogramming.pub/custom-gestures-in-swiftui-2-0-132590d66ee7
-            DragGesture()
-                .updating($fingerLocation) { value, fingerLocation, _ in
-                    fingerLocation = value.location
-                    print(fingerLocation)
-                }
-                .onChanged { dragValue in
-                    // Check if drag location is within any tag rects
-                    for (index, rect) in tagRects.enumerated() {
-                        if rect.contains(dragValue.location) {
-                            let tag = tags[index]
-                            // Avoid repeating the action for the same tag during a single interaction
-                            if lastInteractedTagId == tag.id {
-                                break
-                            } else {
-                                tags[index] = tags[index].copyWith(isSelected: !tags[index].isSelected)
-                                lastInteractedTagId = tags[index].id
-                            }
-                            break
-                        }
+            .background(Color.red)
+
+            // Calculate the rectangles for each tag
+            .overlayPreferenceValue(TagAnchorPreferenceKey.self) { value in
+                GeometryReader { geometryReader in
+                    Color.clear.onAppear {
+                        // Update the rectangles for each tag based on the anchor
+                        tagRects = value.map { geometryReader[$0.anchor] }
                     }
                 }
+            }
+
+            // View for visualizing the selection rectangle
+            SelectionBoxView(selectionRect: selectionRect)
+        }
+        // Rectangle selection gesture for selecting tags
+        .gesture(
+            RectangleSelectionGesture(
+                tags: $tags,
+                selectionRect: $selectionRect,
+                tagRects: tagRects
+            )
         )
     }
 }

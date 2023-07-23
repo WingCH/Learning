@@ -14,6 +14,8 @@
 		0E105A582A6D0E8C007EF928 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E105A572A6D0E8C007EF928 /* ShareViewController.swift */; };
 		0E105A5B2A6D0E8C007EF928 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0E105A592A6D0E8C007EF928 /* MainInterface.storyboard */; };
 		0E105A5F2A6D0E8C007EF928 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0E105A552A6D0E8C007EF928 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0E105A682A6D3599007EF928 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E105A672A6D3599007EF928 /* ContentView.swift */; };
+		0E105A6C2A6D5145007EF928 /* SharedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E105A6B2A6D5145007EF928 /* SharedData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,8 @@
 		0E105A642A6D10CF007EF928 /* study_share_extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = study_share_extension.entitlements; sourceTree = "<group>"; };
 		0E105A652A6D10E7007EF928 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		0E105A662A6D1481007EF928 /* study-share-extension-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "study-share-extension-Info.plist"; sourceTree = SOURCE_ROOT; };
+		0E105A672A6D3599007EF928 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0E105A6B2A6D5145007EF928 /* SharedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +121,8 @@
 			children = (
 				0E105A652A6D10E7007EF928 /* ShareExtension.entitlements */,
 				0E105A572A6D0E8C007EF928 /* ShareViewController.swift */,
+				0E105A672A6D3599007EF928 /* ContentView.swift */,
+				0E105A6B2A6D5145007EF928 /* SharedData.swift */,
 				0E105A592A6D0E8C007EF928 /* MainInterface.storyboard */,
 				0E105A5C2A6D0E8C007EF928 /* Info.plist */,
 			);
@@ -233,6 +239,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E105A6C2A6D5145007EF928 /* SharedData.swift in Sources */,
+				0E105A682A6D3599007EF928 /* ContentView.swift in Sources */,
 				0E105A582A6D0E8C007EF928 /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

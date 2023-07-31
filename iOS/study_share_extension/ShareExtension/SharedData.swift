@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import UIKit
 
 class SharedData: ObservableObject {
     enum ImageStatue {
         case loading
-        case success(data: Data)
+        case success(uiImage: UIImage)
         case failure(error: Error)
     }
 

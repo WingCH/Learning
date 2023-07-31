@@ -33,12 +33,24 @@ class ShareViewController: UIViewController {
             } else if let url = item as? URL {
                 do {
                     let imageData = try Data(contentsOf: url)
-                    updateImageStatue(imageStatue: .success(data: imageData))
+                    guard let uiImage = UIImage(data: imageData) else {
+                        updateImageStatue(
+                            imageStatue: .failure(error: NSError(domain: "Invalid Image", code: 0, userInfo: nil))
+                        )
+                        return
+                    }
+                    updateImageStatue(imageStatue: .success(uiImage: uiImage))
                 } catch {
                     updateImageStatue(imageStatue: .failure(error: error))
                 }
             } else if let imageData = item as? Data {
-                updateImageStatue(imageStatue: .success(data: imageData))
+                guard let uiImage = UIImage(data: imageData) else {
+                    updateImageStatue(
+                        imageStatue: .failure(error: NSError(domain: "Invalid Image", code: 0, userInfo: nil))
+                    )
+                    return
+                }
+                updateImageStatue(imageStatue: .success(uiImage: uiImage))
             } else {
                 updateImageStatue(imageStatue: .failure(error: NSError(domain: "Unknown Type", code: 0, userInfo: nil)))
             }

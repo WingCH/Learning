@@ -6,8 +6,8 @@ struct GoogleVisionResponse: Codable {
     struct Response: Codable {
         struct TextAnnotation: Codable {
             struct Vertice: Codable {
-                let x: Int?
-                let y: Int?
+                let x: CGFloat?
+                let y: CGFloat?
             }
 
             struct BoundingPoly: Codable {
@@ -68,10 +68,10 @@ func callGoogleVisionOCR(image: UIImage, completion: @escaping (Result<(String, 
             let googleVisionResponse = try JSONDecoder().decode(GoogleVisionResponse.self, from: data)
             let text = googleVisionResponse.responses[0].textAnnotations.map { $0.description }.joined(separator: "\n")
 
-//            let verticesList = googleVisionResponse.responses[0].textAnnotations.map { $0.boundingPoly.vertices }
-            let verticesList = [googleVisionResponse.responses[0].textAnnotations.first.map({
-                $0.boundingPoly.vertices
-            })!]
+            let verticesList = googleVisionResponse.responses[0].textAnnotations.map { $0.boundingPoly.vertices }
+//            let verticesList = [googleVisionResponse.responses[0].textAnnotations.map({
+//                $0.boundingPoly.vertices
+//            })[1]]
             let drawnImage = drawRectanglesAroundText(on: image, verticesList: verticesList)
 
             completion(.success((text, drawnImage)))
@@ -100,17 +100,18 @@ func drawRectanglesAroundText(on image: UIImage, verticesList: [[GoogleVisionRes
     verticesList.forEach { vertices in
         // Assume vertices are always four and form a rectangle.
         if vertices.count == 4 {
-            let upperLeft = CGPoint(x: vertices[0].x ?? 0, y: vertices[0].y ?? 0)
-            let upperRight = CGPoint(x: vertices[1].x ?? 0, y: vertices[1].y ?? 0)
-            let lowerRight = CGPoint(x: vertices[2].x ?? 0, y: vertices[2].y ?? 0)
-            let lowerLeft = CGPoint(x: vertices[3].x ?? 0, y: vertices[3].y ?? 0)
-        
+            // 在畫矩形時，我們需要特別注意的是，Google Vision API回傳的坐標系統是以圖像左上角為原點，向右為 x 正向，向下為 y 正向。而在 iOS 中，繪製圖形的時候，坐標系統是以左上角為原點，向右為 x 正向，向上為 y 正向。
+            let upperLeft = CGPoint(x: vertices[0].x ?? 0, y: image.size.height - (vertices[0].y ?? 0))
+            let upperRight = CGPoint(x: vertices[1].x ?? 0, y: image.size.height - (vertices[1].y ?? 0))
+            let lowerRight = CGPoint(x: vertices[2].x ?? 0, y: image.size.height - (vertices[2].y ?? 0))
+            let lowerLeft = CGPoint(x: vertices[3].x ?? 0, y: image.size.height - (vertices[3].y ?? 0))
+
             let width = upperRight.x - upperLeft.x
-            let height = lowerLeft.y - upperLeft.y
-            let rect = CGRect(x: upperLeft.x, y: upperLeft.y, width: width, height: height)
-        
+            let height = upperLeft.y - lowerLeft.y
+            let rect = CGRect(x: upperLeft.x, y: lowerLeft.y, width: width, height: height)
+
             context.setStrokeColor(UIColor.red.cgColor)
-            context.setLineWidth(2.0)
+            context.setLineWidth(5.0)
             context.stroke(rect)
         }
     }

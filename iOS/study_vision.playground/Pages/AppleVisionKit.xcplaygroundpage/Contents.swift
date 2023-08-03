@@ -1,7 +1,7 @@
 import UIKit
 import Vision
 
-let image = #imageLiteral(resourceName: "iShot_2023-06-25_20.09.46.png")
+let image = #imageLiteral(resourceName: "IMG_1219-min.PNG")
 
 Task {
     do {

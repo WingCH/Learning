@@ -46,7 +46,7 @@ func callGoogleVisionOCR(image: UIImage, completion: @escaping (Result<(String, 
     ]
 
     let jsonData = try! JSONSerialization.data(withJSONObject: jsonRequest)
-    let url = URL(string: "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDuXTHCPaQm362OJSjlicGW41IQp5RYniY")!
+    let url = URL(string: "https://vision.googleapis.com/v1/images:annotate?key=APIKEY")!
 
     var request = URLRequest(url: url)
     request.httpMethod = "POST"

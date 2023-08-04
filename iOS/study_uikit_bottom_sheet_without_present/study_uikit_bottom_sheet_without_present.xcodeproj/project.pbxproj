@@ -11,6 +11,7 @@
 		0E84D5D02A7D22B5003EF56E /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E84D5CF2A7D22B5003EF56E /* RootViewController.swift */; };
 		0E84D5D42A7D22B6003EF56E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E84D5D32A7D22B6003EF56E /* Assets.xcassets */; };
 		0E84D5D72A7D22B6003EF56E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0E84D5D52A7D22B6003EF56E /* LaunchScreen.storyboard */; };
+		0E84D5DE2A7D2CAA003EF56E /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E84D5DD2A7D2CAA003EF56E /* BottomSheetView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		0E84D5CF2A7D22B5003EF56E /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		0E84D5D32A7D22B6003EF56E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0E84D5D62A7D22B6003EF56E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		0E84D5DD2A7D2CAA003EF56E /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +55,7 @@
 			children = (
 				0E84D5CD2A7D22B5003EF56E /* AppDelegate.swift */,
 				0E84D5CF2A7D22B5003EF56E /* RootViewController.swift */,
+				0E84D5DD2A7D2CAA003EF56E /* BottomSheetView.swift */,
 				0E84D5D32A7D22B6003EF56E /* Assets.xcassets */,
 				0E84D5D52A7D22B6003EF56E /* LaunchScreen.storyboard */,
 			);
@@ -131,6 +134,7 @@
 			files = (
 				0E84D5D02A7D22B5003EF56E /* RootViewController.swift in Sources */,
 				0E84D5CE2A7D22B5003EF56E /* AppDelegate.swift in Sources */,
+				0E84D5DE2A7D2CAA003EF56E /* BottomSheetView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

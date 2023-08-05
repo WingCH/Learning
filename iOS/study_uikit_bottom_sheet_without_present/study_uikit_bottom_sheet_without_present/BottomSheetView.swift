@@ -77,6 +77,7 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
         }
     }
 
+    // Revert transform, 8128e8343cc67f0e1a0c1a0f11516d1c6d5120f6
     func show(in parentView: UIView, height: CGFloat) {
         parentView.addSubview(self)
         self.transform = .identity

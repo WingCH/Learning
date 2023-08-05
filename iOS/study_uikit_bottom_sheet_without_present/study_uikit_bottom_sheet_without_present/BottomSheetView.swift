@@ -13,6 +13,7 @@ protocol BottomSheetViewDismissable: UIViewController {
 
 class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
     private let contentViewController: Content
+    var onDismiss: (() -> Void)?
 
     private weak var parentView: UIView?
     private let backgroundDimmedView: UIView = {
@@ -40,7 +41,13 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
         backgroundColor = .systemBackground
 
         addSubview(contentViewController.view)
-        contentViewController.view.frame = bounds
+        contentViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contentViewController.view.topAnchor.constraint(equalTo: topAnchor),
+            contentViewController.view.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentViewController.view.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentViewController.view.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 
     private func setupGesture() {
@@ -71,6 +78,7 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
     }
 
     func show(in parentView: UIView, height: CGFloat) {
+        parentView.addSubview(self)
         self.transform = .identity
         self.parentView = parentView
         parentView.addSubview(backgroundDimmedView)
@@ -93,6 +101,8 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
             self.backgroundDimmedView.backgroundColor = UIColor.black.withAlphaComponent(0)
         }, completion: { _ in
             self.backgroundDimmedView.removeFromSuperview()
+            self.removeFromSuperview()
+            self.onDismiss?()
         })
     }
 }

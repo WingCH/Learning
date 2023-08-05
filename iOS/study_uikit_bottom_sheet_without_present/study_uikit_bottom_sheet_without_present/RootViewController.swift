@@ -12,6 +12,7 @@ class YourViewController: UIViewController, BottomSheetViewDismissable {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("YourViewController viewDidLoad")
 
         view.backgroundColor = .lightGray
 
@@ -33,17 +34,12 @@ class YourViewController: UIViewController, BottomSheetViewDismissable {
 }
 
 class BottomSheetViewController: UIViewController {
-    private lazy var bottomSheetView = BottomSheetView(contentViewController: YourViewController())
+    private var bottomSheetView: BottomSheetView<YourViewController>?
     override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .yellow
-        setupBottomSheet()
         setupButton()
-    }
-
-    private func setupBottomSheet() {
-        view.addSubview(bottomSheetView)
     }
 
     private func setupButton() {
@@ -57,6 +53,10 @@ class BottomSheetViewController: UIViewController {
     }
 
     @objc private func didTapButton() {
-        bottomSheetView.show(in: view, height: 300)
+        bottomSheetView = BottomSheetView(contentViewController: YourViewController())
+        bottomSheetView?.onDismiss = { [weak self] in
+            self?.bottomSheetView = nil
+        }
+        bottomSheetView?.show(in: view, height: 300)
     }
 }

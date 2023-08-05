@@ -14,6 +14,13 @@ protocol BottomSheetViewDismissable: UIViewController {
 class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
     private let contentViewController: Content
 
+    private weak var parentView: UIView?
+    private let backgroundDimmedView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0)
+        return view
+    }()
+
     init(contentViewController: Content) {
         self.contentViewController = contentViewController
         super.init(frame: .zero)
@@ -43,6 +50,7 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
 
     @objc private func didDrag(_ gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: self)
+        print("gesture.state: \(gesture.state), translation.y: \(translation.y)")
         if translation.y >= 0 {
             transform = CGAffineTransform(translationX: 0, y: translation.y)
         }
@@ -62,18 +70,29 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
         }
     }
 
-    func show() {
+    func show(in parentView: UIView, height: CGFloat) {
+        self.parentView = parentView
+
+        parentView.addSubview(backgroundDimmedView)
+        backgroundDimmedView.frame = parentView.bounds
+
+        parentView.addSubview(self)
+        frame = CGRect(x: 0, y: parentView.frame.height, width: parentView.frame.width, height: height)
+
         UIView.animate(withDuration: 0.3) {
-            guard let superview = self.superview else { return }
-            self.frame = CGRect(x: 0, y: superview.frame.height - self.frame.height, width: superview.frame.width, height: self.frame.height)
+            self.frame.origin.y = parentView.frame.height - height
+            self.backgroundDimmedView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         }
     }
 
     func hide() {
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 0.3, animations: {
             self.transform = .identity
-            guard let superview = self.superview else { return }
-            self.frame = CGRect(x: 0, y: superview.frame.height, width: superview.frame.width, height: self.frame.height)
-        }
+            guard let parentView = self.parentView else { return }
+            self.frame.origin.y = parentView.frame.height
+            self.backgroundDimmedView.backgroundColor = UIColor.black.withAlphaComponent(0)
+        }, completion: { _ in
+            self.backgroundDimmedView.removeFromSuperview()
+        })
     }
 }

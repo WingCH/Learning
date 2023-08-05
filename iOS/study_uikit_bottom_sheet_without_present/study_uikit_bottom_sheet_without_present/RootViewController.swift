@@ -37,13 +37,13 @@ class BottomSheetViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.backgroundColor = .yellow
         setupBottomSheet()
         setupButton()
     }
 
     private func setupBottomSheet() {
         view.addSubview(bottomSheetView)
-        bottomSheetView.frame = CGRect(x: 0, y: view.frame.height, width: view.frame.width, height: 300)
     }
 
     private func setupButton() {
@@ -57,6 +57,6 @@ class BottomSheetViewController: UIViewController {
     }
 
     @objc private func didTapButton() {
-        bottomSheetView.show()
+        bottomSheetView.show(in: view, height: 300)
     }
 }

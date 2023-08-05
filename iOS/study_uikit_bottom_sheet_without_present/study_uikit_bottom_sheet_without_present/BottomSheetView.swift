@@ -71,25 +71,25 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
     }
 
     func show(in parentView: UIView, height: CGFloat) {
+        self.transform = .identity
         self.parentView = parentView
-
         parentView.addSubview(backgroundDimmedView)
         backgroundDimmedView.frame = parentView.bounds
 
         parentView.addSubview(self)
-        frame = CGRect(x: 0, y: parentView.frame.height, width: parentView.frame.width, height: height)
+        frame = CGRect(x: 0, y: parentView.frame.height - height, width: parentView.frame.width, height: height)
+        transform = CGAffineTransform(translationX: 0, y: height)
 
         UIView.animate(withDuration: 0.3) {
-            self.frame.origin.y = parentView.frame.height - height
+            self.transform = .identity
             self.backgroundDimmedView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         }
     }
 
     func hide() {
         UIView.animate(withDuration: 0.3, animations: {
-            self.transform = .identity
             guard let parentView = self.parentView else { return }
-            self.frame.origin.y = parentView.frame.height
+            self.transform = CGAffineTransform(translationX: 0, y: parentView.frame.height)
             self.backgroundDimmedView.backgroundColor = UIColor.black.withAlphaComponent(0)
         }, completion: { _ in
             self.backgroundDimmedView.removeFromSuperview()

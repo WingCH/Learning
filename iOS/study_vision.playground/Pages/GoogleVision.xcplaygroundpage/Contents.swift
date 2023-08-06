@@ -25,76 +25,49 @@ struct GoogleVisionResponse: Codable {
 }
 
 // Function name and variable names are more descriptive and consistent now
-func analyzeImageWithGoogleVisionOCR(image: UIImage, completion: @escaping (Result<(String, UIImage?), Error>) -> Void) {
+func analyzeImageWithGoogleVisionOCR(image: UIImage) async throws -> (String, UIImage?) {
     guard let base64Image = convertImageToBase64(image: image) else {
-        print("Could not convert image to base64.")
-        return
+        throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not convert image to base64."])
     }
 
-    let imageAnalysisRequest: [String: Any] = generateImageAnalysisRequest(with: base64Image)
-    
-    do {
-        let jsonData = try JSONSerialization.data(withJSONObject: imageAnalysisRequest)
-        let apiURL = URL(string: "https://vision.googleapis.com/v1/images:annotate?key=XXXXX")!
-        
-        var apiRequest = URLRequest(url: apiURL)
-        apiRequest.httpMethod = "POST"
-        apiRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        apiRequest.httpBody = jsonData
-        
-        let apiRequestTask = URLSession.shared.dataTask(with: apiRequest) { data, _, error in
-            handleAPIResponse(data: data, error: error, completion: completion)
-        }
-        apiRequestTask.resume()
-    } catch {
-        print("Error: \(error)")
-    }
-}
-
-func convertImageToBase64(image: UIImage) -> String? {
-    return image.jpegData(compressionQuality: 1.0)?.base64EncodedString()
-}
-
-func generateImageAnalysisRequest(with base64Image: String) -> [String: Any] {
-    return [
-        "requests": [
-            [
-                "image": [
-                    "content": base64Image
-                ],
-                "features": [
-                    [
-                        "type": "TEXT_DETECTION"
+    let imageAnalysisRequest: [String: Any] = {
+        [
+            "requests": [
+                [
+                    "image": [
+                        "content": base64Image
+                    ],
+                    "features": [
+                        [
+                            "type": "TEXT_DETECTION"
+                        ]
                     ]
                 ]
             ]
         ]
-    ]
+    }()
+    let jsonData = try JSONSerialization.data(withJSONObject: imageAnalysisRequest)
+    let apiURL = URL(string: "https://vision.googleapis.com/v1/images:annotate?key=XXX")!
+
+    var apiRequest = URLRequest(url: apiURL)
+    apiRequest.httpMethod = "POST"
+    apiRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    apiRequest.httpBody = jsonData
+
+    let (data, _) = try await URLSession.shared.data(for: apiRequest)
+
+    let googleVisionResponse = try JSONDecoder().decode(GoogleVisionResponse.self, from: data)
+    let text = googleVisionResponse.responses[0].textAnnotations.map { $0.description }.joined(separator: "\n")
+
+    let verticesList = googleVisionResponse.responses[0].textAnnotations.map { $0.boundingPoly.vertices }
+    let rects = extractRectanglesFromVertices(verticesList: verticesList, on: image)
+    let drawnImage = drawDetectedTextBoundsOnImage(image: image, with: rects)
+
+    return (text, drawnImage)
 }
 
-func handleAPIResponse(data: Data?, error: Error?, completion: @escaping (Result<(String, UIImage?), Error>) -> Void) {
-    if let error = error {
-        completion(.failure(error))
-        return
-    }
-
-    guard let data = data else {
-        completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received from API"])))
-        return
-    }
-
-    do {
-        let googleVisionResponse = try JSONDecoder().decode(GoogleVisionResponse.self, from: data)
-        let text = googleVisionResponse.responses[0].textAnnotations.map { $0.description }.joined(separator: "\n")
-        
-        let verticesList = googleVisionResponse.responses[0].textAnnotations.map { $0.boundingPoly.vertices }
-        let rects = extractRectanglesFromVertices(verticesList: verticesList, on: image)
-        let drawnImage = drawDetectedTextBoundsOnImage(image: image, with: rects)
-        
-        completion(.success((text, drawnImage)))
-    } catch let decodeError {
-        completion(.failure(decodeError))
-    }
+func convertImageToBase64(image: UIImage) -> String? {
+    return image.jpegData(compressionQuality: 1.0)?.base64EncodedString()
 }
 
 func extractRectanglesFromVertices(verticesList: [[GoogleVisionResponse.Response.TextAnnotation.Vertex]], on image: UIImage) -> [CGRect] {
@@ -102,7 +75,7 @@ func extractRectanglesFromVertices(verticesList: [[GoogleVisionResponse.Response
     return verticesList.compactMap { vertices in
         // Assume vertices are always four and form a rectangle.
         guard vertices.count == 4 else { return nil }
-
+        // 在畫矩形時，我們需要特別注意的是，Google Vision API回傳的坐標系統是以圖像左上角為原點，向右為 x 正向，向下為 y 正向。而在 iOS 中，繪製圖形的時候，坐標系統是以左上角為原點，向右為 x 正向，向上為 y 正向。
         let upperLeft = CGPoint(x: vertices[0].x ?? 0, y: image.size.height - (vertices[0].y ?? 0))
         let upperRight = CGPoint(x: vertices[1].x ?? 0, y: image.size.height - (vertices[1].y ?? 0))
         let lowerRight = CGPoint(x: vertices[2].x ?? 0, y: image.size.height - (vertices[2].y ?? 0))
@@ -117,7 +90,7 @@ func extractRectanglesFromVertices(verticesList: [[GoogleVisionResponse.Response
 func drawDetectedTextBoundsOnImage(image: UIImage, with rects: [CGRect]) -> UIImage? {
     UIGraphicsBeginImageContextWithOptions(image.size, true, image.scale)
     guard let context = UIGraphicsGetCurrentContext() else { return nil }
-    
+
     context.interpolationQuality = .none
     image.draw(in: CGRect(origin: CGPoint.zero, size: image.size))
 
@@ -139,18 +112,20 @@ func drawDetectedTextBoundsOnImage(image: UIImage, with rects: [CGRect]) -> UIIm
     return drawnImage
 }
 
+// Usage
+
 let image = #imageLiteral(resourceName: "IMG_1219-min.PNG")
-analyzeImageWithGoogleVisionOCR(image: image) { result in
-    switch result {
-    case .success(let (text, drawnImage)):
+Task {
+    do {
+        let (text, drawnImage) = try await analyzeImageWithGoogleVisionOCR(image: image)
         print(text)
         if let image = drawnImage {
+            // do something with the image
             image
         } else {
             print("No image returned.")
         }
-    case .failure(let error):
+    } catch {
         print("Error: \(error)")
     }
 }
-

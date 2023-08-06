@@ -3,11 +3,21 @@
    version = "3.0">
    <TimelineItems>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=5403&amp;CharacterRangeLoc=0&amp;EndingColumnNumber=0&amp;EndingLineNumber=156&amp;StartingColumnNumber=0&amp;StartingLineNumber=0&amp;Timestamp=712984814.400985"
+         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=4712&amp;CharacterRangeLoc=0&amp;EndingColumnNumber=0&amp;EndingLineNumber=131&amp;StartingColumnNumber=0&amp;StartingLineNumber=0&amp;Timestamp=712986323.855978"
          selectedRepresentationIndex = "0">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=5&amp;CharacterRangeLoc=5258&amp;EndingColumnNumber=17&amp;EndingLineNumber=147&amp;StartingColumnNumber=12&amp;StartingLineNumber=147&amp;Timestamp=712984814.401076"
+         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=4712&amp;CharacterRangeLoc=0&amp;EndingColumnNumber=0&amp;EndingLineNumber=131&amp;StartingColumnNumber=0&amp;StartingLineNumber=0&amp;Timestamp=712986323.856033"
+         selectedRepresentationIndex = "0">
+      </LoggerValueHistoryTimelineItem>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=4712&amp;CharacterRangeLoc=0&amp;EndingColumnNumber=0&amp;EndingLineNumber=131&amp;StartingColumnNumber=0&amp;StartingLineNumber=0&amp;Timestamp=712986323.856073"
+         lockedSize = "{996, 127}"
+         selectedRepresentationIndex = "0"
+         shouldTrackSuperviewWidth = "NO">
+      </LoggerValueHistoryTimelineItem>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=4712&amp;CharacterRangeLoc=0&amp;EndingColumnNumber=0&amp;EndingLineNumber=131&amp;StartingColumnNumber=0&amp;StartingLineNumber=0&amp;Timestamp=712986323.856113"
          selectedRepresentationIndex = "0">
       </LoggerValueHistoryTimelineItem>
    </TimelineItems>

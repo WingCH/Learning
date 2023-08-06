@@ -3,12 +3,22 @@
    version = "3.0">
    <TimelineItems>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=4926&amp;CharacterRangeLoc=0&amp;EndingColumnNumber=0&amp;EndingLineNumber=140&amp;StartingColumnNumber=0&amp;StartingLineNumber=0&amp;Timestamp=712803063.776173"
+         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=5403&amp;CharacterRangeLoc=0&amp;EndingColumnNumber=0&amp;EndingLineNumber=156&amp;StartingColumnNumber=0&amp;StartingLineNumber=0&amp;Timestamp=712984814.400985"
          selectedRepresentationIndex = "0">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=5&amp;CharacterRangeLoc=4782&amp;EndingColumnNumber=17&amp;EndingLineNumber=132&amp;StartingColumnNumber=12&amp;StartingLineNumber=132&amp;Timestamp=712803063.776271"
+         documentLocation = "file:///Users/wingch/Project/Learning/iOS/study_vision.playground/Pages/GoogleVision.xcplaygroundpage#CharacterRangeLen=5&amp;CharacterRangeLoc=5258&amp;EndingColumnNumber=17&amp;EndingLineNumber=147&amp;StartingColumnNumber=12&amp;StartingLineNumber=147&amp;Timestamp=712984814.401076"
          selectedRepresentationIndex = "0">
+      </LoggerValueHistoryTimelineItem>
+   </TimelineItems>
+   <TimelineItems>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "documentLocation"
+         selectedRepresentationIndex = "selectedRepresentationIndex">
+      </LoggerValueHistoryTimelineItem>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "documentLocation"
+         selectedRepresentationIndex = "selectedRepresentationIndex">
       </LoggerValueHistoryTimelineItem>
    </TimelineItems>
 </Timeline>

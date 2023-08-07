@@ -12,6 +12,7 @@
 		0E84D5D42A7D22B6003EF56E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E84D5D32A7D22B6003EF56E /* Assets.xcassets */; };
 		0E84D5D72A7D22B6003EF56E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0E84D5D52A7D22B6003EF56E /* LaunchScreen.storyboard */; };
 		0E84D5DE2A7D2CAA003EF56E /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E84D5DD2A7D2CAA003EF56E /* BottomSheetView.swift */; };
+		661A9FD62A80FDF300789389 /* TinyConstraints in Frameworks */ = {isa = PBXBuildFile; productRef = 661A9FD52A80FDF300789389 /* TinyConstraints */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				661A9FD62A80FDF300789389 /* TinyConstraints in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +80,9 @@
 			dependencies = (
 			);
 			name = study_uikit_bottom_sheet_without_present;
+			packageProductDependencies = (
+				661A9FD52A80FDF300789389 /* TinyConstraints */,
+			);
 			productName = study_uikit_bottom_sheet_without_present;
 			productReference = 0E84D5CA2A7D22B5003EF56E /* study_uikit_bottom_sheet_without_present.app */;
 			productType = "com.apple.product-type.application";
@@ -106,6 +111,9 @@
 				Base,
 			);
 			mainGroup = 0E84D5C12A7D22B5003EF56E;
+			packageReferences = (
+				661A9FD42A80FDF300789389 /* XCRemoteSwiftPackageReference "TinyConstraints" */,
+			);
 			productRefGroup = 0E84D5CB2A7D22B5003EF56E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -342,6 +350,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		661A9FD42A80FDF300789389 /* XCRemoteSwiftPackageReference "TinyConstraints" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/roberthein/TinyConstraints";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		661A9FD52A80FDF300789389 /* TinyConstraints */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 661A9FD42A80FDF300789389 /* XCRemoteSwiftPackageReference "TinyConstraints" */;
+			productName = TinyConstraints;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0E84D5C22A7D22B5003EF56E /* Project object */;
 }

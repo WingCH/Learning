@@ -7,13 +7,8 @@
 
 import UIKit
 
-protocol BottomSheetViewDismissable: UIViewController {
-    var onDismiss: (() -> Void)? { get set }
-}
-
-class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
-    private let contentViewController: Content
-    var onDismiss: (() -> Void)?
+public class BottomSheetView: UIView {
+    private let contentViewController: UIViewController
 
     private weak var parentView: UIView?
     private let backgroundDimmedView: UIView = {
@@ -22,12 +17,9 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
         return view
     }()
 
-    init(contentViewController: Content) {
+    public init(contentViewController: UIViewController) {
         self.contentViewController = contentViewController
         super.init(frame: .zero)
-        contentViewController.onDismiss = { [weak self] in
-            self?.hide()
-        }
         setupView()
         setupGesture()
     }
@@ -71,14 +63,13 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
                 UIView.animate(withDuration: 0.3, animations: {
                     self.transform = CGAffineTransform(translationX: 0, y: self.frame.height)
                 }, completion: { _ in
-                    self.hide()
+                    self.close()
                 })
             }
         }
     }
 
-    // Revert transform, 8128e8343cc67f0e1a0c1a0f11516d1c6d5120f6
-    func show(in parentView: UIView, height: CGFloat) {
+    public func show(in parentView: UIView, height: CGFloat) {
         parentView.addSubview(self)
         self.transform = .identity
         self.parentView = parentView
@@ -95,7 +86,7 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
         }
     }
 
-    func hide() {
+    public func close(completion: (() -> Void)? = nil) {
         UIView.animate(withDuration: 0.3, animations: {
             guard let parentView = self.parentView else { return }
             self.transform = CGAffineTransform(translationX: 0, y: parentView.frame.height)
@@ -103,7 +94,7 @@ class BottomSheetView<Content: BottomSheetViewDismissable>: UIView {
         }, completion: { _ in
             self.backgroundDimmedView.removeFromSuperview()
             self.removeFromSuperview()
-            self.onDismiss?()
+            completion?()
         })
     }
 }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class YourViewController: UIViewController, BottomSheetViewDismissable {
+class YourViewController: UIViewController {
     var onDismiss: (() -> Void)?
 
     override func viewDidLoad() {
@@ -34,7 +34,7 @@ class YourViewController: UIViewController, BottomSheetViewDismissable {
 }
 
 class BottomSheetViewController: UIViewController {
-    private var bottomSheetView: BottomSheetView<YourViewController>?
+    private var bottomSheetView: BottomSheetView?
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -53,10 +53,14 @@ class BottomSheetViewController: UIViewController {
     }
 
     @objc private func didTapButton() {
-        bottomSheetView = BottomSheetView(contentViewController: YourViewController())
-        bottomSheetView?.onDismiss = { [weak self] in
-            self?.bottomSheetView = nil
+        let vc = YourViewController()
+        vc.onDismiss = { [weak self] in
+            self?.bottomSheetView?.close(completion: {
+                self?.bottomSheetView = nil
+            })
         }
+        bottomSheetView = BottomSheetView(contentViewController: vc)
+
         bottomSheetView?.show(in: view, height: 300)
     }
 }

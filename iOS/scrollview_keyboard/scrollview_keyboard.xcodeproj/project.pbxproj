@@ -11,7 +11,7 @@
 		0EFB071C280D00D400655FA2 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EFB071B280D00D400655FA2 /* RootViewController.swift */; };
 		0EFB0720280D00D500655FA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0EFB071F280D00D500655FA2 /* Assets.xcassets */; };
 		0EFB0723280D00D500655FA2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0EFB0721280D00D500655FA2 /* LaunchScreen.storyboard */; };
-		392CE840F3FD0F5AF709A163 /* Pods_scrollview_keyboard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0FFBCD24CE3151538A13E8B /* Pods_scrollview_keyboard.framework */; };
+		6610208A2A81DDAC00E09DD9 /* TinyConstraints in Frameworks */ = {isa = PBXBuildFile; productRef = 661020892A81DDAC00E09DD9 /* TinyConstraints */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,9 +20,6 @@
 		0EFB071B280D00D400655FA2 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		0EFB071F280D00D500655FA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0EFB0722280D00D500655FA2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		10E2402BFDD6445AE6B05519 /* Pods-scrollview_keyboard.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-scrollview_keyboard.release.xcconfig"; path = "Target Support Files/Pods-scrollview_keyboard/Pods-scrollview_keyboard.release.xcconfig"; sourceTree = "<group>"; };
-		9787AD059A8A724EA2017A7F /* Pods-scrollview_keyboard.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-scrollview_keyboard.debug.xcconfig"; path = "Target Support Files/Pods-scrollview_keyboard/Pods-scrollview_keyboard.debug.xcconfig"; sourceTree = "<group>"; };
-		E0FFBCD24CE3151538A13E8B /* Pods_scrollview_keyboard.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_scrollview_keyboard.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -30,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				392CE840F3FD0F5AF709A163 /* Pods_scrollview_keyboard.framework in Frameworks */,
+				6610208A2A81DDAC00E09DD9 /* TinyConstraints in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,7 +39,6 @@
 			children = (
 				0EFB0718280D00D400655FA2 /* scrollview_keyboard */,
 				0EFB0717280D00D400655FA2 /* Products */,
-				32865D3C1143BD0FD72D4D74 /* Pods */,
 				F56408E632279A3015FC5DCC /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -66,19 +62,9 @@
 			path = scrollview_keyboard;
 			sourceTree = "<group>";
 		};
-		32865D3C1143BD0FD72D4D74 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				9787AD059A8A724EA2017A7F /* Pods-scrollview_keyboard.debug.xcconfig */,
-				10E2402BFDD6445AE6B05519 /* Pods-scrollview_keyboard.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		F56408E632279A3015FC5DCC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E0FFBCD24CE3151538A13E8B /* Pods_scrollview_keyboard.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -90,17 +76,18 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0EFB0726280D00D500655FA2 /* Build configuration list for PBXNativeTarget "scrollview_keyboard" */;
 			buildPhases = (
-				900D4057B985A4C4D0906279 /* [CP] Check Pods Manifest.lock */,
 				0EFB0712280D00D400655FA2 /* Sources */,
 				0EFB0713280D00D400655FA2 /* Frameworks */,
 				0EFB0714280D00D400655FA2 /* Resources */,
-				D70C782B919AAB712245A97D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = scrollview_keyboard;
+			packageProductDependencies = (
+				661020892A81DDAC00E09DD9 /* TinyConstraints */,
+			);
 			productName = scrollview_keyboard;
 			productReference = 0EFB0716280D00D400655FA2 /* scrollview_keyboard.app */;
 			productType = "com.apple.product-type.application";
@@ -129,6 +116,9 @@
 				Base,
 			);
 			mainGroup = 0EFB070D280D00D400655FA2;
+			packageReferences = (
+				661020882A81DDAC00E09DD9 /* XCRemoteSwiftPackageReference "TinyConstraints" */,
+			);
 			productRefGroup = 0EFB0717280D00D400655FA2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -149,48 +139,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		900D4057B985A4C4D0906279 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-scrollview_keyboard-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D70C782B919AAB712245A97D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-scrollview_keyboard/Pods-scrollview_keyboard-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-scrollview_keyboard/Pods-scrollview_keyboard-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-scrollview_keyboard/Pods-scrollview_keyboard-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0EFB0712280D00D400655FA2 /* Sources */ = {
@@ -334,7 +282,6 @@
 		};
 		0EFB0727280D00D500655FA2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9787AD059A8A724EA2017A7F /* Pods-scrollview_keyboard.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -361,7 +308,6 @@
 		};
 		0EFB0728280D00D500655FA2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 10E2402BFDD6445AE6B05519 /* Pods-scrollview_keyboard.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -408,6 +354,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		661020882A81DDAC00E09DD9 /* XCRemoteSwiftPackageReference "TinyConstraints" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/roberthein/TinyConstraints";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		661020892A81DDAC00E09DD9 /* TinyConstraints */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 661020882A81DDAC00E09DD9 /* XCRemoteSwiftPackageReference "TinyConstraints" */;
+			productName = TinyConstraints;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0EFB070E280D00D400655FA2 /* Project object */;
 }

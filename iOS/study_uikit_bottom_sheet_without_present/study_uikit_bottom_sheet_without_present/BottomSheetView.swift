@@ -5,17 +5,14 @@
 //  Created by Wing on 4/8/2023.
 //
 
+import TinyConstraints
 import UIKit
 
 public class BottomSheetView: UIView {
     private let contentViewController: UIViewController
 
     private weak var parentView: UIView?
-    private let backgroundDimmedView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.black.withAlphaComponent(0)
-        return view
-    }()
+    private let contentView: UIView = UIView()
 
     public init(contentViewController: UIViewController) {
         self.contentViewController = contentViewController
@@ -30,16 +27,10 @@ public class BottomSheetView: UIView {
     }
 
     private func setupView() {
-        backgroundColor = .systemBackground
-
-        addSubview(contentViewController.view)
-        contentViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            contentViewController.view.topAnchor.constraint(equalTo: topAnchor),
-            contentViewController.view.leadingAnchor.constraint(equalTo: leadingAnchor),
-            contentViewController.view.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contentViewController.view.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
+        backgroundColor = .clear
+        addSubview(contentView)
+        contentView.addSubview(contentViewController.view)
+        contentViewController.view.edgesToSuperview()
     }
 
     private func setupGesture() {
@@ -51,17 +42,17 @@ public class BottomSheetView: UIView {
         let translation = gesture.translation(in: self)
         print("gesture.state: \(gesture.state), translation.y: \(translation.y)")
         if translation.y >= 0 {
-            transform = CGAffineTransform(translationX: 0, y: translation.y)
+            contentView.transform = CGAffineTransform(translationX: 0, y: translation.y)
         }
 
         if gesture.state == .ended {
             if translation.y < 200 {
                 UIView.animate(withDuration: 0.3) {
-                    self.transform = .identity
+                    self.contentView.transform = .identity
                 }
             } else {
                 UIView.animate(withDuration: 0.3, animations: {
-                    self.transform = CGAffineTransform(translationX: 0, y: self.frame.height)
+                    self.contentView.transform = CGAffineTransform(translationX: 0, y: self.frame.height)
                 }, completion: { _ in
                     self.close()
                 })
@@ -71,28 +62,25 @@ public class BottomSheetView: UIView {
 
     public func show(in parentView: UIView, height: CGFloat) {
         parentView.addSubview(self)
-        self.transform = .identity
+        self.contentView.transform = .identity
         self.parentView = parentView
-        parentView.addSubview(backgroundDimmedView)
-        backgroundDimmedView.frame = parentView.bounds
 
-        parentView.addSubview(self)
-        frame = CGRect(x: 0, y: parentView.frame.height - height, width: parentView.frame.width, height: height)
-        transform = CGAffineTransform(translationX: 0, y: height)
+        frame = parentView.bounds
+        contentView.frame = CGRect(x: 0, y: parentView.frame.height - height, width: parentView.frame.width, height: height)
+        contentView.transform = CGAffineTransform(translationX: 0, y: height)
 
         UIView.animate(withDuration: 0.3) {
-            self.transform = .identity
-            self.backgroundDimmedView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+            self.contentView.transform = .identity
+            self.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         }
     }
 
     public func close(completion: (() -> Void)? = nil) {
         UIView.animate(withDuration: 0.3, animations: {
             guard let parentView = self.parentView else { return }
-            self.transform = CGAffineTransform(translationX: 0, y: parentView.frame.height)
-            self.backgroundDimmedView.backgroundColor = UIColor.black.withAlphaComponent(0)
+            self.contentView.transform = CGAffineTransform(translationX: 0, y: parentView.frame.height)
+            self.backgroundColor = UIColor.black.withAlphaComponent(0)
         }, completion: { _ in
-            self.backgroundDimmedView.removeFromSuperview()
             self.removeFromSuperview()
             completion?()
         })

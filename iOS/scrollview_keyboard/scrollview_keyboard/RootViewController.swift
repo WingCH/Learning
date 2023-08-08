@@ -99,7 +99,7 @@ class RootViewController: UIViewController {
               let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
         let keyboardFrame = keyboardFrameValue.cgRectValue
         let keyboardSize = keyboardFrame.size
-        // TODO: why have padding bettween textfield and keyboard
+        // TODO: why have padding between textfield and keyboard
         let contentInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: keyboardSize.height, right: 0.0)
         print(keyboardSize.height)
         scrollView.contentInset = contentInsets

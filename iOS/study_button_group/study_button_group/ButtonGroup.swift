@@ -11,25 +11,18 @@ struct ButtonGroup: View {
     @State var offset: CGSize = .zero
 
     var body: some View {
-        Grid {
+        Grid(alignment: .trailing) {
             GridRow {
-                RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.blue)
-                    .frame(width: 50, height: 50)
-
-                RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.blue)
-                    .frame(width: 50, height: 50)
+                CapsuleButton(imageName: "doc.on.doc", action: {})
+                CapsuleButton(imageName: "text.viewfinder", action: {})
+                CapsuleButton(imageName: "text.magnifyingglass", action: {})
             }
             GridRow {
-                RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.blue)
-                    .frame(width: 50, height: 50)
-
-                RoundedRectangle(cornerRadius: 5)
-                    .fill(Color.gray)
-                    .frame(width: 50, height: 50)
-                    .gesture(
+                CapsuleButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", action: {})
+                    .gridCellColumns(3)
+                    .disabled(true)
+                    .foregroundColor(Color.white)
+                    .highPriorityGesture(
                         // https://stackoverflow.com/a/69573041/5588637
                         DragGesture(coordinateSpace: .global).onChanged { value in
                             offset = value.translation
@@ -42,7 +35,9 @@ struct ButtonGroup: View {
                         }
                     )
             }
-        }.offset(x: offset.width, y: offset.height)
+        }
+        .background(Color.red)
+        .offset(x: offset.width, y: offset.height)
     }
 }
 

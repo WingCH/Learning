@@ -10,7 +10,6 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         ButtonGroup()
-//            .offset(x: viewState.width, y: viewState.height)
     }
 }
 

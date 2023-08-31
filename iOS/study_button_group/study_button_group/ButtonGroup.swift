@@ -7,19 +7,22 @@
 
 import SwiftUI
 
-struct ButtonGroup: View {
+struct ButtonGroup<Content: View>: View {
     @State var offset: CGSize = .zero
+    let content: Content
+
+    init(@ViewBuilder _ content: () -> Content) {
+        self.content = content()
+    }
 
     var body: some View {
         Grid(alignment: .trailing) {
             GridRow {
-                CapsuleButton(imageName: "doc.on.doc", action: {})
-                CapsuleButton(imageName: "text.viewfinder", action: {})
-                CapsuleButton(imageName: "text.magnifyingglass", action: {})
+                content
             }
             GridRow {
                 CapsuleButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", action: {})
-                    .gridCellColumns(3)
+                    .gridCellColumns(99)
                     .disabled(true)
                     .foregroundColor(Color.white)
                     .highPriorityGesture(
@@ -36,13 +39,16 @@ struct ButtonGroup: View {
                     )
             }
         }
-        .background(Color.red)
         .offset(x: offset.width, y: offset.height)
     }
 }
 
 struct ButtonGroup_Previews: PreviewProvider {
     static var previews: some View {
-        ButtonGroup()
+        ButtonGroup {
+            CapsuleButton(imageName: "doc.on.doc", action: {})
+            CapsuleButton(imageName: "text.viewfinder", action: {})
+            CapsuleButton(imageName: "text.magnifyingglass", action: {})
+        }
     }
 }

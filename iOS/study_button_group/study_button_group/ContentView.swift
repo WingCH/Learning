@@ -8,8 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var count: Int = 1
     var body: some View {
-        ButtonGroup()
+        VStack {
+            ButtonGroup {
+                ForEach(1 ..< count, id: \.self) { i in
+                    CapsuleButton(imageName: "\(i).circle", action: {})
+                }
+            }
+            .background(Color.red)
+            .animation(.spring(), value: count)
+            Button("Add") {
+                count += 1
+            }
+        }
     }
 }
 

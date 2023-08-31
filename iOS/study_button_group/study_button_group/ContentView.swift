@@ -13,7 +13,7 @@ struct ContentView: View {
         VStack {
             ButtonGroup {
                 ForEach(1 ..< count, id: \.self) { i in
-                    CapsuleButton(imageName: "\(i).circle", action: {})
+                    CapsuleButton(imageName: "\(i).circle") {}
                 }
             }
             .background(Color.red)

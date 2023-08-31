@@ -32,13 +32,13 @@ struct CapsuleButton: View {
 struct CapsuleButton_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            CapsuleButton(imageName: "text.viewfinder", action: {})
+            CapsuleButton(imageName: "text.viewfinder") {}
                 .padding(16)
                 .background(Color.red)
-            CapsuleButton(imageName: "text.magnifyingglass", action: {})
+            CapsuleButton(imageName: "text.magnifyingglass") {}
                 .padding(16)
                 .background(Color.red)
-            CapsuleButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", action: {})
+            CapsuleButton(imageName: "arrow.up.and.down.and.arrow.left.and.right") {}
                 .padding(16)
                 .background(Color.red)
             CapsuleButton(imageName: "doc.on.doc", action: {})

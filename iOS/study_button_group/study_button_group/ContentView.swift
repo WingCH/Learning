@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var position: CGPoint = CGPoint(x: 50, y: 50)
     @State var count: Int = 1
     var body: some View {
         VStack {
-            ButtonGroup {
+            ButtonGroup(position: $position) {
                 ForEach(1 ..< count, id: \.self) { i in
                     CapsuleButton(imageName: "\(i).circle") {}
                 }

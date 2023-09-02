@@ -13,6 +13,7 @@
 		0E3A911F2A96484B00D84E18 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E3A911E2A96484B00D84E18 /* Preview Assets.xcassets */; };
 		0E3A91262A96570A00D84E18 /* ButtonGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E3A91252A96570A00D84E18 /* ButtonGroup.swift */; };
 		0E5EFEA22A9AED7B0046F248 /* CapsuleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EFEA12A9AED7B0046F248 /* CapsuleButton.swift */; };
+		0E9865292AA32B8700EECC5B /* CustomDragGesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9865282AA32B8700EECC5B /* CustomDragGesture.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		0E3A911E2A96484B00D84E18 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0E3A91252A96570A00D84E18 /* ButtonGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonGroup.swift; sourceTree = "<group>"; };
 		0E5EFEA12A9AED7B0046F248 /* CapsuleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleButton.swift; sourceTree = "<group>"; };
+		0E9865282AA32B8700EECC5B /* CustomDragGesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDragGesture.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				0E3A911D2A96484B00D84E18 /* Preview Content */,
 				0E3A91252A96570A00D84E18 /* ButtonGroup.swift */,
 				0E5EFEA12A9AED7B0046F248 /* CapsuleButton.swift */,
+				0E9865282AA32B8700EECC5B /* CustomDragGesture.swift */,
 			);
 			path = study_button_group;
 			sourceTree = "<group>";
@@ -143,6 +146,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E9865292AA32B8700EECC5B /* CustomDragGesture.swift in Sources */,
 				0E3A911A2A96484A00D84E18 /* ContentView.swift in Sources */,
 				0E3A91262A96570A00D84E18 /* ButtonGroup.swift in Sources */,
 				0E3A91182A96484A00D84E18 /* study_button_groupApp.swift in Sources */,

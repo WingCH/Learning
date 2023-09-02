@@ -8,10 +8,14 @@
 import SwiftUI
 
 struct ButtonGroup<Content: View>: View {
-    @State var offset: CGSize = .zero
+    @Binding private var position: CGPoint
+    @GestureState private var fingerLocation: CGPoint? = nil
+    @GestureState private var startLocation: CGPoint? = nil
+
     let content: Content
 
-    init(@ViewBuilder _ content: () -> Content) {
+    init(position: Binding<CGPoint>, @ViewBuilder _ content: () -> Content) {
+        self._position = position
         self.content = content()
     }
 
@@ -25,30 +29,28 @@ struct ButtonGroup<Content: View>: View {
                     .gridCellColumns(99)
                     .disabled(true)
                     .foregroundColor(Color.white)
-                    .highPriorityGesture(
-                        // https://stackoverflow.com/a/69573041/5588637
-                        DragGesture(coordinateSpace: .global).onChanged { value in
-                            offset = value.translation
-                        }
-                        .onEnded { _ in
-                            print("onEnded")
-                            withAnimation(.spring()) {
-                                offset = .zero
-                            }
-                        }
-                    )
+                    .onDrag(position: $position)
             }
         }
-        .offset(x: offset.width, y: offset.height)
+        .position(position)
     }
 }
 
 struct ButtonGroup_Previews: PreviewProvider {
     static var previews: some View {
-        ButtonGroup {
-            CapsuleButton(imageName: "doc.on.doc", action: {})
-            CapsuleButton(imageName: "text.viewfinder", action: {})
-            CapsuleButton(imageName: "text.magnifyingglass", action: {})
+        PreviewWrapper()
+    }
+
+    // https://stackoverflow.com/a/59626213/5588637
+    struct PreviewWrapper: View {
+        @State private var position: CGPoint = CGPoint(x: 50, y: 50)
+
+        var body: some View {
+            ButtonGroup(position: $position) {
+                CapsuleButton(imageName: "doc.on.doc", action: {})
+                CapsuleButton(imageName: "text.viewfinder", action: {})
+                CapsuleButton(imageName: "text.magnifyingglass", action: {})
+            }
         }
     }
 }

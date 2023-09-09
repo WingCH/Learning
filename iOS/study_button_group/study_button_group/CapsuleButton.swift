@@ -31,19 +31,34 @@ struct CapsuleButton: View {
 
 struct CapsuleButton_Previews: PreviewProvider {
     static var previews: some View {
-        VStack {
-            CapsuleButton(imageName: "text.viewfinder") {}
-                .padding(16)
-                .background(Color.red)
-            CapsuleButton(imageName: "text.magnifyingglass") {}
-                .padding(16)
-                .background(Color.red)
-            CapsuleButton(imageName: "arrow.up.and.down.and.arrow.left.and.right") {}
-                .padding(16)
-                .background(Color.red)
-            CapsuleButton(imageName: "doc.on.doc", action: {})
-                .padding(16)
-                .background(Color.red)
+        PreviewWrapper()
+    }
+
+    struct PreviewWrapper: View {
+        @State private var position: CGPoint = CGPoint(x: 100, y: 100)
+        var body: some View {
+            VStack(alignment: .center) {
+                CapsuleButton(imageName: "text.viewfinder") {}
+                    .padding(16)
+                    .background(Color.red)
+                CapsuleButton(imageName: "text.magnifyingglass") {}
+                    .padding(16)
+                    .background(Color.red)
+                CapsuleButton(imageName: "arrow.up.and.down.and.arrow.left.and.right") {}
+                    .padding(16)
+                    .background(Color.red)
+                CapsuleButton(imageName: "doc.on.doc", action: {})
+                    .padding(16)
+                    .background(Color.red)
+                // 做唔到同時兩個Gesture(drag & tap)
+                // https://steipete.com/posts/supporting-both-tap-and-longpress-on-button-in-swiftui/
+                CapsuleButton(imageName: "arrow.up.and.down.and.arrow.left.and.right", action: {})
+                    .padding(16)
+                    .background(Color.red)
+                    .onDrag(position: $position)
+                    .position(position)
+            }
+            .background(Color.gray)
         }
     }
 }

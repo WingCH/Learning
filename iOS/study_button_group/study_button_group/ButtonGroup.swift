@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ButtonGroup<Content: View>: View {
     @Binding private var position: CGPoint
-    @GestureState private var fingerLocation: CGPoint? = nil
-    @GestureState private var startLocation: CGPoint? = nil
 
     let content: Content
 
@@ -43,14 +41,14 @@ struct ButtonGroup_Previews: PreviewProvider {
 
     // https://stackoverflow.com/a/59626213/5588637
     struct PreviewWrapper: View {
-        @State private var position: CGPoint = CGPoint(x: 50, y: 50)
+        @State private var position: CGPoint = CGPoint(x: 200, y: 200)
 
         var body: some View {
             ButtonGroup(position: $position) {
                 CapsuleButton(imageName: "doc.on.doc", action: {})
                 CapsuleButton(imageName: "text.viewfinder", action: {})
                 CapsuleButton(imageName: "text.magnifyingglass", action: {})
-            }
+            }.background(Color.black)
         }
     }
 }

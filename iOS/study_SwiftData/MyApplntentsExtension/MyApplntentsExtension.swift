@@ -32,14 +32,18 @@ struct MyApplntentsExtension: AppIntent {
     }
 
     @MainActor
-    func perform() async throws -> some ReturnsValue<Date> {
-        let context = DataManager().modelContainer.mainContext
+    func perform() async throws -> some ReturnsValue<String> {
         var image: UIImage?
         if let imageData = imageFile?.data {
             image = UIImage(data: imageData)
         }
-        context.insert(Item(timestamp: date, imageData: image?.jpegData(compressionQuality: 1)))
-        try context.save()
-        return .result(value: date)
+
+        try await DataManager.shared.addItem(
+            item: Item(timestamp: date, imageData: image?.jpegData(compressionQuality: 1))
+        )
+
+        let items = try DataManager.shared.fetchItems()
+        // if want return custom model, can ref https://github.com/mralexhay/Booky/blob/c2f85f52640257754b2297b2753d870f42a598e4/Shortcuts/Actions/AddBook.swift#L51
+        return .result(value: "\(items.map(\.timestamp))")
     }
 }

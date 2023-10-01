@@ -14,6 +14,6 @@ struct study_SwiftDataApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(DataManager().modelContainer)
+        .modelContainer(DataManager.shared.modelContainer)
     }
 }

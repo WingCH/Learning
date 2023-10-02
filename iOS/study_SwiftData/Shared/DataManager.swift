@@ -33,9 +33,10 @@ final class DataManager {
         }
     }
 
-    func addItem(item: Item) async throws {
+    func addItem(item: Item) async throws -> String? {
         context.insert(item)
         try modelContainer.mainContext.save()
+        return item.persistentModelID.storeIdentifier
     }
 
     func fetchItems() throws -> [Item] {

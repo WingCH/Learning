@@ -38,12 +38,13 @@ struct MyApplntentsExtension: AppIntent {
             image = UIImage(data: imageData)
         }
 
-        try await DataManager.shared.addItem(
+       let storeIdentifier = try await DataManager.shared.addItem(
             item: Item(timestamp: date, imageData: image?.jpegData(compressionQuality: 1))
         )
 
+        print(storeIdentifier)
         let items = try DataManager.shared.fetchItems()
         // if want return custom model, can ref https://github.com/mralexhay/Booky/blob/c2f85f52640257754b2297b2753d870f42a598e4/Shortcuts/Actions/AddBook.swift#L51
-        return .result(value: "\(items.map(\.timestamp))")
+        return .result(value: "\(items.map(\.id.storeIdentifier))")
     }
 }

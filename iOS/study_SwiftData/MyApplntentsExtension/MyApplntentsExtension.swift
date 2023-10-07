@@ -33,13 +33,8 @@ struct MyApplntentsExtension: AppIntent {
 
     @MainActor
     func perform() async throws -> some ReturnsValue<String> {
-        var image: UIImage?
-        if let imageData = imageFile?.data {
-            image = UIImage(data: imageData)
-        }
-
-       let storeIdentifier = try await DataManager.shared.addItem(
-            item: Item(timestamp: date, imageData: image?.jpegData(compressionQuality: 1))
+        let storeIdentifier = try await DataManager.shared.addItem(
+            item: Item(timestamp: date, imageData: imageFile?.data)
         )
 
         print(storeIdentifier)

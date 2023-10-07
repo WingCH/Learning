@@ -22,10 +22,10 @@ struct TagAnchorPreferenceKey: PreferenceKey {
     }
 }
 
-struct TagModel: Identifiable {
+struct TagModel: Identifiable, Hashable {
     let id: UUID
     let text: String
-    let isSelected: Bool
+    var isSelected: Bool
 
     init(id: UUID = UUID(), text: String, isSelected: Bool) {
         self.id = id
@@ -41,7 +41,7 @@ struct TagModel: Identifiable {
 struct TagView: View {
     let tag: TagModel
     var body: some View {
-        Text(tag.text)
+        Text("\(tag.text)")
             .padding()
             .background(.regularMaterial)
             .background(tag.isSelected ? .blue : .clear)
@@ -49,6 +49,7 @@ struct TagView: View {
             .anchorPreference(key: TagAnchorPreferenceKey.self, value: .bounds) { anchor in
                 [TagAnchorModel(id: tag.id, anchor: anchor)]
             }
+            .id(tag)
     }
 }
 

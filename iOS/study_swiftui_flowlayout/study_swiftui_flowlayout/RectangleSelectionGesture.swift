@@ -8,16 +8,10 @@
 import SwiftUI
 
 struct RectangleSelectionGesture: Gesture {
-    @Binding var tags: [TagModel]
-    // The rectangle drawn by the gesture
-    @Binding var selectionRect: CGRect
-    // The indexes of tags that have been processed by the gesture
-    @State var processedIndexes: Set<Int> = []
-
-    // The rectangles representing the on-screen position and size of each tag
-    let tagRects: [CGRect]
-    // The original state of the tags, stored when the gesture begins
-    @State var originalTags: [TagModel]?
+    @Binding var tags: [TagModel] // The current tags data models list
+    @Binding var selectionRect: CGRect // The rectangle drawn by the gesture
+    let tagRects: [CGRect] // The rectangles representing the on-screen position and size of each tag
+    @State var originalTags: [TagModel]? // The original state of the tags, stored when the gesture begins
 
     var body: some Gesture {
         DragGesture()
@@ -40,32 +34,34 @@ struct RectangleSelectionGesture: Gesture {
     }
 
     private func calculateGestureArea(start: CGPoint, end: CGPoint) -> CGRect {
+        // Calculate the selection area from start point to end point
         let origin = CGPoint(x: min(start.x, end.x), y: min(start.y, end.y))
         let size = CGSize(width: abs(start.x - end.x), height: abs(start.y - end.y))
         return CGRect(origin: origin, size: size)
     }
 
     private func processTagSelectionChange(gestureArea: CGRect, originalTags: [TagModel]) {
+        // Update the selection state of tags based on the gesture area and the original tag state
         for (index, rect) in tagRects.enumerated() {
             let originalTag = originalTags[index]
             let currentTag = tags[index]
 
             if rect.intersects(gestureArea) {
                 tags[index] = currentTag.copyWith(isSelected: !originalTag.isSelected)
-                processedIndexes.insert(index)
-            } else if processedIndexes.contains(index) {
+            } else if originalTag.isSelected != currentTag.isSelected {
                 tags[index] = currentTag.copyWith(isSelected: originalTag.isSelected)
             }
         }
     }
 
     private func saveOriginalTagsIfNeeded() {
+        // Save the current tag state if original tags are nil
         guard originalTags == nil else { return }
         originalTags = tags
     }
 
     private func handleGestureEnd() {
-        processedIndexes.removeAll()
+        // Reset the original tag state when the gesture ends
         originalTags = nil
     }
 }

@@ -48,7 +48,10 @@ struct ContentView: View {
                 selectionRect: $selectionRect,
                 tagRects: tagRects
             )
-        )
+        ).onChange(of: tags) { oldValue, newValue in
+            print("oldValue: \(oldValue)")
+            print("oldValue: \(newValue)")
+        }
     }
 }
 

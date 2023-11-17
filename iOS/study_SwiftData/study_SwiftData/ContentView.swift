@@ -36,6 +36,8 @@ struct ContentView: View {
             }
         } detail: {
             Text("Select an item")
+        }.onChange(of: items) { oldValue, newValue in
+            print("onChange: \(oldValue) \(newValue)")
         }
     }
 

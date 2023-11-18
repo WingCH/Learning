@@ -54,7 +54,10 @@ private class CustomBottomStackView: UIView {
     let uiLabel1 = UILabel()
     let uiLabel2 = UILabel()
 
-    var constraint: Constraint?
+//    var constraint: Constraint?
+    var constraintTop: Constraint?
+    var constraintBottom: Constraint?
+
     var onViewExpanded: ((CGFloat) -> Void)?
 
     override init(frame: CGRect = .zero) {
@@ -96,30 +99,47 @@ private class CustomBottomStackView: UIView {
         wrapper.edgesToSuperview()
         topStack.edgesToSuperview()
         bottomStack.horizontalToSuperview()
-        constraint = bottomStack.top(to: topStack)
+//        constraint = bottomStack.top(to: topStack)
+        constraintTop = bottomStack.top(to: topStack)
+        constraintBottom = bottomStack.bottomToTop(of: topStack, isActive: false)
     }
 
     func trigger() {
-        let height: CGFloat
-        let bottomStackHeight = bottomStack.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
-        let topStackHeight = topStack.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
-
-        if constraint?.constant == 0 {
-            constraint?.constant = -bottomStackHeight
-            height = bottomStackHeight
-        } else {
-            constraint?.constant = 0
-            height = 0
-        }
+        constraintTop?.isActive.toggle()
+        constraintBottom?.isActive.toggle()
         UIView.animate(withDuration: 0.5) {
             self.layoutIfNeeded()
-            self.onViewExpanded?(height)
+
+            if self.constraintBottom?.isActive == true {
+                let bottomStackHeight = self.bottomStack.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
+                self.onViewExpanded?(bottomStackHeight)
+            } else if self.constraintTop?.isActive == true {
+                self.onViewExpanded?(0)
+            }
         }
     }
+
+    //    func trigger() {
+    //        let height: CGFloat
+    //        let bottomStackHeight = bottomStack.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
+    //        let topStackHeight = topStack.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize).height
+    //
+    //        if constraint?.constant == 0 {
+    //            constraint?.constant = -bottomStackHeight
+    //            height = bottomStackHeight
+    //        } else {
+    //            constraint?.constant = 0
+    //            height = 0
+    //        }
+    //        UIView.animate(withDuration: 0.5) {
+    //            self.layoutIfNeeded()
+    //            self.onViewExpanded?(height)
+    //        }
+    //    }
 }
 
 // normal
-//private class CustomBottomView: UIView {
+// private class CustomBottomView: UIView {
 //    let topView = UIView()
 //    let bottomView = UIView()
 //    var constraint: Constraint?
@@ -161,4 +181,4 @@ private class CustomBottomStackView: UIView {
 //            self.layoutIfNeeded()
 //        }
 //    }
-//}
+// }

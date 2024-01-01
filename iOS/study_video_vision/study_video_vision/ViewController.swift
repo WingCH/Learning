@@ -17,16 +17,23 @@ class ViewController: UIViewController {
             print("無法找到視頻文件")
             return
         }
-
-        let images: [UIImage] = Array(extractFrames(from: videoURL, eachSecond: 1))
-
-        generateFeaturePrints(for: images) { [weak self] featurePrints in
-            self?.compareFeaturePrints(featurePrints)
+        Task {
+            let images = try await extractFrames(from: videoURL, eachSecond: 1)
+            let featurePrints = await generateFeaturePrints(for: images)
+            self.compareFeaturePrints(featurePrints)
+            print(images)
         }
     }
 
-    func extractFrames(from videoURL: URL, eachSecond: TimeInterval) -> [UIImage] {
+    func extractFrames(from videoURL: URL, eachSecond: TimeInterval) async throws -> [UIImage] {
         let asset = AVAsset(url: videoURL)
+        let durationTime = try await asset.load(.duration)
+        let durationSeconds = CMTimeGetSeconds(durationTime)
+
+        return await extractFramesUsingDuration(asset: asset, duration: durationSeconds, eachSecond: eachSecond)
+    }
+
+    func extractFramesUsingDuration(asset: AVAsset, duration: Double, eachSecond: TimeInterval) async -> [UIImage] {
         let assetGenerator = AVAssetImageGenerator(asset: asset)
         assetGenerator.appliesPreferredTrackTransform = true
         assetGenerator.requestedTimeToleranceBefore = .zero
@@ -34,7 +41,6 @@ class ViewController: UIViewController {
 
         var frames: [UIImage] = []
         var currentTime: Float64 = 0
-        let duration = CMTimeGetSeconds(asset.duration)
 
         while currentTime < duration {
             let cmTime = CMTimeMakeWithSeconds(currentTime, preferredTimescale: 600)
@@ -49,33 +55,43 @@ class ViewController: UIViewController {
         return frames
     }
 
-    func generateFeaturePrints(for images: [UIImage], completion: @escaping ([VNFeaturePrintObservation?]) -> Void) {
-        var featurePrints: [VNFeaturePrintObservation?] = []
+    func generateFeaturePrints(for images: [UIImage]) async -> [VNFeaturePrintObservation?] {
+        var featurePrints = [VNFeaturePrintObservation?](repeating: nil, count: images.count)
 
-        let group = DispatchGroup()
-        for image in images {
-            group.enter()
-            guard let cgImage = image.cgImage else {
-                featurePrints.append(nil)
-                group.leave()
-                continue
+        await withTaskGroup(of: (Int, VNFeaturePrintObservation?).self) { group in
+            for (index, image) in images.enumerated() {
+                guard let cgImage = image.cgImage else {
+                    featurePrints[index] = nil
+                    continue
+                }
+
+                group.addTask {
+                    let result = await self.processImage(cgImage)
+                    return (index, result)
+                }
             }
 
-            let request = VNGenerateImageFeaturePrintRequest()
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            do {
-                try handler.perform([request])
-                print("request.results: \(request.results)")
-                featurePrints.append(request.results?.first as? VNFeaturePrintObservation)
-            } catch {
-                featurePrints.append(nil)
-                print("Error generating feature print: \(error)")
+            for await (index, result) in group {
+                featurePrints[index] = result
             }
-            group.leave()
         }
 
-        group.notify(queue: .main) {
-            completion(featurePrints)
+        return featurePrints
+    }
+
+    private func processImage(_ cgImage: CGImage) async -> VNFeaturePrintObservation? {
+        let request = VNGenerateImageFeaturePrintRequest()
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+
+        return await withCheckedContinuation { continuation in
+            do {
+                try handler.perform([request])
+                let observation = request.results?.first as? VNFeaturePrintObservation
+                continuation.resume(returning: observation)
+            } catch {
+                print("Error generating feature print: \(error)")
+                continuation.resume(returning: nil)
+            }
         }
     }
 

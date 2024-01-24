@@ -37,6 +37,7 @@ public class MemberLevelBar: UIView {
 private class CustomProgressView: UIView {
     private let progressView = UIView()
     private let thumbView = UIView()
+    private let gradientLayer = CAGradientLayer()
 
     private var currentProgress: CGFloat = 0
     private var thumbViewSize: CGSize {
@@ -49,7 +50,7 @@ private class CustomProgressView: UIView {
         super.init(frame: frame)
         setupProgressView()
         setupThumbView()
-        backgroundColor = .brown
+        setupGradientBackground()
     }
 
     @available(*, unavailable)
@@ -59,6 +60,7 @@ private class CustomProgressView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        gradientLayer.frame = bounds
         updateProgress(to: currentProgress, animated: false)
         thumbView.layer.cornerRadius = thumbViewCornerRadius
     }
@@ -72,6 +74,20 @@ private class CustomProgressView: UIView {
         thumbView.backgroundColor = .red
         thumbView.clipsToBounds = true
         addSubview(thumbView)
+    }
+
+    private func setupGradientBackground() {
+        gradientLayer.colors = [
+            // #403826
+            UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 1).cgColor,
+            // #40382600
+            UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 0).cgColor
+        ]
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+
+        layer.insertSublayer(gradientLayer, at: 0)
     }
 
     func updateProgress(to progress: CGFloat, animated: Bool = true) {

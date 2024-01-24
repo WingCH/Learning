@@ -45,6 +45,8 @@ private class CustomProgressView: UIView {
     }
 
     private var thumbViewCornerRadius: CGFloat { self.thumbViewSize.height / 2 }
+    // #C7A353
+    private let progressColor = UIColor(red: 0.78, green: 0.639, blue: 0.325, alpha: 1)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -66,12 +68,12 @@ private class CustomProgressView: UIView {
     }
 
     private func setupProgressView() {
-        progressView.backgroundColor = .blue
+        progressView.backgroundColor = progressColor
         addSubview(progressView)
     }
 
     private func setupThumbView() {
-        thumbView.backgroundColor = .red
+        thumbView.backgroundColor = progressColor
         thumbView.clipsToBounds = true
         addSubview(thumbView)
     }
@@ -96,7 +98,8 @@ private class CustomProgressView: UIView {
 
         let updateFrame = { [weak self] in
             guard let self = self else { return }
-            let progressWidth = self.bounds.width * progress
+            let minProgress: CGFloat = 10 / 355
+            let progressWidth = self.bounds.width * max(progress, minProgress)
             self.progressView.frame = CGRect(x: 0, y: 0, width: progressWidth, height: self.bounds.height)
             self.thumbView.frame = CGRect(
                 x: progressWidth - thumbViewCornerRadius,

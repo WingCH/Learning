@@ -47,28 +47,22 @@ class ViewController: UIViewController {
 
     func generateDisplayModel(levelText: String, amountText: String, progress: CGFloat) -> MemberLevelBar.DisplayModel {
         MemberLevelBar.DisplayModel(
-            infoViewDisplayModel: InfoView.DisplayModel(
-                gradientColors: [
-                    // #D8B354
-                    UIColor(red: 0.846, green: 0.702, blue: 0.331, alpha: 1).cgColor,
-                    // #A3814F
-                    UIColor(red: 0.637, green: 0.507, blue: 0.311, alpha: 1).cgColor
-                ],
-                levelTextDisplayModel: BorderLabelView.DisplayModel(
-                    backgroundColor: UIColor(red: 0.2, green: 0.188, blue: 0.173, alpha: 0.3),
-                    attributedText: levelText.toAttributedString()
-                ),
-                amountAttributedText: amountText.toAttributedString()
-            ),
-            progressViewDisplayModel: CustomProgressView.DisplayModel(
-                progress: progress,
-                gradientColors: [
-                    // #403826
-                    UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 1).cgColor,
-                    // #40382600
-                    UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 0).cgColor
-                ]
-            )
+            infoViewGradientColors: [
+                // #D8B354
+                UIColor(red: 0.846, green: 0.702, blue: 0.331, alpha: 1).cgColor,
+                // #A3814F
+                UIColor(red: 0.637, green: 0.507, blue: 0.311, alpha: 1).cgColor
+            ],
+            levelViewBackgroundColor: UIColor(red: 0.2, green: 0.188, blue: 0.173, alpha: 0.3),
+            levelViewAttributedText: levelText.toAttributedString(),
+            amountAttributedText: amountText.toAttributedString(),
+            progress: progress,
+            progressViewGradientColors: [
+                // #403826
+                UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 1).cgColor,
+                // #40382600
+                UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 0).cgColor
+            ]
         )
     }
 }

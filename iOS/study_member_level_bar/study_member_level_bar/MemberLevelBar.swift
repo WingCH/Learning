@@ -12,8 +12,12 @@ import UIKit
 
 public class MemberLevelBar: UIView {
     struct DisplayModel {
-        let infoViewDisplayModel: InfoView.DisplayModel
-        let progressViewDisplayModel: CustomProgressView.DisplayModel
+        let infoViewGradientColors: [CGColor]
+        let levelViewBackgroundColor: UIColor
+        let levelViewAttributedText: NSAttributedString
+        let amountAttributedText: NSAttributedString
+        let progress: CGFloat
+        let progressViewGradientColors: [CGColor]
     }
     
     private let infoView = InfoView()
@@ -46,12 +50,26 @@ public class MemberLevelBar: UIView {
     }
 
     func configure(with model: DisplayModel) {
-        infoView.configure(with: model.infoViewDisplayModel)
-        progressView.configure(with: model.progressViewDisplayModel)
+        infoView.configure(
+            with: InfoView.DisplayModel(
+                gradientColors: model.infoViewGradientColors,
+                levelTextDisplayModel: BorderLabelView.DisplayModel(
+                    backgroundColor: model.levelViewBackgroundColor,
+                    attributedText: model.levelViewAttributedText
+                ),
+                amountAttributedText: model.amountAttributedText
+            )
+        )
+        progressView.configure(
+            with: CustomProgressView.DisplayModel(
+                progress: model.progress,
+                gradientColors: model.progressViewGradientColors
+            )
+        )
     }
 }
 
-class InfoView: UIView {
+private class InfoView: UIView {
     struct DisplayModel {
         let gradientColors: [CGColor]
         let levelTextDisplayModel: BorderLabelView.DisplayModel
@@ -154,7 +172,7 @@ class InfoView: UIView {
     }
 }
     
-class BorderLabelView: UIView {
+private class BorderLabelView: UIView {
     struct DisplayModel {
         let backgroundColor: UIColor
         let attributedText: NSAttributedString
@@ -185,7 +203,7 @@ class BorderLabelView: UIView {
     }
 }
     
-class CustomProgressView: UIView {
+private class CustomProgressView: UIView {
     struct DisplayModel {
         let progress: CGFloat
         let gradientColors: [CGColor]

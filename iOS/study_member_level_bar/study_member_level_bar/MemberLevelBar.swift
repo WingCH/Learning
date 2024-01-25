@@ -56,6 +56,7 @@ public class MemberLevelBar: UIView {
 }
 
 private class InfoView: UIView {
+    private let gradientLayer = CAGradientLayer()
     private let hStack = UIStackView()
     let levelLabelView = BorderLabelView()
     let amountLabel = UILabel()
@@ -71,29 +72,44 @@ private class InfoView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        gradientLayer.frame = self.bounds
+
+        let clipPath = borderPath(rect: self.bounds)
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = clipPath.cgPath
+        self.layer.mask = maskLayer
     }
 
-    override func draw(_ rect: CGRect) {
-        guard let context = UIGraphicsGetCurrentContext() else { return }
+    private func setupViews() {
+        addSubview(hStack)
+        layer.insertSublayer(gradientLayer, at: 0)
 
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let colors = [
-            // #D8B354
-            UIColor(red: 0.846, green: 0.702, blue: 0.331, alpha: 1).cgColor,
-            // #A3814F
-            UIColor(red: 0.637, green: 0.507, blue: 0.311, alpha: 1).cgColor
-        ] as CFArray
+        gradientLayer.do {
+            $0.colors = [
+                // #D8B354
+                UIColor(red: 0.846, green: 0.702, blue: 0.331, alpha: 1).cgColor,
+                // #A3814F
+                UIColor(red: 0.637, green: 0.507, blue: 0.311, alpha: 1).cgColor
+            ]
+            $0.locations = [0.0, 1.0]
+            $0.startPoint = CGPoint(x: 0.83, y: 0)
+            $0.endPoint = CGPoint(x: 0.83, y: 0.93)
+        }
 
-        guard let gradient = CGGradient(
-            colorsSpace: colorSpace,
-            colors: colors,
-            locations: [0.0, 1.0]
-        ) else { return }
+        hStack.do {
+            $0.addArrangedSubview(levelLabelView)
+            $0.setCustomSpacing(4, after: levelLabelView)
+            $0.addArrangedSubview(amountLabel)
+            $0.edgesToSuperview(insets: .init(top: 8, left: 8, bottom: 8, right: 20))
+        }
 
+        clipsToBounds = true
+    }
+
+    private func borderPath(rect: CGRect) -> UIBezierPath {
         let topLeftRadius: CGFloat = 8
         let topRightRadius: CGFloat = 16
         let bottomRightRadius: CGFloat = 12
-
         let path = UIBezierPath()
         path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
         path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + topLeftRadius))
@@ -132,30 +148,7 @@ private class InfoView: UIView {
         path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
 
         path.close()
-
-        context.saveGState()
-        path.addClip()
-
-        let startPoint = CGPoint(x: rect.midX, y: rect.minY)
-        let endPoint = CGPoint(x: rect.midX, y: rect.maxY)
-
-        context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: [])
-        context.restoreGState()
-
-        /*
-         $0.startPoint = CGPoint(x: 0.83, y: 0)
-         $0.endPoint = CGPoint(x: 0.83, y: 0.93)
-         */
-    }
-
-    private func setupViews() {
-        addSubview(hStack)
-        hStack.addArrangedSubview(levelLabelView)
-        hStack.setCustomSpacing(4, after: levelLabelView)
-        hStack.addArrangedSubview(amountLabel)
-        hStack.edgesToSuperview(insets: .init(top: 8, left: 8, bottom: 8, right: 20))
-
-        backgroundColor = .clear
+        return path
     }
 }
 

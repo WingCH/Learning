@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		662A1AF52B61FBEB00BAD010 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 662A1AF42B61FBEB00BAD010 /* Then */; };
 		664A96032B60D10200E8A571 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664A96022B60D10200E8A571 /* AppDelegate.swift */; };
 		664A96052B60D10200E8A571 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664A96042B60D10200E8A571 /* SceneDelegate.swift */; };
 		664A96072B60D10200E8A571 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664A96062B60D10200E8A571 /* ViewController.swift */; };
@@ -35,6 +36,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66AD55A42B60F5F6004AD26F /* TinyConstraints in Frameworks */,
+				662A1AF52B61FBEB00BAD010 /* Then in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +92,7 @@
 			name = study_member_level_bar;
 			packageProductDependencies = (
 				66AD55A32B60F5F6004AD26F /* TinyConstraints */,
+				662A1AF42B61FBEB00BAD010 /* Then */,
 			);
 			productName = study_member_level_bar;
 			productReference = 664A95FF2B60D10200E8A571 /* study_member_level_bar.app */;
@@ -121,6 +124,7 @@
 			mainGroup = 664A95F62B60D10200E8A571;
 			packageReferences = (
 				66AD55A22B60F5F6004AD26F /* XCRemoteSwiftPackageReference "TinyConstraints" */,
+				662A1AF32B61FBEB00BAD010 /* XCRemoteSwiftPackageReference "Then" */,
 			);
 			productRefGroup = 664A96002B60D10200E8A571 /* Products */;
 			projectDirPath = "";
@@ -370,6 +374,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		662A1AF32B61FBEB00BAD010 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 		66AD55A22B60F5F6004AD26F /* XCRemoteSwiftPackageReference "TinyConstraints" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/roberthein/TinyConstraints";
@@ -381,6 +393,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		662A1AF42B61FBEB00BAD010 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 662A1AF32B61FBEB00BAD010 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
+		};
 		66AD55A32B60F5F6004AD26F /* TinyConstraints */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 66AD55A22B60F5F6004AD26F /* XCRemoteSwiftPackageReference "TinyConstraints" */;

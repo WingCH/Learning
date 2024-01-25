@@ -1,6 +1,5 @@
 //
 //  MemberLevelBar.swift
-//  study_member_level_bar
 //
 //  Created by Wing CHAN on 24/1/2024.
 //
@@ -11,19 +10,41 @@ import TinyConstraints
 import UIKit
 
 public class MemberLevelBar: UIView {
-    struct DisplayModel {
+    public struct DisplayModel {
         let infoViewGradientColors: [CGColor]
         let levelViewBackgroundColor: UIColor
         let levelViewAttributedText: NSAttributedString
         let amountAttributedText: NSAttributedString
         let progress: CGFloat
         let progressViewGradientColors: [CGColor]
+        let progressColor: UIColor
+        let progressBarIsRoundedCorner: Bool
+        
+        public init(
+            infoViewGradientColors: [CGColor],
+            levelViewBackgroundColor: UIColor,
+            levelViewAttributedText: NSAttributedString,
+            amountAttributedText: NSAttributedString,
+            progress: CGFloat,
+            progressViewGradientColors: [CGColor],
+            progressColor: UIColor,
+            progressBarIsRoundedCorner: Bool
+        ) {
+            self.infoViewGradientColors = infoViewGradientColors
+            self.levelViewBackgroundColor = levelViewBackgroundColor
+            self.levelViewAttributedText = levelViewAttributedText
+            self.amountAttributedText = amountAttributedText
+            self.progress = progress
+            self.progressViewGradientColors = progressViewGradientColors
+            self.progressColor = progressColor
+            self.progressBarIsRoundedCorner = progressBarIsRoundedCorner
+        }
     }
     
     private let infoView = InfoView()
     private let progressView = CustomProgressView()
 
-    init() {
+    public init() {
         super.init(frame: .zero)
         setupViews()
     }
@@ -49,7 +70,7 @@ public class MemberLevelBar: UIView {
         }
     }
 
-    func configure(with model: DisplayModel) {
+    public func configure(with model: DisplayModel) {
         infoView.configure(
             with: InfoView.DisplayModel(
                 gradientColors: model.infoViewGradientColors,
@@ -63,7 +84,9 @@ public class MemberLevelBar: UIView {
         progressView.configure(
             with: CustomProgressView.DisplayModel(
                 progress: model.progress,
-                gradientColors: model.progressViewGradientColors
+                gradientColors: model.progressViewGradientColors,
+                progressColor: model.progressColor,
+                isRoundedCorner: model.progressBarIsRoundedCorner
             )
         )
     }
@@ -207,8 +230,11 @@ private class CustomProgressView: UIView {
     struct DisplayModel {
         let progress: CGFloat
         let gradientColors: [CGColor]
+        let progressColor: UIColor
+        let isRoundedCorner: Bool
     }
         
+    private let backgroundView = UIView()
     private let progressView = UIView()
     private let thumbView = UIView()
     private let gradientLayer = CAGradientLayer()
@@ -218,17 +244,12 @@ private class CustomProgressView: UIView {
         CGSize(width: self.bounds.height * 1.5, height: self.bounds.height * 1.5)
     }
         
-    private var thumbViewCornerRadius: CGFloat { self.thumbViewSize.height / 2
-    }
-
-    // #C7A353
-    private let progressColor = UIColor(red: 0.78, green: 0.639, blue: 0.325, alpha: 1)
+    private var thumbViewCornerRadius: CGFloat { self.thumbViewSize.height / 2 }
+    private var displayModel: DisplayModel?
         
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupProgressView()
-        setupThumbView()
-        setupGradientBackground()
+        setupView()
     }
         
     @available(*, unavailable)
@@ -238,28 +259,35 @@ private class CustomProgressView: UIView {
         
     override func layoutSubviews() {
         super.layoutSubviews()
+        backgroundView.frame = bounds
         gradientLayer.frame = bounds
         updateProgress(to: currentProgress, animated: false)
         thumbView.layer.cornerRadius = thumbViewCornerRadius
-    }
         
-    private func setupProgressView() {
-        progressView.backgroundColor = progressColor
+        if displayModel?.isRoundedCorner == true {
+            let roundedCornerPath = UIBezierPath(
+                roundedRect: bounds,
+                byRoundingCorners: [.topRight, .bottomRight],
+                cornerRadii: CGSize(width: bounds.height / 2, height: bounds.height / 2)
+            )
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.path = roundedCornerPath.cgPath
+            backgroundView.layer.mask = shapeLayer
+        } else {
+            backgroundView.layer.mask = nil
+        }
+    }
+    
+    private func setupView() {
+        addSubview(backgroundView)
         addSubview(progressView)
-    }
-        
-    private func setupThumbView() {
-        thumbView.backgroundColor = progressColor
-        thumbView.clipsToBounds = true
         addSubview(thumbView)
-    }
+        backgroundView.layer.insertSublayer(gradientLayer, at: 0)
         
-    private func setupGradientBackground() {
+        thumbView.clipsToBounds = true
         gradientLayer.locations = [0.0, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
-            
-        layer.insertSublayer(gradientLayer, at: 0)
     }
         
     private func updateProgress(to progress: CGFloat, animated: Bool = true) {
@@ -291,5 +319,8 @@ private class CustomProgressView: UIView {
     func configure(with model: DisplayModel) {
         updateProgress(to: model.progress)
         gradientLayer.colors = model.gradientColors
+        progressView.backgroundColor = model.progressColor
+        thumbView.backgroundColor = model.progressColor
+        displayModel = model
     }
 }

@@ -30,7 +30,8 @@ class ViewController: UIViewController {
             with: generateDisplayModel(
                 levelText: "Level -",
                 amountText: "-",
-                progress: 0
+                progress: 0,
+                progressBarIsRoundedCorner: true
             )
         )
     }
@@ -40,12 +41,13 @@ class ViewController: UIViewController {
             with: generateDisplayModel(
                 levelText: "Level \(Int.random(in: 1...10))",
                 amountText: "\(Int.random(in: 100...10000))",
-                progress: CGFloat.random(in: 0...1)
+                progress: CGFloat.random(in: 0...1),
+                progressBarIsRoundedCorner: false
             )
         )
     }
 
-    func generateDisplayModel(levelText: String, amountText: String, progress: CGFloat) -> MemberLevelBar.DisplayModel {
+    func generateDisplayModel(levelText: String, amountText: String, progress: CGFloat, progressBarIsRoundedCorner: Bool) -> MemberLevelBar.DisplayModel {
         MemberLevelBar.DisplayModel(
             infoViewGradientColors: [
                 // #D8B354
@@ -60,9 +62,12 @@ class ViewController: UIViewController {
             progressViewGradientColors: [
                 // #403826
                 UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 1).cgColor,
+                UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 1).cgColor
                 // #40382600
-                UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 0).cgColor
-            ]
+//                UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 0).cgColor
+            ],
+            progressColor: UIColor(red: 0.78, green: 0.639, blue: 0.325, alpha: 1),
+            progressBarIsRoundedCorner: progressBarIsRoundedCorner
         )
     }
 }

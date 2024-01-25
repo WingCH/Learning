@@ -25,9 +25,9 @@ class ViewController: UIViewController {
         updateProgressButton.setTitle("Update Progress", for: .normal)
         updateProgressButton.setTitleColor(.blue, for: .normal)
         updateProgressButton.addTarget(self, action: #selector(update), for: .touchUpInside)
-        
+
         memberLevelBar.configure(
-            with: MemberLevelBar.DisplayModel(
+            with: generateDisplayModel(
                 levelText: "Level -",
                 amountText: "-",
                 progress: 0
@@ -37,11 +37,48 @@ class ViewController: UIViewController {
 
     @objc func update() {
         memberLevelBar.configure(
-            with: MemberLevelBar.DisplayModel(
+            with: generateDisplayModel(
                 levelText: "Level \(Int.random(in: 1...10))",
                 amountText: "\(Int.random(in: 100...10000))",
                 progress: CGFloat.random(in: 0...1)
             )
         )
+    }
+
+    func generateDisplayModel(levelText: String, amountText: String, progress: CGFloat) -> MemberLevelBar.DisplayModel {
+        MemberLevelBar.DisplayModel(
+            infoViewDisplayModel: InfoView.DisplayModel(
+                gradientColors: [
+                    // #D8B354
+                    UIColor(red: 0.846, green: 0.702, blue: 0.331, alpha: 1).cgColor,
+                    // #A3814F
+                    UIColor(red: 0.637, green: 0.507, blue: 0.311, alpha: 1).cgColor
+                ],
+                levelTextDisplayModel: BorderLabelView.DisplayModel(
+                    backgroundColor: UIColor(red: 0.2, green: 0.188, blue: 0.173, alpha: 0.3),
+                    attributedText: levelText.toAttributedString()
+                ),
+                amountAttributedText: amountText.toAttributedString()
+            ),
+            progressViewDisplayModel: CustomProgressView.DisplayModel(
+                progress: progress,
+                gradientColors: [
+                    // #403826
+                    UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 1).cgColor,
+                    // #40382600
+                    UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 0).cgColor
+                ]
+            )
+        )
+    }
+}
+
+extension String {
+    func toAttributedString(font: UIFont = UIFont.systemFont(ofSize: 14), color: UIColor = UIColor.black) -> NSAttributedString {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: color
+        ]
+        return NSAttributedString(string: self, attributes: attributes)
     }
 }

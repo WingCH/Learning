@@ -10,15 +10,12 @@ import Then
 import TinyConstraints
 import UIKit
 
-public extension MemberLevelBar {
-    struct DisplayModel {
-        let levelText: String
-        let amountText: String
-        let progress: CGFloat
-    }
-}
-
 public class MemberLevelBar: UIView {
+    struct DisplayModel {
+        let infoViewDisplayModel: InfoView.DisplayModel
+        let progressViewDisplayModel: CustomProgressView.DisplayModel
+    }
+    
     private let infoView = InfoView()
     private let progressView = CustomProgressView()
 
@@ -48,54 +45,53 @@ public class MemberLevelBar: UIView {
         }
     }
 
-    public func configure(with model: DisplayModel) {
-        infoView.levelLabelView.label.text = model.levelText
-        infoView.amountLabel.text = model.amountText
-        progressView.updateProgress(to: model.progress)
+    func configure(with model: DisplayModel) {
+        infoView.configure(with: model.infoViewDisplayModel)
+        progressView.configure(with: model.progressViewDisplayModel)
     }
 }
 
-private class InfoView: UIView {
+class InfoView: UIView {
+    struct DisplayModel {
+        let gradientColors: [CGColor]
+        let levelTextDisplayModel: BorderLabelView.DisplayModel
+        let amountAttributedText: NSAttributedString
+    }
+    
     private let gradientLayer = CAGradientLayer()
     private let hStack = UIStackView()
-    let levelLabelView = BorderLabelView()
+    private let levelLabelView = BorderLabelView()
     let amountLabel = UILabel()
     init() {
         super.init(frame: .zero)
         setupViews()
     }
-
+    
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer.frame = self.bounds
-
+        
         let clipPath = borderPath(rect: self.bounds)
         let maskLayer = CAShapeLayer()
         maskLayer.path = clipPath.cgPath
         self.layer.mask = maskLayer
     }
-
+    
     private func setupViews() {
         addSubview(hStack)
         layer.insertSublayer(gradientLayer, at: 0)
-
+        
         gradientLayer.do {
-            $0.colors = [
-                // #D8B354
-                UIColor(red: 0.846, green: 0.702, blue: 0.331, alpha: 1).cgColor,
-                // #A3814F
-                UIColor(red: 0.637, green: 0.507, blue: 0.311, alpha: 1).cgColor
-            ]
             $0.locations = [0.0, 1.0]
             $0.startPoint = CGPoint(x: 0.83, y: 0)
             $0.endPoint = CGPoint(x: 0.83, y: 0.93)
         }
-
+        
         hStack.do {
             $0.addArrangedSubview(levelLabelView)
             $0.setCustomSpacing(4, after: levelLabelView)
@@ -105,7 +101,7 @@ private class InfoView: UIView {
 
         clipsToBounds = true
     }
-
+    
     private func borderPath(rect: CGRect) -> UIBezierPath {
         let topLeftRadius: CGFloat = 8
         let topRightRadius: CGFloat = 16
@@ -146,98 +142,112 @@ private class InfoView: UIView {
             clockwise: false
         )
         path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-
+        
         path.close()
         return path
     }
+    
+    func configure(with model: DisplayModel) {
+        levelLabelView.configure(with: model.levelTextDisplayModel)
+        amountLabel.attributedText = model.amountAttributedText
+        gradientLayer.colors = model.gradientColors
+    }
 }
-
-private class BorderLabelView: UIView {
-    let label = UILabel()
+    
+class BorderLabelView: UIView {
+    struct DisplayModel {
+        let backgroundColor: UIColor
+        let attributedText: NSAttributedString
+    }
+        
+    private let label = UILabel()
     init() {
         super.init(frame: .zero)
         setupViews()
     }
-
+        
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+        
     private func setupViews() {
         addSubview(label)
-
-        // #33302C4D
-        backgroundColor = UIColor(red: 0.2, green: 0.188, blue: 0.173, alpha: 0.3)
         layer.cornerRadius = 4
         label.do {
             $0.edgesToSuperview(insets: .init(top: 2, left: 4, bottom: 0, right: 4))
         }
     }
+        
+    func configure(with model: DisplayModel) {
+        backgroundColor = model.backgroundColor
+        label.attributedText = model.attributedText
+    }
 }
-
-private class CustomProgressView: UIView {
+    
+class CustomProgressView: UIView {
+    struct DisplayModel {
+        let progress: CGFloat
+        let gradientColors: [CGColor]
+    }
+        
     private let progressView = UIView()
     private let thumbView = UIView()
     private let gradientLayer = CAGradientLayer()
-
+        
     private var currentProgress: CGFloat = 0
     private var thumbViewSize: CGSize {
         CGSize(width: self.bounds.height * 1.5, height: self.bounds.height * 1.5)
     }
+        
+    private var thumbViewCornerRadius: CGFloat { self.thumbViewSize.height / 2
+    }
 
-    private var thumbViewCornerRadius: CGFloat { self.thumbViewSize.height / 2 }
     // #C7A353
     private let progressColor = UIColor(red: 0.78, green: 0.639, blue: 0.325, alpha: 1)
-
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupProgressView()
         setupThumbView()
         setupGradientBackground()
     }
-
+        
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+        
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer.frame = bounds
         updateProgress(to: currentProgress, animated: false)
         thumbView.layer.cornerRadius = thumbViewCornerRadius
     }
-
+        
     private func setupProgressView() {
         progressView.backgroundColor = progressColor
         addSubview(progressView)
     }
-
+        
     private func setupThumbView() {
         thumbView.backgroundColor = progressColor
         thumbView.clipsToBounds = true
         addSubview(thumbView)
     }
-
+        
     private func setupGradientBackground() {
-        gradientLayer.colors = [
-            // #403826
-            UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 1).cgColor,
-            // #40382600
-            UIColor(red: 0.251, green: 0.22, blue: 0.149, alpha: 0).cgColor
-        ]
         gradientLayer.locations = [0.0, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
-
+            
         layer.insertSublayer(gradientLayer, at: 0)
     }
-
-    func updateProgress(to progress: CGFloat, animated: Bool = true) {
+        
+    private func updateProgress(to progress: CGFloat, animated: Bool = true) {
         guard progress >= 0 && progress <= 1 else { return }
         currentProgress = progress
-
+            
         let updateFrame = { [weak self] in
             guard let self = self else { return }
             let minProgress: CGFloat = 10 / 355
@@ -250,7 +260,7 @@ private class CustomProgressView: UIView {
                 height: thumbViewSize.height
             )
         }
-
+            
         if animated {
             UIView.animate(withDuration: 0.5, animations: {
                 updateFrame()
@@ -258,5 +268,10 @@ private class CustomProgressView: UIView {
         } else {
             updateFrame()
         }
+    }
+        
+    func configure(with model: DisplayModel) {
+        updateProgress(to: model.progress)
+        gradientLayer.colors = model.gradientColors
     }
 }

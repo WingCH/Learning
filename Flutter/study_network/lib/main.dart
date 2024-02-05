@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'cupertino_http_page.dart';
 import 'http_page.dart';
 
 void main() {
@@ -50,7 +51,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             },
-          )
+          ),
+          ListTile(
+            title: const Text("cupertino_http"),
+            trailing: const Icon(Icons.arrow_forward),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CupertinoHttpPage(),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

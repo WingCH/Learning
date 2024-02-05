@@ -1,0 +1,22 @@
+PODS:
+  - cupertino_http (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - cupertino_http (from `.symlinks/plugins/cupertino_http/ios`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  cupertino_http:
+    :path: ".symlinks/plugins/cupertino_http/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  cupertino_http: 5f8b1161107fe6c8d94a0c618735a033d93fa7db
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+
+PODFILE CHECKSUM: 075ddf6b19cdcced44581bd8fbdfb58404a78f8a
+
+COCOAPODS: 1.11.3

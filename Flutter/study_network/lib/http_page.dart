@@ -30,7 +30,7 @@ class _HttpPageState extends State<HttpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("HttpPage"),
+        title: const Text("http"),
       ),
       body: Center(
         child: Column(

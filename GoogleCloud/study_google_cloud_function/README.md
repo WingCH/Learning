@@ -30,8 +30,7 @@ https://cloud.google.com/sdk/docs/install-sdk#mac
 ```
 export PATH="$PATH":"$HOME/google-cloud-sdk/bin"
 gcloud init
-gcloud functions deploy TypescriptFunction --trigger-http --runtime nodejs20
-
+gcloud functions deploy TypescriptFunction --gen2 --region asia-east2 --trigger-http --runtime nodejs20 
 
 ```
 

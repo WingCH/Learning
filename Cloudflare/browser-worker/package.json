@@ -1,0 +1,16 @@
+{
+  "name": "browser-worker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/puppeteer": "^0.0.5",
+    "@cloudflare/workers-types": "^4.20240208.0",
+    "typescript": "^5.0.4",
+    "wrangler": "^3.0.0"
+  }
+}

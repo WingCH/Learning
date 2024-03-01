@@ -1,0 +1,22 @@
+{
+  "name": "study_google_cloud_function",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --inspect -r ts-node/register node_modules/.bin/functions-framework --target=TypescriptFunction",
+    "prestart": "npm run build",
+    "gcp-build": "npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

@@ -14,6 +14,7 @@
 		0E18EB432B162D84002A2F4D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E18EB422B162D84002A2F4D /* Assets.xcassets */; };
 		0E18EB462B162D84002A2F4D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0E18EB442B162D84002A2F4D /* LaunchScreen.storyboard */; };
 		0E18EB502B162EC9002A2F4D /* RPReplay_Final1701175542.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 0E18EB4F2B162EC9002A2F4D /* RPReplay_Final1701175542.MP4 */; };
+		0E79E19D2BB04E6F00E75105 /* VisionVideoFeaturePrintHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E79E19C2BB04E6F00E75105 /* VisionVideoFeaturePrintHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		0E18EB452B162D84002A2F4D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0E18EB472B162D84002A2F4D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0E18EB4F2B162EC9002A2F4D /* RPReplay_Final1701175542.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = RPReplay_Final1701175542.MP4; sourceTree = "<group>"; };
+		0E79E19C2BB04E6F00E75105 /* VisionVideoFeaturePrintHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionVideoFeaturePrintHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				0E18EB422B162D84002A2F4D /* Assets.xcassets */,
 				0E18EB442B162D84002A2F4D /* LaunchScreen.storyboard */,
 				0E18EB472B162D84002A2F4D /* Info.plist */,
+				0E79E19C2BB04E6F00E75105 /* VisionVideoFeaturePrintHelper.swift */,
 			);
 			path = study_video_vision;
 			sourceTree = "<group>";
@@ -144,6 +147,7 @@
 			files = (
 				0E18EB3E2B162D82002A2F4D /* ViewController.swift in Sources */,
 				0E18EB3A2B162D82002A2F4D /* AppDelegate.swift in Sources */,
+				0E79E19D2BB04E6F00E75105 /* VisionVideoFeaturePrintHelper.swift in Sources */,
 				0E18EB3C2B162D82002A2F4D /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -60,7 +60,6 @@ struct VisionVideoFeaturePrintHelper {
         await withTaskGroup(of: (Int, VNFeaturePrintObservation?).self) { group in
             for (index, image) in images.enumerated() {
                 guard let cgImage = image.cgImage else {
-                    featurePrints[index] = nil
                     continue
                 }
 

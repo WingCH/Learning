@@ -6,11 +6,18 @@
 //
 
 import AVFoundation
-import UIKit
 import Vision
 
+#if os(iOS)
+import UIKit
+typealias PlatformImage = UIImage
+#elseif os(macOS)
+import AppKit
+typealias PlatformImage = NSImage
+#endif
+
 struct VisionVideoFeaturePrintHelper {
-    static func processVideoAndComputeFeaturePrints(videoURL: URL) async throws -> ([UIImage], [Float]) {
+    static func processVideoAndComputeFeaturePrints(videoURL: URL) async throws -> ([PlatformImage], [Float]) {
         let images = try await extractFrames(from: videoURL, eachSecond: 1)
         let featurePrints = await generateFeaturePrints(for: images)
         let distances = compareFeaturePrints(featurePrints)
@@ -18,7 +25,7 @@ struct VisionVideoFeaturePrintHelper {
     }
 
     // Asynchronously extract frames from a video URL at each second interval
-    private static func extractFrames(from videoURL: URL, eachSecond: TimeInterval) async throws -> [UIImage] {
+    private static func extractFrames(from videoURL: URL, eachSecond: TimeInterval) async throws -> [PlatformImage] {
         let asset = AVAsset(url: videoURL)
         let durationTime = try await asset.load(.duration)
         let durationSeconds = CMTimeGetSeconds(durationTime)
@@ -28,13 +35,13 @@ struct VisionVideoFeaturePrintHelper {
     }
 
     // Extract frames from an AVAsset using AVAssetImageGenerator
-    private static func extractFramesUsingDuration(asset: AVAsset, duration: Double, eachSecond: TimeInterval) async -> [UIImage] {
+    private static func extractFramesUsingDuration(asset: AVAsset, duration: Double, eachSecond: TimeInterval) async -> [PlatformImage] {
         let assetGenerator = AVAssetImageGenerator(asset: asset)
         assetGenerator.appliesPreferredTrackTransform = true // Ensure the image orientation is correct
         assetGenerator.requestedTimeToleranceBefore = .zero
         assetGenerator.requestedTimeToleranceAfter = .zero
 
-        var frames: [UIImage] = []
+        var frames: [PlatformImage] = []
         var currentTime: Float64 = 0
 
         // Iterate through each time point to extract corresponding frame
@@ -42,10 +49,13 @@ struct VisionVideoFeaturePrintHelper {
             let cmTime = CMTimeMakeWithSeconds(currentTime, preferredTimescale: 600)
             do {
                 let imageRef = try assetGenerator.copyCGImage(at: cmTime, actualTime: nil)
-                frames.append(UIImage(cgImage: imageRef))
+                #if os(iOS)
+                frames.append(PlatformImage(cgImage: imageRef))
+                #elseif os(macOS)
+                frames.append(PlatformImage(cgImage: imageRef, size: .init(width: imageRef.width, height: imageRef.height)))
+                #endif
             } catch {
                 print("Error extracting frame at time \(currentTime): \(error)")
-                
             }
             currentTime += eachSecond
         }
@@ -53,15 +63,21 @@ struct VisionVideoFeaturePrintHelper {
     }
 
     // Generate feature prints for each image frame
-    private static func generateFeaturePrints(for images: [UIImage]) async -> [VNFeaturePrintObservation?] {
+    private static func generateFeaturePrints(for images: [PlatformImage]) async -> [VNFeaturePrintObservation?] {
         var featurePrints = [VNFeaturePrintObservation?](repeating: nil, count: images.count)
 
         // Process each image in parallel tasks
         await withTaskGroup(of: (Int, VNFeaturePrintObservation?).self) { group in
             for (index, image) in images.enumerated() {
+                #if os(iOS)
                 guard let cgImage = image.cgImage else {
                     continue
                 }
+                #elseif os(macOS)
+                guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+                    continue
+                }
+                #endif
 
                 // Create an asynchronous task for processing feature print for each image
                 group.addTask {

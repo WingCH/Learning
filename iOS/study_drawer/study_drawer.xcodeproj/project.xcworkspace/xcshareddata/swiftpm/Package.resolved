@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "floatingpanel?tab=readme-ov-file",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/scenee/FloatingPanel?tab=readme-ov-file",
+      "state" : {
+        "revision" : "8f2be39bf49b4d5e22bbf7bdde69d5b76d0ecd2a",
+        "version" : "2.8.2"
+      }
+    }
+  ],
+  "version" : 2
+}

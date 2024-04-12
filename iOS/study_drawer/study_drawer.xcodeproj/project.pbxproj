@@ -14,6 +14,7 @@
 		662BFA5C2BC9310900A35467 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 662BFA5B2BC9310900A35467 /* Assets.xcassets */; };
 		662BFA5F2BC9310900A35467 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 662BFA5D2BC9310900A35467 /* LaunchScreen.storyboard */; };
 		662BFA672BC9327900A35467 /* ViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662BFA662BC9327900A35467 /* ViewController2.swift */; };
+		662BFA8A2BC94BB100A35467 /* FloatingPanel in Frameworks */ = {isa = PBXBuildFile; productRef = 662BFA892BC94BB100A35467 /* FloatingPanel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				662BFA8A2BC94BB100A35467 /* FloatingPanel in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +88,9 @@
 			dependencies = (
 			);
 			name = study_drawer;
+			packageProductDependencies = (
+				662BFA892BC94BB100A35467 /* FloatingPanel */,
+			);
 			productName = study_drawer;
 			productReference = 662BFA4F2BC9310800A35467 /* study_drawer.app */;
 			productType = "com.apple.product-type.application";
@@ -114,6 +119,9 @@
 				Base,
 			);
 			mainGroup = 662BFA462BC9310800A35467;
+			packageReferences = (
+				662BFA882BC94BB100A35467 /* XCRemoteSwiftPackageReference "FloatingPanel" */,
+			);
 			productRefGroup = 662BFA502BC9310800A35467 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -365,6 +373,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		662BFA882BC94BB100A35467 /* XCRemoteSwiftPackageReference "FloatingPanel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scenee/FloatingPanel?tab=readme-ov-file";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		662BFA892BC94BB100A35467 /* FloatingPanel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 662BFA882BC94BB100A35467 /* XCRemoteSwiftPackageReference "FloatingPanel" */;
+			productName = FloatingPanel;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 662BFA472BC9310800A35467 /* Project object */;
 }

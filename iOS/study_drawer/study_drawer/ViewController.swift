@@ -17,8 +17,7 @@ class ViewController: UIViewController {
         UISheetPresentationController
         Issue:
         1. cannot disable `presentingViewController` animation when detents is large
-        2. iOS 16
-        
+        2. Custom Height need iOS 16
         """
         let button1 = UIButton(type: .system)
         button1.setTitle("UISheetPresentationController", for: .normal)
@@ -57,11 +56,9 @@ class ViewController: UIViewController {
     @objc func button1Tapped() {
         let vc = ViewController2()
         if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.large()]
-            sheet.preferredCornerRadius = 0
+            sheet.detents = [.medium(), .large()]
         }
         vc.modalPresentationStyle = .overFullScreen
-        vc.transitioningDelegate = self
         present(vc, animated: true)
     }
     
@@ -71,17 +68,5 @@ class ViewController: UIViewController {
     
     @objc func button3Tapped() {
         print("Button 3 was tapped.")
-    }
-}
-
-extension ViewController: UIViewControllerTransitioningDelegate {
-    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-        return CustomPresentationController(presentedViewController: presented, presenting: presenting ?? source)
-    }
-}
-
-class CustomPresentationController: UIPresentationController {
-    override var shouldRemovePresentersView: Bool {
-        return false
     }
 }

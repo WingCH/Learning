@@ -5,6 +5,7 @@
 //  Created by Wing CHAN on 12/4/2024.
 //
 
+import FloatingPanel
 import UIKit
 
 class ViewController: UIViewController {
@@ -25,17 +26,22 @@ class ViewController: UIViewController {
         let label2 = UILabel()
         label2.numberOfLines = 0
         label2.text = """
-        UISheetPresentationController
+        UIViewControllerTransitioningDelegate
         Issue:
-        1. cannot disable `presentingViewController` animation when detents is large
-        2. Custom Height need iOS 16
+        1. no Drag
         """
         let button2 = UIButton(type: .system)
         button2.setTitle("UIViewControllerTransitioningDelegate -> UIPresentationController", for: .normal)
         
-        // TODO: FloatingPanel
+        let label3 = UILabel()
+        label3.numberOfLines = 0
+        label3.text = """
+        FloatingPanel
+        """
         let button3 = UIButton(type: .system)
-        button3.setTitle("Button 3", for: .normal)
+        button3.setTitle("FloatingPanel normal", for: .normal)
+        let button4 = UIButton(type: .system)
+        button4.setTitle("FloatingPanel IntrinsicView", for: .normal)
         
         // Create a stack view
         let stackView = UIStackView(
@@ -44,7 +50,9 @@ class ViewController: UIViewController {
                 button1,
                 label2,
                 button2,
-                button3
+                label3,
+                button3,
+                button4,
             ]
         )
         stackView.axis = .vertical
@@ -54,13 +62,14 @@ class ViewController: UIViewController {
         NSLayoutConstraint.activate([
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9)
+            stackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9),
         ])
         
         // Add targets to buttons
         button1.addTarget(self, action: #selector(button1Tapped), for: .touchUpInside)
         button2.addTarget(self, action: #selector(button2Tapped), for: .touchUpInside)
         button3.addTarget(self, action: #selector(button3Tapped), for: .touchUpInside)
+        button4.addTarget(self, action: #selector(button4Tapped), for: .touchUpInside)
     }
     
     @objc func button1Tapped() {
@@ -80,7 +89,26 @@ class ViewController: UIViewController {
     }
     
     @objc func button3Tapped() {
-        print("Button 3 was tapped.")
+        let fpc = FloatingPanelController()
+        let contentVC = ViewController2()
+        fpc.set(contentViewController: contentVC)
+        fpc.contentMode = .fitToBounds
+        fpc.isRemovalInteractionEnabled = true
+        fpc.backdropView.dismissalTapGestureRecognizer.isEnabled = true
+        
+        self.present(fpc, animated: true, completion: nil)
+    }
+    
+    @objc func button4Tapped() {
+        let fpc = FloatingPanelController()
+        let contentVC = IntrinsicViewController()
+        fpc.set(contentViewController: contentVC)
+        fpc.layout = IntrinsicPanelLayout()
+        fpc.behavior = IntrinsicPanelBehavior()
+        // tap background to dismiss
+        fpc.isRemovalInteractionEnabled = true
+        fpc.backdropView.dismissalTapGestureRecognizer.isEnabled = true
+        self.present(fpc, animated: true, completion: nil)
     }
 }
 

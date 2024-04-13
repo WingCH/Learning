@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E16DDD12BCA0C9C009FA26B /* TinyConstraints in Frameworks */ = {isa = PBXBuildFile; productRef = 0E16DDD02BCA0C9C009FA26B /* TinyConstraints */; };
+		0E16DDD32BCA1828009FA26B /* IntrinsicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E16DDD22BCA1828009FA26B /* IntrinsicViewController.swift */; };
 		662BFA532BC9310800A35467 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662BFA522BC9310800A35467 /* AppDelegate.swift */; };
 		662BFA552BC9310800A35467 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662BFA542BC9310800A35467 /* SceneDelegate.swift */; };
 		662BFA572BC9310800A35467 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 662BFA562BC9310800A35467 /* ViewController.swift */; };
@@ -18,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E16DDD22BCA1828009FA26B /* IntrinsicViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntrinsicViewController.swift; sourceTree = "<group>"; };
 		662BFA4F2BC9310800A35467 /* study_drawer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = study_drawer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		662BFA522BC9310800A35467 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		662BFA542BC9310800A35467 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -35,6 +38,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				662BFA8A2BC94BB100A35467 /* FloatingPanel in Frameworks */,
+				0E16DDD12BCA0C9C009FA26B /* TinyConstraints in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,6 +68,7 @@
 				662BFA542BC9310800A35467 /* SceneDelegate.swift */,
 				662BFA562BC9310800A35467 /* ViewController.swift */,
 				662BFA662BC9327900A35467 /* ViewController2.swift */,
+				0E16DDD22BCA1828009FA26B /* IntrinsicViewController.swift */,
 				662BFA582BC9310800A35467 /* Main.storyboard */,
 				662BFA5B2BC9310900A35467 /* Assets.xcassets */,
 				662BFA5D2BC9310900A35467 /* LaunchScreen.storyboard */,
@@ -90,6 +95,7 @@
 			name = study_drawer;
 			packageProductDependencies = (
 				662BFA892BC94BB100A35467 /* FloatingPanel */,
+				0E16DDD02BCA0C9C009FA26B /* TinyConstraints */,
 			);
 			productName = study_drawer;
 			productReference = 662BFA4F2BC9310800A35467 /* study_drawer.app */;
@@ -121,6 +127,7 @@
 			mainGroup = 662BFA462BC9310800A35467;
 			packageReferences = (
 				662BFA882BC94BB100A35467 /* XCRemoteSwiftPackageReference "FloatingPanel" */,
+				0E16DDCF2BCA0C9C009FA26B /* XCRemoteSwiftPackageReference "TinyConstraints" */,
 			);
 			productRefGroup = 662BFA502BC9310800A35467 /* Products */;
 			projectDirPath = "";
@@ -150,6 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				662BFA572BC9310800A35467 /* ViewController.swift in Sources */,
+				0E16DDD32BCA1828009FA26B /* IntrinsicViewController.swift in Sources */,
 				662BFA672BC9327900A35467 /* ViewController2.swift in Sources */,
 				662BFA532BC9310800A35467 /* AppDelegate.swift in Sources */,
 				662BFA552BC9310800A35467 /* SceneDelegate.swift in Sources */,
@@ -375,6 +383,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0E16DDCF2BCA0C9C009FA26B /* XCRemoteSwiftPackageReference "TinyConstraints" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/roberthein/TinyConstraints";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.2;
+			};
+		};
 		662BFA882BC94BB100A35467 /* XCRemoteSwiftPackageReference "FloatingPanel" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scenee/FloatingPanel?tab=readme-ov-file";
@@ -386,6 +402,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0E16DDD02BCA0C9C009FA26B /* TinyConstraints */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0E16DDCF2BCA0C9C009FA26B /* XCRemoteSwiftPackageReference "TinyConstraints" */;
+			productName = TinyConstraints;
+		};
 		662BFA892BC94BB100A35467 /* FloatingPanel */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 662BFA882BC94BB100A35467 /* XCRemoteSwiftPackageReference "FloatingPanel" */;

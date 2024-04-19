@@ -19,7 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         
         let vcA = ViewControllerA()
-        let nav = UINavigationController(rootViewController: vcA)
+        let vcB = ViewControllerB()
+        let nav = UINavigationController()
+        nav.setViewControllers([vcA, vcB], animated: true)
         window.rootViewController = nav
         
 //        let vcB = ViewControllerB()

@@ -12,22 +12,24 @@ class ViewControllerA: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .blue
+        
+        print("\(String(describing: ViewControllerA.self)) viewDidLoad")
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if isFirstAppear {
-            isFirstAppear = false
-            let vcB = ViewControllerB()
-            navigationController?.pushViewController(vcB, animated: true)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.printInfo()
-            }
-//            present(vcB, animated: true) {
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        if isFirstAppear {
+//            isFirstAppear = false
+//            let vcB = ViewControllerB()
+//            navigationController?.pushViewController(vcB, animated: true)
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
 //                self.printInfo()
 //            }
-        }
-    }
+////            present(vcB, animated: true) {
+////                self.printInfo()
+////            }
+//        }
+//    }
 
     func printInfo() {
         let log = """

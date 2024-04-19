@@ -12,18 +12,20 @@ class ViewControllerB: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .yellow
+        
+        print("\(String(describing: ViewControllerB.self)) viewDidLoad")
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if isFirstAppear {
-            isFirstAppear = false
-            let vcC = ViewControllerC()
-            present(vcC, animated: true) {
-                self.printInfo()
-            }
-        }
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        if isFirstAppear {
+//            isFirstAppear = false
+//            let vcC = ViewControllerC()
+//            present(vcC, animated: true) {
+//                self.printInfo()
+//            }
+//        }
+//    }
 
     func printInfo() {
         let log = """

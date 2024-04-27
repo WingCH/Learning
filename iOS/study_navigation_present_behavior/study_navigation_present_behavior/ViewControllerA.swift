@@ -15,6 +15,11 @@ class ViewControllerA: UIViewController {
         
         print("\(String(describing: ViewControllerA.self)) viewDidLoad")
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("\(String(describing: ViewControllerA.self)) viewDidAppear")
+    }
 
 //    override func viewDidAppear(_ animated: Bool) {
 //        super.viewDidAppear(animated)

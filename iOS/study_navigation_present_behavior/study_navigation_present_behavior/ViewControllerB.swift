@@ -12,7 +12,7 @@ class ViewControllerB: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .yellow
-        
+
         print("\(String(describing: ViewControllerB.self)) viewDidLoad")
     }
 

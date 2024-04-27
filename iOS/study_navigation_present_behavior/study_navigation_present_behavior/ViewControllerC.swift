@@ -10,22 +10,28 @@ import UIKit
 class ViewControllerC: UIViewController {
     var isFirstAppear = true
     let button = UIButton(type: .system)
-    var onTapButton: (() -> Void)?
+    var onPopLastNavigationPage: (() -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .green
         printInfo()
 
-        button.setTitle("Go to second view", for: .normal)
+        button.setTitle("pop last navigation page", for: .normal)
         button.sizeToFit()
         button.center = view.center
         button.addTarget(self, action: #selector(onClickButton), for: .touchUpInside)
         view.addSubview(button)
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("\(String(describing: ViewControllerC.self)) viewDidAppear")
+    }
 
     @objc private func onClickButton() {
-        onTapButton?()
+        onPopLastNavigationPage?()
+        dismiss(animated: true)
     }
 
     func printInfo() {

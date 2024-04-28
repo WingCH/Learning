@@ -12,3 +12,9 @@ async def root():
 @app.get("/youtube/{video_id}/available_transcripts", response_model=AvailableTranscriptResponse)
 async def available_transcripts(video_id: str):
     return await request_available_transcripts(video_id)
+
+
+if __name__ == '__main__':
+    import uvicorn
+
+    uvicorn.run(app)

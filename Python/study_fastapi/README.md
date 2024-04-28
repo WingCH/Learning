@@ -1,0 +1,4 @@
+# Deploy
+
+vercel
+vercel --prod

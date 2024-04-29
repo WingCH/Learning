@@ -5,14 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f85b026-ab57-4de1-9455-2b410e2689fe" name="Changes" comment="study_fastapi">
-      <change afterPath="$PROJECT_DIR$/Python/study_fastapi/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Python/study_fastapi/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Python/study_fastapi/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Python/study_fastapi/vercel.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Flutter/native_view" beforeDir="false" afterPath="$PROJECT_DIR$/../../Flutter/native_view" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Python/study_fastapi/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Python/study_fastapi/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Python/study_fastapi/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Python/study_fastapi/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +20,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
@@ -44,7 +37,7 @@
     "FastAPI.Unnamed.executor": "Debug",
     "Python.main.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "<unknown>",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/wingch/Project/Learning/Python/study_fastapi",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -121,7 +114,8 @@
       <option name="presentableId" value="Default" />
       <updated>1714296232451</updated>
       <workItem from="1714296233567" duration="734000" />
-      <workItem from="1714296978717" duration="4146000" />
+      <workItem from="1714296978717" duration="7665000" />
+      <workItem from="1714308892578" duration="1308000" />
     </task>
     <servers />
   </component>
@@ -134,7 +128,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/study_fastapi$Unnamed.coverage" NAME="FastAPI Coverage Results" MODIFIED="1714296923136" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/study_fastapi$FastAPI.coverage" NAME="FastAPI Coverage Results" MODIFIED="1714301496899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/study_fastapi$FastAPI.coverage" NAME="FastAPI Coverage Results" MODIFIED="1714309212541" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/study_fastapi$main.coverage" NAME="main Coverage Results" MODIFIED="1714301443550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

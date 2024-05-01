@@ -93,8 +93,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.main" />
       <item itemvalue="FastAPI.FastAPI" />
+      <item itemvalue="Python.main" />
     </list>
   </component>
   <component name="SharedIndexes">
@@ -116,7 +116,7 @@
       <workItem from="1714296233567" duration="734000" />
       <workItem from="1714296978717" duration="7665000" />
       <workItem from="1714308892578" duration="1308000" />
-      <workItem from="1714351798817" duration="16000" />
+      <workItem from="1714351798817" duration="738000" />
     </task>
     <servers />
   </component>

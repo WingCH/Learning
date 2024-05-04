@@ -23,10 +23,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 self.scheduleRefreshNormalTask()
             }
         }
+        
+        BGTaskScheduler.shared.register(
+            forTaskWithIdentifier: AppConstants.backgroundProcessingTaskIdentifier,
+            using: nil
+        ) { task in
+            Task { [weak self] in
+                guard let self else { return }
+                await self.processNormalTask()
+                task.setTaskCompleted(success: true)
+                self.scheduleProcessingNormalTask()
+            }
+        }
 
-        scheduleRefreshNormalTask()
         return true
     }
+
 
     func scheduleRefreshNormalTask() {
         Task {
@@ -37,7 +49,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             do {
                 try BGTaskScheduler.shared.submit(request)
                 let supabaseManager = SupabaseManager.shared
-
                 await supabaseManager.insertData(
                     logData: SupabaseManager.LogData(
                         type: .scheduleRefreshNormalTask,
@@ -52,7 +63,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     logData: SupabaseManager.LogData(
                         type: .scheduleRefreshNormalTask,
                         extra: [
-                            "error": "Couldn't schedule app refresh \(error.localizedDescription)"
+                            "error": "Couldn't scheduleRefreshNormalTask \(error.localizedDescription)"
+                        ]
+                    )
+                )
+            }
+        }
+    }
+
+    func scheduleProcessingNormalTask() {
+        Task {
+            let request = BGProcessingTaskRequest(
+                identifier: AppConstants.backgroundProcessingTaskIdentifier
+            )
+            request.requiresNetworkConnectivity = true
+            request.requiresExternalPower = true
+            request.earliestBeginDate = Date(timeIntervalSinceNow: 1 * 60)
+            do {
+                try BGTaskScheduler.shared.submit(request)
+                let supabaseManager = SupabaseManager.shared
+                await supabaseManager.insertData(
+                    logData: SupabaseManager.LogData(
+                        type: .scheduleProcessingNormalTask,
+                        extra: [
+                            "message": "scheduleProcessingNormalTask"
+                        ]
+                    )
+                )
+            } catch {
+                let supabaseManager = SupabaseManager.shared
+                await supabaseManager.insertData(
+                    logData: SupabaseManager.LogData(
+                        type: .scheduleProcessingNormalTask,
+                        extra: [
+                            "error": "Couldn't scheduleProcessingNormalTask \(error.localizedDescription)"
                         ]
                     )
                 )
@@ -62,10 +106,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func refreshNormalTask() async {
         let supabaseManager = SupabaseManager.shared
-
         await supabaseManager.insertData(
             logData: SupabaseManager.LogData(
                 type: .backgroundRefreshTask,
+                extra: [
+                    "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description
+                ]
+            )
+        )
+    }
+    
+    func processNormalTask() async {
+        let supabaseManager = SupabaseManager.shared
+        await supabaseManager.insertData(
+            logData: SupabaseManager.LogData(
+                type: .backgroundProcessingTask,
                 extra: [
                     "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description
                 ]

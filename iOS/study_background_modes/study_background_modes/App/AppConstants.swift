@@ -9,4 +9,5 @@ import Foundation
 
 enum AppConstants {
     static let backgroundRefreshTaskIdentifier = "com.wingch.study-background-modes.task.refresh"
+    static let backgroundProcessingTaskIdentifier = "com.wingch.study-background-modes.task.processing"
 }

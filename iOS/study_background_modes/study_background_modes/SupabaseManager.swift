@@ -68,8 +68,10 @@ extension SupabaseManager {
     enum LogType: String, Encodable {
         case lifecycle
         case error
-        case backgroundRefreshTask
         case scheduleRefreshNormalTask
+        case backgroundRefreshTask
+        case scheduleProcessingNormalTask
+        case backgroundProcessingTask
     }
 
     struct LogData: Encodable {

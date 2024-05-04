@@ -40,14 +40,13 @@ class SupabaseManager {
         } catch {}
     }
 
-    func insertData(logData: LogData) {
-        Task {
-            do {
-                try await supabase.from("BackgroundMode").insert(logData).execute()
-            } catch {
-                print("insertData catch: \(error)")
-            }
+    func insertData(logData: LogData) async {
+        do {
+            try await supabase.from("BackgroundMode").insert(logData).execute()
+        } catch {
+            logger.log(level: .error, "insertData catch: \(error)")
         }
+
         logger.log(level: .info, "\(logData.toString())")
     }
 }
@@ -55,7 +54,9 @@ class SupabaseManager {
 extension SupabaseManager {
     enum LogType: String, Encodable {
         case lifecycle
+        case error
         case backgroundRefreshTask
+        case scheduleRefreshNormalTask
     }
 
     struct LogData: Encodable {

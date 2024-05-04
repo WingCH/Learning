@@ -34,7 +34,7 @@ struct RefreshTaskView: View {
             Button {
                 model.sendLog()
             } label: {
-                Text("sendLog")
+                Text("debug test")
             }.buttonStyle(.bordered)
 
             Spacer()
@@ -52,7 +52,7 @@ extension RefreshTaskView {
         let supabaseManager = SupabaseManager.shared
         func sendLog() {
             Task {
-                supabaseManager.insertData(
+                await supabaseManager.insertData(
                     logData: .init(
                         type: .backgroundRefreshTask,
                         extra: ["test": "sendLog"]

@@ -33,6 +33,7 @@
 		0E95F3022BE610E700E9FBD3 /* RefreshTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshTaskView.swift; sourceTree = "<group>"; };
 		0E95F3042BE618A100E9FBD3 /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
 		0E95F30F2BE61D6400E9FBD3 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		0E95F3112BE62D7A00E9FBD3 /* study-background-modes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "study-background-modes-Info.plist"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +70,7 @@
 		0E95F2E92BE5FF4400E9FBD3 /* study_background_modes */ = {
 			isa = PBXGroup;
 			children = (
+				0E95F3112BE62D7A00E9FBD3 /* study-background-modes-Info.plist */,
 				0E95F2F82BE5FF4E00E9FBD3 /* App */,
 				0E95F2FF2BE6104400E9FBD3 /* Views */,
 				0E95F2EE2BE5FF4500E9FBD3 /* Assets.xcassets */,
@@ -328,6 +330,9 @@
 				DEVELOPMENT_TEAM = AL869FRMV6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "study-background-modes-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -357,6 +362,9 @@
 				DEVELOPMENT_TEAM = AL869FRMV6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "study-background-modes-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -19,6 +19,7 @@ struct AppMain: App {
                     if scenePhase == .background {
                         appDelegate.scheduleRefreshNormalTask()
                         appDelegate.scheduleProcessingNormalTask()
+                        appDelegate.startObservingStepChanges()
                     }
                 }
         }

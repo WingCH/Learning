@@ -72,6 +72,8 @@ extension SupabaseManager {
         case backgroundRefreshTask
         case scheduleProcessingNormalTask
         case backgroundProcessingTask
+        case enableBackgroundDelivery
+        case receivedBackgroundDelivery
     }
 
     struct LogData: Encodable {

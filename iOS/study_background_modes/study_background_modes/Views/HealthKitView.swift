@@ -56,7 +56,7 @@ struct HealthKitView: View {
 extension HealthKitView {
     class Model: ObservableObject {
         let supabaseManager = SupabaseManager.shared
-        let healthData = HealthData()
+        let healthData = HealthData.shared
         @Published var requestHealthDataAccessResult: String = ""
         @Published var stepDataList: [HKQuantitySample] = []
         @Published var stepDataDescription: String = ""

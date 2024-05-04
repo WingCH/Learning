@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 self.scheduleRefreshNormalTask()
             }
         }
-        
+
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: AppConstants.backgroundProcessingTaskIdentifier,
             using: nil
@@ -39,6 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    func startObservingStepChanges() {
+        let healthData = HealthData.shared
+        healthData.startObservingStepChanges()
+    }
 
     func scheduleRefreshNormalTask() {
         Task {
@@ -106,16 +110,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func refreshNormalTask() async {
         let supabaseManager = SupabaseManager.shared
-        await supabaseManager.insertData(
-            logData: SupabaseManager.LogData(
-                type: .backgroundRefreshTask,
-                extra: [
-                    "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description
-                ]
+        let healthData = HealthData.shared
+        do {
+            let lastWeekStepData = try await healthData.getLastWeekStepData()
+            await supabaseManager.insertData(
+                logData: SupabaseManager.LogData(
+                    type: .backgroundRefreshTask,
+                    extra: [
+                        "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description,
+                        "lastWeekStepDataCount": lastWeekStepData.count.queryValue
+                    ]
+                )
             )
-        )
+        } catch {
+            await supabaseManager.insertData(
+                logData: SupabaseManager.LogData(
+                    type: .backgroundRefreshTask,
+                    extra: [
+                        "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description,
+                        "error": error.localizedDescription
+                    ]
+                )
+            )
+        }
     }
-    
+
     func processNormalTask() async {
         let supabaseManager = SupabaseManager.shared
         await supabaseManager.insertData(

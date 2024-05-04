@@ -24,6 +24,13 @@ struct ContentView: View {
                         Text("Refresh Task")
                     }
                 }
+            HealthKitView()
+                .tabItem {
+                    VStack {
+                        Image(systemName: "heart.circle")
+                        Text("HealthKit")
+                    }
+                }
         }
     }
 }

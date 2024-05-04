@@ -20,6 +20,9 @@
 		0E95F30C2BE618CB00E9FBD3 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 0E95F30B2BE618CB00E9FBD3 /* Realtime */; };
 		0E95F30E2BE618CB00E9FBD3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 0E95F30D2BE618CB00E9FBD3 /* Supabase */; };
 		0E95F3102BE61D6400E9FBD3 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E95F30F2BE61D6400E9FBD3 /* AuthView.swift */; };
+		0E95F3132BE66B4700E9FBD3 /* HealthData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E95F3122BE66B4700E9FBD3 /* HealthData.swift */; };
+		0E95F3162BE66C3500E9FBD3 /* HealthKitSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E95F3152BE66C3500E9FBD3 /* HealthKitSupport.swift */; };
+		0E95F3182BE66F0900E9FBD3 /* HealthKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E95F3172BE66F0900E9FBD3 /* HealthKitView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +37,10 @@
 		0E95F3042BE618A100E9FBD3 /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
 		0E95F30F2BE61D6400E9FBD3 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		0E95F3112BE62D7A00E9FBD3 /* study-background-modes-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "study-background-modes-Info.plist"; sourceTree = SOURCE_ROOT; };
+		0E95F3122BE66B4700E9FBD3 /* HealthData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthData.swift; sourceTree = "<group>"; };
+		0E95F3152BE66C3500E9FBD3 /* HealthKitSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSupport.swift; sourceTree = "<group>"; };
+		0E95F3172BE66F0900E9FBD3 /* HealthKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitView.swift; sourceTree = "<group>"; };
+		0EC661772BE679DD00D38B2D /* study_background_modes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = study_background_modes.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,12 +77,15 @@
 		0E95F2E92BE5FF4400E9FBD3 /* study_background_modes */ = {
 			isa = PBXGroup;
 			children = (
+				0EC661772BE679DD00D38B2D /* study_background_modes.entitlements */,
 				0E95F3112BE62D7A00E9FBD3 /* study-background-modes-Info.plist */,
+				0E95F3142BE66C2800E9FBD3 /* Utilities */,
 				0E95F2F82BE5FF4E00E9FBD3 /* App */,
 				0E95F2FF2BE6104400E9FBD3 /* Views */,
 				0E95F2EE2BE5FF4500E9FBD3 /* Assets.xcassets */,
 				0E95F2F02BE5FF4500E9FBD3 /* Preview Content */,
 				0E95F3042BE618A100E9FBD3 /* SupabaseManager.swift */,
+				0E95F3122BE66B4700E9FBD3 /* HealthData.swift */,
 			);
 			path = study_background_modes;
 			sourceTree = "<group>";
@@ -104,8 +114,17 @@
 				0E95F3002BE6105F00E9FBD3 /* ContentView.swift */,
 				0E95F3022BE610E700E9FBD3 /* RefreshTaskView.swift */,
 				0E95F30F2BE61D6400E9FBD3 /* AuthView.swift */,
+				0E95F3172BE66F0900E9FBD3 /* HealthKitView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0E95F3142BE66C2800E9FBD3 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				0E95F3152BE66C3500E9FBD3 /* HealthKitSupport.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -190,8 +209,11 @@
 				0E95F3102BE61D6400E9FBD3 /* AuthView.swift in Sources */,
 				0E95F2FC2BE5FF8400E9FBD3 /* AppDelegate.swift in Sources */,
 				0E95F3032BE610E700E9FBD3 /* RefreshTaskView.swift in Sources */,
+				0E95F3162BE66C3500E9FBD3 /* HealthKitSupport.swift in Sources */,
+				0E95F3132BE66B4700E9FBD3 /* HealthData.swift in Sources */,
 				0E95F3012BE6105F00E9FBD3 /* ContentView.swift in Sources */,
 				0E95F3052BE618A100E9FBD3 /* SupabaseManager.swift in Sources */,
+				0E95F3182BE66F0900E9FBD3 /* HealthKitView.swift in Sources */,
 				0E95F2FA2BE5FF6400E9FBD3 /* AppMain.swift in Sources */,
 				0E95F2FE2BE5FFDB00E9FBD3 /* AppConstants.swift in Sources */,
 			);
@@ -324,6 +346,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = study_background_modes/study_background_modes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"study_background_modes/Preview Content\"";
@@ -356,6 +379,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = study_background_modes/study_background_modes.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"study_background_modes/Preview Content\"";

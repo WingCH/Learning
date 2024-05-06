@@ -33,7 +33,7 @@ class HealthData {
     func getLastWeekStepData() async throws -> [HKQuantitySample] {
         let now = Date()
         let lastWeekStartDate = Calendar.current.date(byAdding: .day, value: -6, to: now)!
-        var quantityType: HKQuantityType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        let quantityType: HKQuantityType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
         let predicate = HKQuery.predicateForSamples(withStart: lastWeekStartDate, end: now)
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
 

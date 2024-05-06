@@ -81,7 +81,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 identifier: AppConstants.backgroundProcessingTaskIdentifier
             )
             request.requiresNetworkConnectivity = true
-            request.requiresExternalPower = true
             request.earliestBeginDate = Date(timeIntervalSinceNow: 1 * 60)
             do {
                 try BGTaskScheduler.shared.submit(request)
@@ -137,13 +136,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func processNormalTask() async {
         let supabaseManager = SupabaseManager.shared
-        await supabaseManager.insertData(
-            logData: SupabaseManager.LogData(
-                type: .backgroundProcessingTask,
-                extra: [
-                    "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description
-                ]
+        let healthData = HealthData.shared
+        do {
+            let lastWeekStepData = try await healthData.getLastWeekStepData()
+            await supabaseManager.insertData(
+                logData: SupabaseManager.LogData(
+                    type: .backgroundProcessingTask,
+                    extra: [
+                        "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description,
+                        "lastWeekStepDataCount": lastWeekStepData.count.queryValue
+                    ]
+                )
             )
-        )
+        } catch {
+            await supabaseManager.insertData(
+                logData: SupabaseManager.LogData(
+                    type: .backgroundProcessingTask,
+                    extra: [
+                        "isDidFinishLaunchingWithOptionsTriggered": isDidFinishLaunchingWithOptionsTriggered.description,
+                        "error": error.localizedDescription
+                    ]
+                )
+            )
+        }
     }
 }

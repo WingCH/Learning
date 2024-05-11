@@ -35,14 +35,13 @@ class ViewController: UIViewController, WKScriptMessageHandler, WKNavigationDele
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         let js = """
-        var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
+        var resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
                 var newHeight = document.body.offsetHeight;
                 window.webkit.messageHandlers.notifyHeightChange.postMessage(newHeight);
-            });
+            }
         });
-        var config = { attributes: true, childList: true, subtree: true, attributeOldValue: true };
-        observer.observe(document.body, config);
+        resizeObserver.observe(document.body);
         """
         webView.evaluateJavaScript(js, completionHandler: nil)
     }

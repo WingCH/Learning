@@ -1,3 +1,5 @@
 fastapi
 uvicorn[standard]
 youtube-transcript-api
+openai
+python-dotenv

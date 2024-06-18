@@ -1,0 +1,71 @@
+{
+  "type": "object",
+  "properties": {
+    "detected_records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "required"
+          },
+          "currency": {
+            "type": "string",
+            "description": "optional",
+            "enum": ["HKD", "USD", "CNY", "JPY"]
+          },
+          "account": {
+            "type": "string",
+            "description": "optional",
+            "enum": [
+              "MPOWER", "錢包", "中信 Motion", "恒生", "TAP AND GO", "中國工商銀行",
+              "DBS COMPASS visa", "HSBC Red Card", "HKBC", "WeLab", "MOX", "Citibank",
+              "Payme", "Apple Watch 八達通", "Za Bank", "原味家作", "iPhone 八達通",
+              "Fusion Bank 富融", "富途牛牛", "livi", "恒生mum", "AAX", "華盛", "SoFi",
+              "Mox Credit", "幣安", "Crypto.com Visa", "livi PayLater", "長橋證券",
+              "馬會", "Kikitrade", "微牛", "微信支付 內地", "渣打 Smart", "Samsung Pay Octopus",
+              "Apple Gift card", "Deliveroo", "Foodpanda", "Q Credit Card", "HSBC Visa Signature",
+              "八達通錢包", "Sim credit card", "中國工商(媽)", "漲樂金球通", "日元現金",
+              "Suica", "杯", "老虎證券", "App Store", "Alipay PayLater", "中銀 Chill Card",
+              "HSBC Pulse銀聯雙幣鑽石信用卡", "台幣", "Ant Bank", "OpenAI", "Anthropic Claude",
+              "Wildcard", "Steam", "Pixel Octopus"
+            ]
+          },
+          "subcategory": {
+            "type": "string",
+            "description": "required",
+            "enum": [
+              "晚餐", "配件", "保險", "衣物", "電子產品", "電話費", "美妝保養", "其他",
+              "通話費", "美容美髮", "Apps", "精品", "點心", "計程車", "門診", "應用軟體"
+            ]
+          },
+          "store": {
+            "type": "string",
+            "description": "optional"
+          },
+          "note": {
+            "type": "string",
+            "description": "optional"
+          },
+          "date": {
+            "type": "string",
+            "description": "YYYY.MM.dd"
+          },
+          "time": {
+            "type": "string",
+            "description": "HH:mm"
+          },
+          "credibility": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "required"
+          }
+        },
+        "required": ["amount", "subcategory", "credibility"]
+      }
+    }
+  },
+  "required": ["detected_records"]
+}

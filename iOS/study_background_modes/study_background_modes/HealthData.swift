@@ -60,7 +60,7 @@ class HealthData {
     func startObservingStepChanges() {
         let supabaseManager = SupabaseManager.shared
         let quantityType: HKQuantityType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        let query: HKObserverQuery = HKObserverQuery(
+        let query: HKObserverQuery = registerOneOffTask(
             sampleType: quantityType,
             predicate: nil,
             updateHandler: { [weak self] _, completionHandler, _ in

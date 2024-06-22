@@ -1,8 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/common_page/bloc.dart';
-import 'event.dart';
-import 'state.dart';
+import '../../models/optional.dart';
+
+part 'event.dart';
+
+part 'state.dart';
 
 class CounterBloc extends CommonPageBloc<CounterState> {
   CounterBloc() : super(const CounterState()) {

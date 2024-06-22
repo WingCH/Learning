@@ -1,4 +1,4 @@
-import '../../bloc/common_page/bloc.dart';
+part of 'bloc.dart';
 
 class LoginEvent extends CommonPageEvent {
   @override

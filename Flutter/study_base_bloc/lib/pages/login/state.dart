@@ -1,5 +1,4 @@
-import '../../bloc/common_page/bloc.dart';
-import '../../models/optional.dart';
+part of 'bloc.dart';
 
 class LoginState extends CommonPageState {
   final String username;

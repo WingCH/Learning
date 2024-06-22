@@ -1,5 +1,4 @@
-import '../../bloc/common_page/bloc.dart';
-import '../../models/optional.dart';
+part of 'bloc.dart';
 
 class CounterState extends CommonPageState {
   final int counter;

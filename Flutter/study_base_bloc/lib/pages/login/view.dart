@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/common_page/view.dart';
 import 'bloc.dart';
-import 'event.dart';
-import 'state.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

@@ -10,3 +10,12 @@ class SetLoadingEvent extends CommonPageEvent {
   @override
   List<Object> get props => [isLoading];
 }
+
+class SetRouteNameEvent extends CommonPageEvent {
+  final Optional<String>? routeName;
+
+  SetRouteNameEvent({required this.routeName});
+
+  @override
+  List<Object?> get props => [routeName];
+}

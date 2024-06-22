@@ -23,10 +23,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes: {
-        '/login': (context) => const LoginPage(),
-        '/counter': (context) => const CounterPage(),
+        LoginPage.routeName: (context) => const LoginPage(),
+        CounterPage.routeName: (context) => const CounterPage(),
       },
-      initialRoute: '/login',
+      initialRoute: LoginPage.routeName,
     );
   }
 }

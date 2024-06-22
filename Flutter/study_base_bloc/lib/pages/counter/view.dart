@@ -9,6 +9,8 @@ import 'state.dart';
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
 
+  static const routeName = '/counter';
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(

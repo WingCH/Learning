@@ -9,6 +9,8 @@ import 'state.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
+  static const routeName = '/login';
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -20,7 +22,13 @@ class LoginPage extends StatelessWidget {
   Widget _buildPage(BuildContext context) {
     final bloc = BlocProvider.of<LoginBloc>(context);
 
-    return BlocBuilder<LoginBloc, LoginState>(
+    return BlocConsumer<LoginBloc, LoginState>(
+      listener: (context, state) {
+        final routeName = state.routeName?.raw;
+        if (routeName != null) {
+          Navigator.of(context).pushNamed(routeName);
+        }
+      },
       builder: (context, state) {
         return CommonPage(
           isLoading: state.isLoading,
@@ -50,7 +58,7 @@ class LoginPage extends StatelessWidget {
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 if (!bloc.state.isLoading) {
-                  bloc.add(LoginEvent());
+                  bloc.add(LoginSubmitEvent());
                 }
               },
               tooltip: 'Login',

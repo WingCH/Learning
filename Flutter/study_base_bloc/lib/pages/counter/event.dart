@@ -1,14 +1,8 @@
-import 'package:equatable/equatable.dart';
+import '../../bloc/common_page/bloc.dart';
 
-abstract class CounterEvent extends Equatable {}
-
-class LoadingEvent extends CounterEvent {
-  final bool isLoading;
-
-  LoadingEvent({required this.isLoading});
-
+class CounterEvent extends CommonPageEvent {
   @override
-  List<Object> get props => [isLoading];
+  List<Object> get props => [];
 }
 
 class IncrementEvent extends CounterEvent {

@@ -1,6 +1,6 @@
-import '../../bloc/page/bloc.dart';
+import '../../bloc/common_page/bloc.dart';
 
-class LoginState extends PageState {
+class LoginState extends CommonPageState {
   final String username;
   final String password;
 

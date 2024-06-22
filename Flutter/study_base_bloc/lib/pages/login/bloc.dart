@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/page/bloc.dart';
+import '../../bloc/common_page/bloc.dart';
 import 'event.dart';
 import 'state.dart';
 
-class LoginBloc extends PageBloc<LoginState> {
+class LoginBloc extends CommonPageBloc<LoginState> {
   LoginBloc() : super(const LoginState()) {
     on<LoginEvent>(_onLoginEvent);
   }

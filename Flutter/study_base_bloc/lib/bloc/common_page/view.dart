@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class BasePage extends StatelessWidget {
+class CommonPage extends StatelessWidget {
   final bool isLoading;
   final Widget child;
 
-  const BasePage({
+  const CommonPage({
     super.key,
     required this.isLoading,
     required this.child,

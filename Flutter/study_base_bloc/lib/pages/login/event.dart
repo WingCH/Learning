@@ -1,6 +1,6 @@
-import '../../bloc/page/bloc.dart';
+import '../../bloc/common_page/bloc.dart';
 
-class LoginEvent extends PageEvent {
+class LoginEvent extends CommonPageEvent {
   @override
   List<Object> get props => [];
 }

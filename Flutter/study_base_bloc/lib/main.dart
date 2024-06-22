@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:study_base_bloc/pages/counter/view.dart';
 
 import 'app_bloc_observer.dart';
 import 'pages/login/view.dart';
@@ -21,7 +22,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/counter': (context) => const CounterPage(),
+      },
+      initialRoute: '/login',
     );
   }
 }

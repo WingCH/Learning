@@ -24,8 +24,7 @@ class CounterPage extends StatelessWidget {
 
     return BlocBuilder<CounterBloc, CounterState>(
       builder: (context, state) {
-        return CommonPage(
-          isLoading: state.isLoading,
+        return CommonPage<CounterBloc, CounterState>(
           child: Scaffold(
             appBar: AppBar(
               backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -56,9 +55,7 @@ class CounterPage extends StatelessWidget {
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
-                if (!bloc.state.isLoading) {
                   bloc.add(IncrementEvent());
-                }
               },
               tooltip: 'Increment',
               child: const Icon(Icons.add),

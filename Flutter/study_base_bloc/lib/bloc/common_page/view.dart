@@ -1,30 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class CommonPage extends StatelessWidget {
-  final bool isLoading;
+import 'bloc.dart';
+
+class CommonPage<B extends Bloc<CommonPageEvent, S>, S extends CommonPageState> extends StatelessWidget {
   final Widget child;
 
   const CommonPage({
     super.key,
-    required this.isLoading,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        child,
-        if (isLoading)
-          Container(
-            color: Colors.grey.withOpacity(0.5),
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
+    return BlocConsumer<B, S>(
+      listener: (context, state) {
+        final routeName = state.routeName.raw;
+        if (routeName != null) {
+          Navigator.of(context).pushNamed(routeName);
+        }
+      },
+      builder: (context, state) {
+        return Stack(
+          children: [
+            child,
+            if (state.isLoading)
+              Container(
+                color: Colors.grey.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

@@ -22,51 +22,38 @@ class LoginPage extends StatelessWidget {
   Widget _buildPage(BuildContext context) {
     final bloc = BlocProvider.of<LoginBloc>(context);
 
-    return BlocConsumer<LoginBloc, LoginState>(
-      listener: (context, state) {
-        final routeName = state.routeName?.raw;
-        if (routeName != null) {
-          Navigator.of(context).pushNamed(routeName);
-        }
-      },
-      builder: (context, state) {
-        return CommonPage(
-          isLoading: state.isLoading,
-          child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: const Text("Login Page"),
-            ),
-            body: BlocConsumer<LoginBloc, LoginState>(
-              listener: (context, state) {},
-              builder: (context, state) {
-                return const Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text('Login Form Goes Here'),
-                          // Add your login form fields here
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                if (!bloc.state.isLoading) {
-                  bloc.add(LoginSubmitEvent());
-                }
-              },
-              tooltip: 'Login',
-              child: const Icon(Icons.login),
-            ), // This trailing comma makes auto-formatting nicer for build methods.
-          ),
-        );
-      },
+    return CommonPage<LoginBloc, LoginState>(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text("Login Page"),
+        ),
+        body: BlocConsumer<LoginBloc, LoginState>(
+          listener: (context, state) {},
+          builder: (context, state) {
+            return const Stack(
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Login Form Goes Here'),
+                      // Add your login form fields here
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            bloc.add(LoginSubmitEvent());
+          },
+          tooltip: 'Login',
+          child: const Icon(Icons.login),
+        ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

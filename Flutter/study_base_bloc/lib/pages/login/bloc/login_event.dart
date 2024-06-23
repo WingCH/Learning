@@ -1,18 +1,18 @@
-part of 'bloc.dart';
+part of 'login_bloc.dart';
 
 class LoginEvent extends CommonPageEvent {
   @override
   List<Object> get props => [];
 }
 
-class LoginSubmitEvent extends CommonPageEvent {
+class LoginSubmitEvent extends LoginEvent {
   LoginSubmitEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class LoginSuccessEvent extends CommonPageEvent {
+class LoginSuccessEvent extends LoginEvent {
   LoginSuccessEvent();
 
   @override

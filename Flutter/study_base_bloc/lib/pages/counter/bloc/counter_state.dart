@@ -1,4 +1,4 @@
-part of 'bloc.dart';
+part of 'counter_bloc.dart';
 
 class CounterState extends CommonPageState {
   final int counter;

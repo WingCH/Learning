@@ -1,6 +1,6 @@
 {
   "name": "CommonPageBloc",
-  "description": "Empty Template Description",
+  "description": "Create a common page with bloc pattern",
   "param": [
     "name"
   ],

@@ -1,17 +1,17 @@
-part of 'home_bloc.dart';
+part of 'login_bloc.dart';
 
-class HomeState extends CommonPageState {
-  const HomeState({
+class LoginState extends CommonPageState {
+  const LoginState({
     super.isLoading,
     super.routeName,
   });
 
   @override
-  HomeState copyWith({
+  LoginState copyWith({
     bool? isLoading,
     Optional<String?>? routeName,
   }) {
-    return HomeState(
+    return LoginState(
       isLoading: isLoading ?? this.isLoading,
       routeName: routeName ?? this.routeName,
     );

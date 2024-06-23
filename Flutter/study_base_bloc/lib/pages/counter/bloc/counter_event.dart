@@ -1,4 +1,4 @@
-part of 'bloc.dart';
+part of 'counter_bloc.dart';
 
 class CounterEvent extends CommonPageEvent {
   @override

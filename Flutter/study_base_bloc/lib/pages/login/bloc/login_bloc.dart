@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/common_page/bloc.dart';
-import '../../models/optional.dart';
-import '../counter/view.dart';
+import '../../../bloc/common_page/bloc.dart';
+import '../../../models/optional.dart';
+import '../../counter/counter_page.dart';
 
-part 'event.dart';
+part 'login_event.dart';
 
-part 'state.dart';
+part 'login_state.dart';
 
 class LoginBloc extends CommonPageBloc<LoginState> {
   LoginBloc() : super(const LoginState()) {

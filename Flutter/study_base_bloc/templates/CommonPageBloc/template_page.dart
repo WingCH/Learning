@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/common_page/view.dart';
-import 'bloc.dart';
+import 'bloc/{name}[-c]_bloc.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class {name}[-C]Page extends StatelessWidget {
+  const {name}[-C]Page({super.key});
 
-  static const routeName = '/login';
+  static const routeName = '/{name}[-c]';
 
   static Route<void> route(RouteSettings settings) {
     return CupertinoPageRoute(
       builder: (context) {
-        return const LoginPage();
+        return const {name}[-C]Page();
       },
     );
   }
@@ -22,8 +22,8 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<LoginBloc>(
-          create: (context) => LoginBloc(),
+        BlocProvider<{name}[-C]Bloc>(
+          create: (context) => {name}[-C]Bloc(),
         ),
       ],
       child: Builder(
@@ -35,25 +35,26 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildPage(BuildContext context) {
-    final bloc = BlocProvider.of<LoginBloc>(context);
+    final bloc = BlocProvider.of<{name}[-C]Bloc>(context);
 
-    return CommonPage<LoginBloc, LoginState>(
+    return CommonPage<{name}[-C]Bloc, {name}[-C]State>(
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text("Login Page"),
+          title: const Text("{name}[-C] Page"),
         ),
-        body: BlocConsumer<LoginBloc, LoginState>(
+        body: BlocConsumer<{name}[-C]Bloc, {name}[-C]State>(
           listener: (context, state) {},
           builder: (context, state) {
-            return const Stack(
+            return Stack(
               children: [
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('Login Form Goes Here'),
-                      // Add your login form fields here
+                      const Text(
+                        '{name}[-C]',
+                      ),
                     ],
                   ),
                 ),
@@ -61,13 +62,6 @@ class LoginPage extends StatelessWidget {
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            bloc.add(LoginSubmitEvent());
-          },
-          tooltip: 'Login',
-          child: const Icon(Icons.login),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
   }

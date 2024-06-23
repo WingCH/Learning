@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/common_page/view.dart';
-import 'bloc.dart';
+import 'bloc/home_bloc.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
-  static const routeName = '/login';
+  static const routeName = '/home';
 
   static Route<void> route(RouteSettings settings) {
     return CupertinoPageRoute(
       builder: (context) {
-        return const LoginPage();
+        return const HomePage();
       },
     );
   }
@@ -22,8 +22,8 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<LoginBloc>(
-          create: (context) => LoginBloc(),
+        BlocProvider<HomeBloc>(
+          create: (context) => HomeBloc(),
         ),
       ],
       child: Builder(
@@ -35,25 +35,26 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildPage(BuildContext context) {
-    final bloc = BlocProvider.of<LoginBloc>(context);
+    final bloc = BlocProvider.of<HomeBloc>(context);
 
-    return CommonPage<LoginBloc, LoginState>(
+    return CommonPage<HomeBloc, HomeState>(
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text("Login Page"),
+          title: const Text("Home Page"),
         ),
-        body: BlocConsumer<LoginBloc, LoginState>(
+        body: BlocConsumer<HomeBloc, HomeState>(
           listener: (context, state) {},
           builder: (context, state) {
-            return const Stack(
+            return Stack(
               children: [
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('Login Form Goes Here'),
-                      // Add your login form fields here
+                      const Text(
+                        'Home',
+                      ),
                     ],
                   ),
                 ),
@@ -61,13 +62,6 @@ class LoginPage extends StatelessWidget {
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            bloc.add(LoginSubmitEvent());
-          },
-          tooltip: 'Login',
-          child: const Icon(Icons.login),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
   }

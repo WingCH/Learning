@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,11 +10,27 @@ class CounterPage extends StatelessWidget {
 
   static const routeName = '/counter';
 
+  static Route<void> route(RouteSettings settings) {
+    return CupertinoPageRoute(
+      builder: (context) {
+        return const CounterPage();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (BuildContext context) => CounterBloc(),
-      child: Builder(builder: (context) => _buildPage(context)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CounterBloc>(
+          create: (context) => CounterBloc(),
+        ),
+      ],
+      child: Builder(
+        builder: (context) {
+          return _buildPage(context);
+        },
+      ),
     );
   }
 
@@ -55,7 +72,7 @@ class CounterPage extends StatelessWidget {
           },
           tooltip: 'Increment',
           child: const Icon(Icons.add),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
+        ),
       ),
     );
   }

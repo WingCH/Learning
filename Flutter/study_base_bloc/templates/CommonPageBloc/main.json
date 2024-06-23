@@ -1,0 +1,30 @@
+{
+  "name": "CommonPageBloc",
+  "description": "Empty Template Description",
+  "param": [
+    "name"
+  ],
+  "addFile": [
+    {
+      "name": "{name}[-s]_bloc.dart",
+      "path": "{name}[-s]/bloc/",
+      "fileTemplatePath": "bloc/template_bloc.dart"
+    },
+    {
+      "name": "{name}[-s]_event.dart",
+      "path": "{name}[-s]/bloc/",
+      "fileTemplatePath": "bloc/template_event.dart"
+    },
+    {
+      "name": "{name}[-s]_state.dart",
+      "path": "{name}[-s]/bloc/",
+      "fileTemplatePath": "bloc/template_state.dart"
+    },
+    {
+      "name": "{name}[-s]_page.dart",
+      "path": "{name}[-s]/",
+      "fileTemplatePath": "template_page.dart"
+    }
+  ],
+  "globalBasePath": ""
+}

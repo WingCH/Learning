@@ -5,12 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/common_page/view.dart';
 import 'bloc/counter_bloc.dart';
 
+class CounterPageArguments {}
+
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
 
   static const routeName = '/counter';
 
   static Route<void> route(RouteSettings settings) {
+    final arguments = settings.arguments as CounterPageArguments?;
     return CupertinoPageRoute(
       builder: (context) {
         return const CounterPage();

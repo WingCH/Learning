@@ -5,12 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/common_page/view.dart';
 import 'bloc/login_bloc.dart';
 
+class LoginPageArguments {}
+
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   static const routeName = '/login';
 
   static Route<void> route(RouteSettings settings) {
+    final arguments = settings.arguments as LoginPageArguments?;
     return CupertinoPageRoute(
       builder: (context) {
         return const LoginPage();

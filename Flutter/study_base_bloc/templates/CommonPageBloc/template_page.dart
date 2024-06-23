@@ -5,12 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/common_page/view.dart';
 import 'bloc/{name}[-c]_bloc.dart';
 
+class {name}[-C]PageArguments {}
+
 class {name}[-C]Page extends StatelessWidget {
   const {name}[-C]Page({super.key});
 
   static const routeName = '/{name}[-c]';
 
   static Route<void> route(RouteSettings settings) {
+    final arguments = settings.arguments as {name}[-C]PageArguments?;
     return CupertinoPageRoute(
       builder: (context) {
         return const {name}[-C]Page();

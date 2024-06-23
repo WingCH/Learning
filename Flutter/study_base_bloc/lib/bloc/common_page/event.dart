@@ -12,7 +12,7 @@ class SetLoadingEvent extends CommonPageEvent {
 }
 
 class SetRouteNameEvent extends CommonPageEvent {
-  final Optional<String>? routeName;
+  final Optional<String?> routeName;
 
   SetRouteNameEvent({required this.routeName});
 

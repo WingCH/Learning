@@ -19,7 +19,5 @@ class CommonPageBloc<State extends CommonPageState> extends Bloc<CommonPageEvent
 
   void _onSetRouteNameEvent(SetRouteNameEvent event, Emitter<State> emit) {
     emit(state.copyWith(routeName: event.routeName) as State);
-    // reset routeName to null after navigating
-    emit(state.copyWith(routeName: Optional.empty) as State);
   }
 }

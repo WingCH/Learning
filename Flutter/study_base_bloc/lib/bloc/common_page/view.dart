@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../models/optional.dart';
 import 'bloc.dart';
 
 class CommonPage<B extends Bloc<CommonPageEvent, S>, S extends CommonPageState> extends StatelessWidget {
@@ -21,6 +22,10 @@ class CommonPage<B extends Bloc<CommonPageEvent, S>, S extends CommonPageState> 
         final routeName = state.routeName.raw;
         if (routeName != null) {
           Navigator.of(context).pushNamed(routeName);
+          // reset routeName to null after navigating
+          context.read<B>().add(
+                SetRouteNameEvent(routeName: const Optional(null)),
+              );
         }
       },
       buildWhen: (previous, current) {

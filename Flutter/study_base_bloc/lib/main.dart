@@ -22,9 +22,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      routes: {
-        CounterPage.routeName: (context) => const CounterPage(),
-        LoginPage.routeName: (context) => const LoginPage(),
+      onGenerateRoute: (settings) {
+        if (settings.name == CounterPage.routeName) {
+          return CounterPage.route(settings);
+        }
+        if (settings.name == LoginPage.routeName) {
+          return LoginPage.route(settings);
+        }
+        return null;
       },
       initialRoute: LoginPage.routeName,
     );

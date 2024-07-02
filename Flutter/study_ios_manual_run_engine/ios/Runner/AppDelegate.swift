@@ -24,7 +24,7 @@ import UIKit
 
                     // save to userdefaults
                     UserDefaults.standard.set(handle, forKey: "callbackHandle")
-                    result("Foreground")
+                    result(nil)
                 } else {
                     result(FlutterMethodNotImplemented)
                 }

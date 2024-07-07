@@ -4,6 +4,10 @@ import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:health/health.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import 'HealthDataHelper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,9 +38,11 @@ class MyTaskHandler extends TaskHandler {
   void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
     final position = await Geolocator.getCurrentPosition();
     final updatedTime = DateTime.now();
+    await Health().configure(useHealthConnectIfAvailable: true);
+    final step = await HealthDataHelper().fetchStepData();
     FlutterForegroundTask.updateService(
       notificationTitle: 'MyTaskHandler, updatedTime: $updatedTime',
-      notificationText: 'Location: ${position.latitude}, ${position.longitude}\neventCount: $_eventCount, ',
+      notificationText: 'Step: $step, Location: ${position.latitude}, ${position.longitude}, eventCount: $_eventCount,',
     );
 
     // Send data to the main isolate.
@@ -99,6 +105,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   ReceivePort? _receivePort;
   Position? position;
+  int? step;
+
+  @override
+  void initState() {
+    super.initState();
+    Health().configure(useHealthConnectIfAvailable: true);
+  }
 
   Future<void> _requestPermissionForAndroid() async {
     if (!Platform.isAndroid) {
@@ -230,6 +243,35 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
+  Future<void> authorize() async {
+    // If we are trying to read Step Count, Workout, Sleep or other data that requires
+    // the ACTIVITY_RECOGNITION permission, we need to request the permission first.
+    // This requires a special request authorization call.
+    //
+    // The location permission is requested for Workouts using the Distance information.
+    await Permission.activityRecognition.request();
+    await Permission.location.request();
+
+    final types = [HealthDataType.STEPS];
+    final permissions = types.map((type) => HealthDataAccess.READ).toList();
+
+    // Check if we have health permissions
+    bool? hasPermissions = await Health().hasPermissions(types, permissions: permissions);
+
+    // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
+    // Hence, we have to request with WRITE as well.
+    hasPermissions = false;
+
+    if (!hasPermissions) {
+      // requesting access to the data types before reading them
+      try {
+        await Health().requestAuthorization(types, permissions: permissions);
+      } catch (error) {
+        debugPrint("Exception in authorize: $error");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WithForegroundTask(
@@ -259,10 +301,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Text('4. Stop Foreground Task'),
               ),
               TextButton(
+                onPressed: authorize,
+                child: const Text('Authorize Health, Location Permissions'),
+              ),
+              TextButton(
                 onPressed: _requestLocation,
                 child: const Text('Request Location'),
               ),
               Text('Location: ${position?.latitude}, ${position?.longitude}'),
+              TextButton(
+                onPressed: () async {
+                  step = await HealthDataHelper().fetchStepData();
+                  setState(() {});
+                },
+                child: const Text('Fetch Step Data'),
+              ),
+              Text('Step: $step'),
             ],
           ),
         ),

@@ -16,8 +16,3 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
-
-buildscript {
-    // fix `fvm flutter run --release` error, (The binary version of its metadata is 1.8.0, expected version is 1.6.0.) for flutter_foreground_task
-    ext.kotlin_version = '1.8.0'
-}

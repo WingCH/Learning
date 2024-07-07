@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,9 +32,11 @@ class MyTaskHandler extends TaskHandler {
   // Called every [interval] milliseconds in [ForegroundTaskOptions].
   @override
   void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
+    final position = await Geolocator.getCurrentPosition();
+    final updatedTime = DateTime.now();
     FlutterForegroundTask.updateService(
-      notificationTitle: 'MyTaskHandler',
-      notificationText: 'eventCount: $_eventCount',
+      notificationTitle: 'MyTaskHandler, updatedTime: $updatedTime',
+      notificationText: 'Location: ${position.latitude}, ${position.longitude}\neventCount: $_eventCount, ',
     );
 
     // Send data to the main isolate.
@@ -95,6 +98,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   ReceivePort? _receivePort;
+  Position? position;
 
   Future<void> _requestPermissionForAndroid() async {
     if (!Platform.isAndroid) {
@@ -221,6 +225,11 @@ class _MyHomePageState extends State<MyHomePage> {
     _receivePort = null;
   }
 
+  Future<void> _requestLocation() async {
+    position = await Geolocator.getCurrentPosition();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return WithForegroundTask(
@@ -249,6 +258,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: _stopForegroundTask,
                 child: const Text('4. Stop Foreground Task'),
               ),
+              TextButton(
+                onPressed: _requestLocation,
+                child: const Text('Request Location'),
+              ),
+              Text('Location: ${position?.latitude}, ${position?.longitude}'),
             ],
           ),
         ),

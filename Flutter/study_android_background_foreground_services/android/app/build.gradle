@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.study_android_background_foreground_services"
-    compileSdk = flutter.compileSdkVersion
+    compileSdkVersion = rootProject.ext.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -39,7 +39,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = 26
-        targetSdk = flutter.targetSdkVersion
+        targetSdkVersion = rootProject.ext.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }

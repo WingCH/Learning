@@ -19,7 +19,8 @@ pluginManagement {
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
     id "com.android.application" version "7.3.0" apply false
-    id "org.jetbrains.kotlin.android" version "1.7.10" apply false
+    // kotlin_version, https://stackoverflow.com/questions/78080244/flutter-version-3-19-2-requires-a-newer-version-of-the-kotlin-gradle-plugin-an
+    id "org.jetbrains.kotlin.android" version "1.9.0" apply false
 }
 
 include ":app"

@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'HealthDataHelper.dart';
 
+// TODO: https://github.com/transistorsoft/flutter_background_fetch/issues/193
 void main() {
   runApp(const MyApp());
 }

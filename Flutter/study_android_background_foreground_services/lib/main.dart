@@ -34,6 +34,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   BackgroundFetch.finish(taskId);
 }
 
+// TODO: https://github.com/transistorsoft/flutter_background_fetch/issues/193
 void main() {
   runApp(const MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);

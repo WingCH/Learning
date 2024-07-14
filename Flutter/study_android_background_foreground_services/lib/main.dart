@@ -7,74 +7,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'ForegroundServiceHelper.dart';
 import 'HealthDataHelper.dart';
 
 void main() {
   runApp(const MyApp());
-}
-
-@pragma('vm:entry-point')
-void startCallback() {
-  // The setTaskHandler function must be called to handle the task in the background.
-  FlutterForegroundTask.setTaskHandler(MyTaskHandler());
-}
-
-class MyTaskHandler extends TaskHandler {
-  SendPort? _sendPort;
-  int _eventCount = 0;
-
-  // Called when the task is started.
-  @override
-  void onStart(DateTime timestamp, SendPort? sendPort) async {
-    _sendPort = sendPort;
-
-    // You can use the getData function to get the stored data.
-    final customData = await FlutterForegroundTask.getData<String>(key: 'customData');
-    print('customData: $customData');
-  }
-
-  // Called every [interval] milliseconds in [ForegroundTaskOptions].
-  @override
-  void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
-    final position = await Geolocator.getCurrentPosition();
-    final updatedTime = DateTime.now();
-    await Health().configure(useHealthConnectIfAvailable: true);
-    final step = await HealthDataHelper().fetchStepData();
-    FlutterForegroundTask.updateService(
-      notificationTitle: 'MyTaskHandler, updatedTime: $updatedTime',
-      notificationText: 'Step: $step, Location: ${position.latitude}, ${position.longitude}, eventCount: $_eventCount,',
-    );
-
-    // Send data to the main isolate.
-    sendPort?.send(_eventCount);
-
-    _eventCount++;
-  }
-
-  // Called when the notification button on the Android platform is pressed.
-  @override
-  void onDestroy(DateTime timestamp, SendPort? sendPort) async {
-    print('onDestroy');
-  }
-
-  // Called when the notification button on the Android platform is pressed.
-  @override
-  void onNotificationButtonPressed(String id) {
-    print('onNotificationButtonPressed >> $id');
-  }
-
-  // Called when the notification itself on the Android platform is pressed.
-  //
-  // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
-  // this function to be called.
-  @override
-  void onNotificationPressed() {
-    // Note that the app will only route to "/resume-route" when it is exited so
-    // it will usually be necessary to send a message through the send port to
-    // signal it to restore state when the app is already started.
-    FlutterForegroundTask.launchApp("/resume-route");
-    _sendPort?.send('onNotificationPressed');
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -140,102 +77,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     // Android 13 and higher, you need to allow notification permission to expose foreground service notification.
-    final NotificationPermission notificationPermissionStatus = await FlutterForegroundTask.checkNotificationPermission();
+    final NotificationPermission notificationPermissionStatus =
+        await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermissionStatus != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
     }
-  }
-
-  void _initForegroundTask() {
-    FlutterForegroundTask.init(
-      androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'foreground_service',
-        channelName: 'Foreground Service Notification',
-        channelDescription: 'This notification appears when the foreground service is running.',
-        channelImportance: NotificationChannelImportance.LOW,
-        priority: NotificationPriority.LOW,
-        iconData: const NotificationIconData(
-          resType: ResourceType.mipmap,
-          resPrefix: ResourcePrefix.ic,
-          name: 'launcher',
-          backgroundColor: Colors.orange,
-        ),
-        buttons: [
-          const NotificationButton(
-            id: 'sendButton',
-            text: 'Send',
-            textColor: Colors.orange,
-          ),
-        ],
-      ),
-      iosNotificationOptions: const IOSNotificationOptions(
-        showNotification: true,
-        playSound: false,
-      ),
-      foregroundTaskOptions: const ForegroundTaskOptions(
-        interval: 5000,
-        isOnceEvent: false,
-        autoRunOnBoot: true,
-        autoRunOnMyPackageReplaced: true,
-        allowWakeLock: true,
-        allowWifiLock: true,
-      ),
-    );
-  }
-
-  Future<bool> _startForegroundTask() async {
-    // You can save data using the saveData function.
-    await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
-
-    // Register the receivePort before starting the service.
-    final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
-    final bool isRegistered = _registerReceivePort(receivePort);
-    if (!isRegistered) {
-      print('Failed to register receivePort!');
-      return false;
-    }
-
-    if (await FlutterForegroundTask.isRunningService) {
-      return FlutterForegroundTask.restartService();
-    } else {
-      return FlutterForegroundTask.startService(
-        notificationTitle: 'Foreground Service is running',
-        notificationText: 'Tap to return to the app',
-        callback: startCallback,
-      );
-    }
-  }
-
-  Future<bool> _stopForegroundTask() {
-    return FlutterForegroundTask.stopService();
-  }
-
-  bool _registerReceivePort(ReceivePort? newReceivePort) {
-    if (newReceivePort == null) {
-      return false;
-    }
-
-    _closeReceivePort();
-
-    _receivePort = newReceivePort;
-    _receivePort?.listen((data) {
-      if (data is int) {
-        print('eventCount: $data');
-      } else if (data is String) {
-        if (data == 'onNotificationPressed') {
-          Navigator.of(context).pushNamed('/resume-route');
-        }
-      } else if (data is DateTime) {
-        print('timestamp: ${data.toString()}');
-      }
-    });
-
-    return _receivePort != null;
-  }
-
-  void _closeReceivePort() {
-    _receivePort?.close();
-    _receivePort = null;
   }
 
   Future<void> _requestLocation() async {
@@ -256,7 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final permissions = types.map((type) => HealthDataAccess.READ).toList();
 
     // Check if we have health permissions
-    bool? hasPermissions = await Health().hasPermissions(types, permissions: permissions);
+    bool? hasPermissions =
+        await Health().hasPermissions(types, permissions: permissions);
 
     // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
     // Hence, we have to request with WRITE as well.
@@ -289,16 +136,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Text('1. Request Permission'),
               ),
               TextButton(
-                onPressed: _initForegroundTask,
-                child: const Text('2. Init Foreground Task'),
+                onPressed: ForegroundServiceHelper.instance.startForegroundTask,
+                child: const Text('2. Start Foreground Task'),
               ),
               TextButton(
-                onPressed: _startForegroundTask,
-                child: const Text('3. Start Foreground Task'),
-              ),
-              TextButton(
-                onPressed: _stopForegroundTask,
-                child: const Text('4. Stop Foreground Task'),
+                onPressed: ForegroundServiceHelper.instance.stopForegroundTask,
+                child: const Text('3. Stop Foreground Task'),
               ),
               TextButton(
                 onPressed: authorize,

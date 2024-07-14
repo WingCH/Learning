@@ -6,9 +6,30 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'ForegroundServiceHelper.dart';
 import 'HealthDataHelper.dart';
+
+@pragma(
+    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask(
+    (task, inputData) async {
+      print(
+        "Native called background task: $task",
+      );
+      if (task == "simplePeriodicTask") {
+        try {
+          await ForegroundServiceHelper.instance.startForegroundTask();
+        } catch (e) {
+          print("Error in background task: $e");
+        }
+      }
+      return Future.value(true);
+    },
+  );
+}
 
 void main() {
   runApp(const MyApp());
@@ -142,6 +163,20 @@ class _MyHomePageState extends State<MyHomePage> {
               TextButton(
                 onPressed: ForegroundServiceHelper.instance.stopForegroundTask,
                 child: const Text('3. Stop Foreground Task'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await Workmanager()
+                      .initialize(callbackDispatcher, isInDebugMode: true);
+                  await Workmanager().registerPeriodicTask(
+                    "periodic-task-identifier",
+                    "simplePeriodicTask",
+                    // When no frequency is provided the default 15 minutes is set.
+                    // Minimum frequency is 15 min. Android will automatically change your frequency to 15 min if you have configured a lower frequency.
+                    frequency: const Duration(minutes: 15),
+                  );
+                },
+                child: const Text('4. Start Background Periodic Task'),
               ),
               TextButton(
                 onPressed: authorize,

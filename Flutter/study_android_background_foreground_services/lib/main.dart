@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,36 +9,15 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'HealthDataHelper.dart';
 
+void main() {
+  runApp(const MyApp());
+}
 
 @pragma('vm:entry-point')
 void startCallback() {
   // The setTaskHandler function must be called to handle the task in the background.
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
-
-@pragma('vm:entry-point')
-void backgroundFetchHeadlessTask(HeadlessTask task) async {
-  String taskId = task.taskId;
-  bool isTimeout = task.timeout;
-  if (isTimeout) {
-    // This task has exceeded its allowed running-time.
-    // You must stop what you're doing and immediately .finish(taskId)
-    print("[BackgroundFetch] Headless task timed-out: $taskId");
-    BackgroundFetch.finish(taskId);
-    return;
-  }
-  print('[BackgroundFetch] Headless event received.');
-  // Do your work here...
-
-  BackgroundFetch.finish(taskId);
-}
-
-// TODO: https://github.com/transistorsoft/flutter_background_fetch/issues/193
-void main() {
-  runApp(const MyApp());
-  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-}
-
 
 class MyTaskHandler extends TaskHandler {
   SendPort? _sendPort;

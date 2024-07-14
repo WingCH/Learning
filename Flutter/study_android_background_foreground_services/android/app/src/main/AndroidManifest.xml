@@ -1,6 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Check whether Health Connect is installed or not -->
     <queries>
@@ -27,7 +25,6 @@
 <!--    E/AndroidRuntime(32059): java.lang.RuntimeException: Unable to create service com.pravera.flutter_foreground_task.service.ForegroundService: java.lang.SecurityException: Starting FGS with type location callerApp=ProcessRecord{ff99ae 32059:com.example.study_android_background_foreground_services/u0a421} targetSDK=34 requires permissions: all of the permissions allOf=true [android.permission.FOREGROUND_SERVICE_LOCATION] any of the permissions allOf=false [android.permission.ACCESS_COARSE_LOCATION, android.permission.ACCESS_FINE_LOCATION]  and the app must be in the eligible state/exemptions to access the foreground only permission-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
-        tools:replace="android:label"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:label="study_android_background_foreground_services">

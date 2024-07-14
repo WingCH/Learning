@@ -1,16 +1,7 @@
-ext {
-    // https://github.com/transistorsoft/flutter_background_fetch/blob/master/help/INSTALL-ANDROID.md
-    compileSdkVersion = 34
-    targetSdkVersion = 34
-    appCompatVersion = "1.6.1"
-}
-
 allprojects {
     repositories {
         google()
         mavenCentral()
-        // [required] background_fetch
-        maven { url "${project(':background_fetch').projectDir}/libs" }
     }
 }
 

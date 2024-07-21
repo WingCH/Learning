@@ -1,4 +1,7 @@
+import 'package:drift_db_viewer/drift_db_viewer.dart';
 import 'package:flutter/material.dart';
+
+import 'database/database.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,9 +36,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  Future<void> _incrementCounter() async {
+    final database = AppDatabase.instance;
+    await database.into(database.todoItems).insert(
+          TodoItemsCompanion.insert(
+            title: 'Test Test',
+            content: 'Test',
+          ),
+        );
+
+    final count = await database.select(database.todoItems).get();
     setState(() {
-      _counter++;
+      _counter = count.length;
     });
   }
 
@@ -60,10 +72,30 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DriftDbViewer(
+                    AppDatabase.instance,
+                  ),
+                ),
+              );
+            },
+            heroTag: 1,
+            child: const Icon(Icons.bug_report),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Increment',
+            heroTag: 2,
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

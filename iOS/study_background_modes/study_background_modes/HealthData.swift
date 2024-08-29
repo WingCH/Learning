@@ -30,7 +30,7 @@ class HealthData {
         return typeIdentifiers.compactMap { getSampleType(for: $0) }
     }
 
-    func getLastWeekStepData() async throws -> [HKQuantitySample] {
+func getLastWeekStepData() async throws -> [HKQuantitySample] {
         let now = Date()
         let lastWeekStartDate = Calendar.current.date(byAdding: .day, value: -6, to: now)!
         let quantityType: HKQuantityType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
@@ -60,7 +60,7 @@ class HealthData {
     func startObservingStepChanges() {
         let supabaseManager = SupabaseManager.shared
         let quantityType: HKQuantityType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
-        let query: HKObserverQuery = registerOneOffTask(
+        let query: HKObserverQuery = HKObserverQuery(
             sampleType: quantityType,
             predicate: nil,
             updateHandler: { [weak self] _, completionHandler, _ in

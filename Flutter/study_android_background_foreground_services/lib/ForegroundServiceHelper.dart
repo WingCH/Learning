@@ -65,11 +65,13 @@ class MyForegroundServiceTaskHandler extends TaskHandler {
   // this function to be called.
   @override
   void onNotificationPressed() {
-    // Note that the app will only route to "/resume-route" when it is exited so
-    // it will usually be necessary to send a message through the send port to
-    // signal it to restore state when the app is already started.
-    FlutterForegroundTask.launchApp("/resume-route");
-    _sendPort?.send('onNotificationPressed');
+    super.onNotificationPressed();
+    print('onNotificationPressed');
+  }
+
+  @override
+  void onNotificationDismissed() {
+    print('onNotificationDismissed');
   }
 }
 
@@ -93,24 +95,8 @@ class ForegroundServiceHelper {
             'This notification appears when the foreground service is running.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
-        iconData: const NotificationIconData(
-          resType: ResourceType.mipmap,
-          resPrefix: ResourcePrefix.ic,
-          name: 'launcher',
-          backgroundColor: Colors.orange,
-        ),
-        buttons: [
-          const NotificationButton(
-            id: 'sendButton',
-            text: 'Send',
-            textColor: Colors.orange,
-          ),
-        ],
       ),
-      iosNotificationOptions: const IOSNotificationOptions(
-        showNotification: true,
-        playSound: false,
-      ),
+      iosNotificationOptions: const IOSNotificationOptions(),
       foregroundTaskOptions: const ForegroundTaskOptions(
         interval: 5000,
         isOnceEvent: false,
@@ -135,11 +121,20 @@ class ForegroundServiceHelper {
     }
 
     if (await FlutterForegroundTask.isRunningService) {
-      return FlutterForegroundTask.restartService();
+      // return FlutterForegroundTask.restartService();
+      return true;
     } else {
       return FlutterForegroundTask.startService(
         notificationTitle: 'Foreground Service is running',
         notificationText: 'Tap to return to the app',
+        notificationIcon: null,
+        notificationButtons: [
+          const NotificationButton(
+            id: 'btn_hello',
+            text: 'hello',
+            textColor: Colors.orange,
+          ),
+        ],
         callback: startCallback,
       );
     }
@@ -159,11 +154,7 @@ class ForegroundServiceHelper {
     _receivePort = newReceivePort;
     _receivePort?.listen((data) {
       if (data is int) {
-        print('eventCount: $data');
-      } else if (data is String) {
-        if (data == 'onNotificationPressed') {
-          print("onNotificationPressed");
-        }
+        print('count: $data');
       } else if (data is DateTime) {
         print('timestamp: ${data.toString()}');
       }

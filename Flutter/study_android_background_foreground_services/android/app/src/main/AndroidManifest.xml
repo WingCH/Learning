@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <!--    E/AndroidRuntime(31765): java.lang.RuntimeException: Unable to create service com.pravera.flutter_foreground_task.service.ForegroundService: java.lang.SecurityException: Starting FGS with type health callerApp=ProcessRecord{1b5cf7e 31765:com.example.study_android_background_foreground_services/u0a421} targetSDK=34 requires permissions: all of the permissions allOf=true [android.permission.FOREGROUND_SERVICE_HEALTH] any of the permissions allOf=false [android.permission.ACTIVITY_RECOGNITION, android.permission.BODY_SENSORS, android.permission.HIGH_SAMPLING_RATE_SENSORS]-->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />

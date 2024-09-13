@@ -19,13 +19,13 @@ void callbackDispatcher() {
       print(
         "Native called background task: $task",
       );
-      if (task == "simplePeriodicTask") {
+      // if (task == "simplePeriodicTask") {
         try {
           await ForegroundServiceHelper.instance.startForegroundTask();
         } catch (e) {
           print("Error in background task: $e");
         }
-      }
+      // }
       return Future.value(true);
     },
   );
@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // Android 13 and higher, you need to allow notification permission to expose foreground service notification.
     final NotificationPermission notificationPermissionStatus =
-        await FlutterForegroundTask.checkNotificationPermission();
+    await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermissionStatus != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
     }
@@ -166,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               TextButton(
                 onPressed: () async {
-                  await Workmanager()
+                  Workmanager()
                       .initialize(callbackDispatcher, isInDebugMode: true);
                   await Workmanager().registerPeriodicTask(
                     "periodic-task-identifier",
@@ -177,6 +177,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                 },
                 child: const Text('4. Start Background Periodic Task'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await Workmanager().cancelAll();
+                },
+                child: const Text('Stop Background Periodic Task'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Workmanager()
+                      .initialize(callbackDispatcher, isInDebugMode: true);
+                  Workmanager()
+                      .registerOneOffTask("task-identifier", "simpleTask");
+                },
+                child: const Text('Start Background One-Off Task'),
               ),
               TextButton(
                 onPressed: authorize,

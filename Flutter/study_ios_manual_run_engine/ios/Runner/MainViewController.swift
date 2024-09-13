@@ -75,7 +75,7 @@ class MainViewController: FlutterViewController {
         print("Native: Invoke flutter method  in background channel")
         backgroundChannel?.invokeMethod(
             "waitResult",
-            arguments: nil,
+            arguments: ["key1": "value1", "key2": "value2"],
             result: { [weak self] flutterResult in
                 self?.cleanupFlutterResources()
                 print("Native: Flutter result: \(flutterResult), Date: \(Date())")

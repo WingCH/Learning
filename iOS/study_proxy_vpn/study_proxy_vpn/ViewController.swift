@@ -77,7 +77,8 @@ class Manager {
     private func createAndSaveProviderManager(_ complete: @escaping (NETunnelProviderManager?) -> Void) {
         let manager = NETunnelProviderManager()
         let proto = NETunnelProviderProtocol()
-//        proto.providerBundleIdentifier = "wingch.com.study-proxy-vpn.VPNExtension"
+        // The following line is commented out but the code still works without it
+        // proto.providerBundleIdentifier = "wingch.com.study-proxy-vpn.VPNExtension"
         proto.serverAddress = "Your VPN"
         manager.protocolConfiguration = proto
         manager.localizedDescription = "Your VPN"

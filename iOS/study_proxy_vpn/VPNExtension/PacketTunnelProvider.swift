@@ -9,14 +9,13 @@
 import NetworkExtension
 import os.log
 
-// Not work, cannot access network
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         os_log("Starting tunnel...", log: .default, type: .info)
         
         // Set up tunnel configuration
-        let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
+        let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "192.168.0.47")
         networkSettings.mtu = 1500
         
         // Configure IPv4 settings
@@ -24,14 +23,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         ipv4Settings.includedRoutes = [NEIPv4Route.default()]
         networkSettings.ipv4Settings = ipv4Settings
         
-        // Set up DNS
+        // Set up DNS, both can work
+//        let dnsSettings = NEDNSSettings(servers: ["192.168.0.1"])
         let dnsSettings = NEDNSSettings(servers: ["8.8.8.8", "8.8.4.4"])
         networkSettings.dnsSettings = dnsSettings
         
         // Set up proxy server
         let proxySettings = NEProxySettings()
-        proxySettings.httpServer = NEProxyServer(address: "127.0.0.1", port: 9090)
-        proxySettings.httpsServer = NEProxyServer(address: "127.0.0.1", port: 9090)
+        proxySettings.httpEnabled = true
+        proxySettings.httpServer = NEProxyServer(address: "192.168.0.47", port: 9090)
+        proxySettings.httpsEnabled = true
+        proxySettings.httpsServer = NEProxyServer(address: "192.168.0.47", port: 9090)
+        proxySettings.excludeSimpleHostnames = true
+        proxySettings.matchDomains = [""]
         networkSettings.proxySettings = proxySettings
         
         // Apply network settings
@@ -43,7 +47,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
             
             // Start handling packets
-            self.startHandlingPackets()
+//            self.startHandlingPackets()
             completionHandler(nil)
         }
     }

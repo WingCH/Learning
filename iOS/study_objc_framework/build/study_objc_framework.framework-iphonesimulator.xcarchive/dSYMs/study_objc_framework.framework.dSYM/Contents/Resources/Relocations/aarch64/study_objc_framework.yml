@@ -1,0 +1,9 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/wingch/Library/Developer/Xcode/DerivedData/study_objc_framework-eezopampdsequmelmgzdlmoipkzt/Build/Intermediates.noindex/ArchiveIntermediates/study_objc_framework/InstallationBuildProductsLocation/Library/Frameworks/study_objc_framework.framework/study_objc_framework'
+relocations:
+  - { offset: 0x32896, size: 0x8, addend: 0x0, symName: _study_objc_frameworkVersionString, symObjAddr: 0x0, symBinAddr: 0x3F58, symSize: 0x0 }
+  - { offset: 0x328CA, size: 0x8, addend: 0x0, symName: _study_objc_frameworkVersionNumber, symObjAddr: 0x48, symBinAddr: 0x3FA0, symSize: 0x0 }
+  - { offset: 0x32906, size: 0x8, addend: 0x0, symName: _add, symObjAddr: 0x0, symBinAddr: 0x3F50, symSize: 0x8 }
+  - { offset: 0x32913, size: 0x8, addend: 0x0, symName: _add, symObjAddr: 0x0, symBinAddr: 0x3F50, symSize: 0x8 }
+...

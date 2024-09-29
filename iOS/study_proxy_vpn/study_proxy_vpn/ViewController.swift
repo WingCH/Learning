@@ -5,117 +5,138 @@
 //  Created by Wing CHAN on 11/9/2024.
 //
 
-import UIKit
 import NetworkExtension
+import UIKit
 
 class ViewController: UIViewController {
+    private let resultTextView: UITextView = {
+        let textView = UITextView()
+        textView.isEditable = false
+        textView.font = UIFont.systemFont(ofSize: 14)
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        return textView
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Add a button to toggle VPN
-        let vpnButton = UIButton(frame: CGRect(x: 100, y: 100, width: 200, height: 50))
-        vpnButton.setTitle("Toggle VPN", for: .normal)
-        vpnButton.setTitleColor(.blue, for: .normal)
-        vpnButton.addTarget(self, action: #selector(toggleVPN), for: .touchUpInside)
-        view.addSubview(vpnButton)
+        setupResultTextView()
+        setupButtons()
     }
 
-    @objc func toggleVPN() {
-        Manager.shared.loadProviderManager { (manager) in
-            guard let manager = manager else {
-                print("Unable to load VPN configuration")
-                return
-            }
-            
-            if manager.connection.status == .disconnected {
-                // VPN is disconnected, try to start
-                do {
-                    try Manager.shared.startVPN { (manager, error) in
-                        if let error = error {
-                            print("Error starting VPN: \(error.localizedDescription)")
-                        } else {
-                            print("VPN started successfully")
-                        }
-                    }
-                } catch {
-                    print("Error starting VPN: \(error.localizedDescription)")
+    func setupResultTextView() {
+        view.addSubview(resultTextView)
+        NSLayoutConstraint.activate([
+            resultTextView.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            resultTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            resultTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            resultTextView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4),
+        ])
+    }
+
+    func setupButtons() {
+        let buttonTitles = [
+            "Get Status", "Start VPN", "Stop VPN", "List Preferences", "Remove All Preferences",
+        ]
+        let buttonActions = [
+            #selector(getStatus), #selector(startVPN), #selector(stopVPN),
+            #selector(listPreferences), #selector(removeAllPreferences),
+        ]
+
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(stackView)
+
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: resultTextView.bottomAnchor, constant: 20),
+            stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stackView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+        ])
+
+        for (index, title) in buttonTitles.enumerated() {
+            let button = UIButton(type: .system)
+            button.setTitle(title, for: .normal)
+            button.addTarget(self, action: buttonActions[index], for: .touchUpInside)
+            stackView.addArrangedSubview(button)
+        }
+    }
+
+    func appendResult(_ text: String) {
+        DispatchQueue.main.async {
+            self.resultTextView.text += text + "\n"
+            let bottom = NSMakeRange(self.resultTextView.text.count - 1, 1)
+            self.resultTextView.scrollRangeToVisible(bottom)
+        }
+    }
+
+    @objc func getStatus() {
+        VpnManager.shared.getVPNStatus { status in
+            if let status = status {
+                self.appendResult("Current VPN status: \(status)")
+                self.appendResult("Status description:")
+                switch status {
+                case .invalid:
+                    self.appendResult("Invalid: The VPN is not configured.")
+                case .disconnected:
+                    self.appendResult("Disconnected: The VPN is disconnected.")
+                case .connecting:
+                    self.appendResult("Connecting: The VPN is connecting.")
+                case .connected:
+                    self.appendResult("Connected: The VPN is connected.")
+                case .reasserting:
+                    self.appendResult(
+                        "Reasserting: The VPN is reconnecting following loss of underlying network connectivity."
+                    )
+                case .disconnecting:
+                    self.appendResult("Disconnecting: The VPN is disconnecting.")
+                @unknown default:
+                    self.appendResult("Unknown status")
                 }
             } else {
-                // VPN is connected, try to stop
-                Manager.shared.stopVPN()
-                print("VPN stopped")
+                self.appendResult("Unable to retrieve VPN status")
             }
         }
     }
-}
 
-class Manager {
-    static let shared = Manager()
-    
-    private init() {}
-    
-    func loadProviderManager(_ complete: @escaping (NETunnelProviderManager?) -> Void) {
-        NETunnelProviderManager.loadAllFromPreferences { (managers, error) in
+    @objc func startVPN() {
+        VpnManager.shared.startVPN { _, error in
             if let error = error {
-                print("Error loading VPN configuration: \(error.localizedDescription)")
+                self.appendResult("Error starting VPN: \(error.localizedDescription)")
+            } else {
+                self.appendResult("VPN started successfully")
             }
+        }
+    }
+
+    @objc func stopVPN() {
+        VpnManager.shared.stopVPN()
+        self.appendResult("VPN stopped")
+    }
+
+    @objc func listPreferences() {
+        VpnManager.shared.listAllPreferences { managers in
             if let managers = managers {
-                print("Found \(managers.count) VPN configurations")
-                if managers.count > 0 {
-                    complete(managers[0])
-                } else {
-                    print("No VPN configurations found")
-                    self.createAndSaveProviderManager(complete)
+                self.appendResult("Found \(managers.count) VPN configurations")
+                for (index, manager) in managers.enumerated() {
+                    self.appendResult(
+                        "Configuration \(index + 1): \(manager.localizedDescription ?? "Unnamed")")
                 }
             } else {
-                print("managers is nil")
-                self.createAndSaveProviderManager(complete)
+                self.appendResult("Unable to retrieve VPN configurations")
             }
         }
     }
-    
-    private func createAndSaveProviderManager(_ complete: @escaping (NETunnelProviderManager?) -> Void) {
-        let manager = NETunnelProviderManager()
-        let proto = NETunnelProviderProtocol()
-        // The following line is commented out but the code still works without it
-        // proto.providerBundleIdentifier = "wingch.com.study-proxy-vpn.VPNExtension"
-        proto.serverAddress = "Your VPN"
-        manager.protocolConfiguration = proto
-        manager.localizedDescription = "Your VPN"
-        manager.isEnabled = true
-        
-        manager.saveToPreferences { error in
+
+    @objc func removeAllPreferences() {
+        VpnManager.shared.removeAllPreferences { error in
             if let error = error {
-                print("Error saving VPN configuration: \(error.localizedDescription)")
-                complete(nil)
+                self.appendResult(
+                    "Error removing VPN configurations: \(error.localizedDescription)")
             } else {
-                print("VPN configuration saved successfully")
-                complete(manager)
+                self.appendResult("All VPN configurations removed successfully")
             }
-        }
-    }
-    
-    func startVPN(_ complete: ((NETunnelProviderManager?, Error?) -> Void)? = nil) {
-        loadProviderManager { (manager) in
-            guard let manager = manager else {
-                complete?(nil, NSError(domain: "VPNError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid VPN configuration"]))
-                return
-            }
-            do {
-                try manager.connection.startVPNTunnel()
-                complete?(manager, nil)
-            } catch {
-                complete?(nil, error)
-            }
-        }
-    }
-    
-    func stopVPN() {
-        loadProviderManager { (manager) -> Void in
-            guard let manager = manager else {
-                return
-            }
-            manager.connection.stopVPNTunnel()
         }
     }
 }

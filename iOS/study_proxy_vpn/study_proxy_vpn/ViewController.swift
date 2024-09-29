@@ -37,10 +37,12 @@ class ViewController: UIViewController {
     func setupButtons() {
         let buttonTitles = [
             "Get Status", "Start VPN", "Stop VPN", "List Preferences", "Remove All Preferences",
+            "Clear Results",
         ]
         let buttonActions = [
             #selector(getStatus), #selector(startVPN), #selector(stopVPN),
             #selector(listPreferences), #selector(removeAllPreferences),
+            #selector(clearResults),
         ]
 
         let stackView = UIStackView()
@@ -137,6 +139,12 @@ class ViewController: UIViewController {
             } else {
                 self.appendResult("All VPN configurations removed successfully")
             }
+        }
+    }
+
+    @objc func clearResults() {
+        DispatchQueue.main.async {
+            self.resultTextView.text = ""
         }
     }
 }

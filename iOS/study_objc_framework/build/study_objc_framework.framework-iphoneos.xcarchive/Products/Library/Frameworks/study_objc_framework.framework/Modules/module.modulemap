@@ -1,0 +1,6 @@
+framework module study_objc_framework {
+  umbrella header "study_objc_framework.h"
+  export *
+
+  module * { export * }
+}

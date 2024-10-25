@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E15A7082CA9025300BA9DD4 /* VpnManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E15A7072CA9024800BA9DD4 /* VpnManager.swift */; };
 		66B573352C917229007EC20E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B573342C917229007EC20E /* AppDelegate.swift */; };
 		66B573372C917229007EC20E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B573362C917229007EC20E /* SceneDelegate.swift */; };
 		66B573392C917229007EC20E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B573382C917229007EC20E /* ViewController.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0E15A7072CA9024800BA9DD4 /* VpnManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VpnManager.swift; sourceTree = "<group>"; };
 		66B573312C917229007EC20E /* study_proxy_vpn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = study_proxy_vpn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66B573342C917229007EC20E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66B573362C917229007EC20E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 		66B573332C917229007EC20E /* study_proxy_vpn */ = {
 			isa = PBXGroup;
 			children = (
+				0E15A7072CA9024800BA9DD4 /* VpnManager.swift */,
 				66B573482C91725C007EC20E /* study_proxy_vpn.entitlements */,
 				66B573342C917229007EC20E /* AppDelegate.swift */,
 				66B573362C917229007EC20E /* SceneDelegate.swift */,
@@ -233,6 +236,7 @@
 			files = (
 				66B573392C917229007EC20E /* ViewController.swift in Sources */,
 				66B573352C917229007EC20E /* AppDelegate.swift in Sources */,
+				0E15A7082CA9025300BA9DD4 /* VpnManager.swift in Sources */,
 				66B573372C917229007EC20E /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

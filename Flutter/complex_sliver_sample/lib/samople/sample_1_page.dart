@@ -20,79 +20,94 @@ class _Sample1PageState extends State<Sample1Page>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
-            SliverToBoxAdapter(
-              child: Container(
-                height: 100,
-                color: Colors.red,
+            SliverOverlapAbsorber(
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              sliver: SliverAppBar(
+                pinned: true,
+                expandedHeight: 300,
+                forceElevated: innerBoxIsScrolled,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Column(
+                    children: [
+                      Container(
+                        height: 100,
+                        color: Colors.red,
+                      ),
+                      Container(
+                        height: 200,
+                        color: Colors.yellow,
+                      ),
+                    ],
+                  ),
+                ),
+                bottom: TabBar(
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(text: 'Tab 1'),
+                    Tab(text: 'Tab 2'),
+                  ],
+                ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Container(
-                height: 200,
-                color: Colors.yellow,
-              ),
-            ),
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: MySliverPersistentHeaderDelegate(),
             ),
           ];
         },
         body: TabBarView(
           controller: _tabController,
-          viewportFraction: 0.5,
-          children: const <Widget>[
-            DemoListView(key: Key('listView1')),
-            DemoListView(key: Key('listView2')),
+          children: [
+            SafeArea(
+              top: false,
+              bottom: false,
+              child: Builder(
+                builder: (BuildContext context) {
+                  return CustomScrollView(
+                    slivers: <Widget>[
+                      SliverOverlapInjector(
+                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                            context),
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                            return ListTile(title: Text('Item $index'));
+                          },
+                          childCount: 1,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            SafeArea(
+              top: false,
+              bottom: false,
+              child: Builder(
+                builder: (BuildContext context) {
+                  return CustomScrollView(
+                    slivers: <Widget>[
+                      SliverOverlapInjector(
+                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                            context),
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                            return ListTile(title: Text('Item $index'));
+                          },
+                          childCount: 30,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-        color: Colors.blue,
-        alignment: Alignment.center,
-        child: const Text('我是一個SliverPersistentHeader',
-            style: TextStyle(color: Colors.white)));
-  }
-
-  @override
-  double get maxExtent => 100.0;
-
-  @override
-  double get minExtent => 100.0;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => false;
-}
-
-class DemoListView extends StatefulWidget {
-  const DemoListView({Key? key}) : super(key: key);
-
-  @override
-  State<DemoListView> createState() => _DemoListViewState();
-}
-
-class _DemoListViewState extends State<DemoListView> {
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      key: widget.key,
-      prototypeItem: const ListTile(title: Text("1")),
-      //itemExtent: 56,
-      itemBuilder: (context, index) {
-        return ListTile(title: Text("$index"));
-      },
     );
   }
 }

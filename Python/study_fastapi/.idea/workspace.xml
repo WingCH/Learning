@@ -5,144 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f85b026-ab57-4de1-9455-2b410e2689fe" name="Changes" comment="study_fastapi">
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/.metadata" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/analysis_options.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/debug/AndroidManifest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/kotlin/com/example/study_background_mode/MainActivity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/drawable-v21/launch_background.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/drawable/launch_background.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/values-night/styles.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/main/res/values/styles.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/app/src/profile/AndroidManifest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/gradle.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/android/settings.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Flutter/AppFrameworkInfo.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Flutter/Debug.xcconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Flutter/Release.xcconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Podfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcworkspace/contents.xcworkspacedata" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/AppDelegate.swift" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Base.lproj/LaunchScreen.storyboard" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Base.lproj/Main.storyboard" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Info.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/Runner/Runner-Bridging-Header.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/ios/RunnerTests/RunnerTests.swift" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/lib/main.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/pubspec.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/pubspec.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_background_mode/test/widget_test.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/.metadata" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/CHANGELOG.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/LICENSE" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/analysis_options.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/analysis_options.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/integration_test/plugin_integration_test.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Flutter/AppFrameworkInfo.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Flutter/Debug.xcconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Flutter/Release.xcconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Podfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Podfile.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcworkspace/contents.xcworkspacedata" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/AppDelegate.swift" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Base.lproj/LaunchScreen.storyboard" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Base.lproj/Main.storyboard" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Info.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/Runner/Runner-Bridging-Header.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/ios/RunnerTests/RunnerTests.swift" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/lib/main.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/pubspec.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/pubspec.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/example/test/widget_test.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/ios/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/ios/Assets/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/ios/Classes/StudyFlutterPluginEntryPointPlugin.swift" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/ios/study_flutter_plugin_entry_point.podspec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/lib/study_flutter_plugin_entry_point.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/lib/study_flutter_plugin_entry_point_method_channel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/lib/study_flutter_plugin_entry_point_platform_interface.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/pubspec.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/test/study_flutter_plugin_entry_point_method_channel_test.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../Flutter/study_flutter_plugin_entry_point/test/study_flutter_plugin_entry_point_test.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Flutter/native_view" beforeDir="false" afterPath="$PROJECT_DIR$/../../Flutter/native_view" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../iOS/study_background_modes/study_background_modes.xcodeproj/project.xcworkspace/xcuserdata/wingch.xcuserdatad/UserInterfaceState.xcuserstate" beforeDir="false" afterPath="$PROJECT_DIR$/../../iOS/study_background_modes/study_background_modes.xcodeproj/project.xcworkspace/xcuserdata/wingch.xcuserdatad/UserInterfaceState.xcuserstate" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../iOS/study_background_modes/study_background_modes.xcodeproj/xcuserdata/wingch.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist" beforeDir="false" afterPath="$PROJECT_DIR$/../../iOS/study_background_modes/study_background_modes.xcodeproj/xcuserdata/wingch.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../iOS/study_background_modes/study_background_modes/HealthData.swift" beforeDir="false" afterPath="$PROJECT_DIR$/../../iOS/study_background_modes/study_background_modes/HealthData.swift" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,8 +106,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
-        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.19072.16" />
+        <option value="bundled-python-sdk-8336bb23522e-2767605e8bc2-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.19072.16" />
       </set>
     </attachedChunks>
   </component>
@@ -262,6 +127,8 @@
       <workItem from="1717423617079" duration="145000" />
       <workItem from="1717423825317" duration="11941000" />
       <workItem from="1718714805079" duration="11000" />
+      <workItem from="1734250494437" duration="6000" />
+      <workItem from="1734250506189" duration="100000" />
     </task>
     <servers />
   </component>

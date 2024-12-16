@@ -2,15 +2,18 @@ use image::{DynamicImage, ImageBuffer};
 use rayon::prelude::*;
 use std::time::Instant;
 
-/*
-Image 1 processing time: 366.332375ms
-Image 2 processing time: 369.479ms
-Image 3 processing time: 362.557917ms
-Total combining time: 3.765370208s
-Combined image saving time: 894.583µs
-Total execution time: 12.95960025s
- */
-fn combine_images_vertical(image_bytes: &[Vec<u8>]) -> Option<Vec<u8>> {
+#[flutter_rust_bridge::frb(sync)] // Synchronous mode for simplicity of the demo
+pub fn greet(name: String) -> String {
+    format!("Hello, {name}!")
+}
+
+#[flutter_rust_bridge::frb(init)]
+pub fn init_app() {
+    // Default utilities - feel free to customize
+    flutter_rust_bridge::setup_default_user_utils();
+}
+
+pub fn combine_images_vertical(image_bytes: &[Vec<u8>]) -> Option<Vec<u8>> {
     let start = Instant::now();
 
     if image_bytes.is_empty() {
@@ -83,23 +86,4 @@ fn combine_images_vertical(image_bytes: &[Vec<u8>]) -> Option<Vec<u8>> {
             None
         }
     }
-}
-
-fn main() {
-    let total_start = Instant::now();
-    // Load images
-    let load_start = Instant::now();
-    let image_bytes: Vec<Vec<u8>> = vec![
-        std::fs::read("receipt_1.jpeg").unwrap(),
-        std::fs::read("receipt_1.1.jpeg").unwrap(),
-        std::fs::read("receipt_2.jpeg").unwrap(),
-    ];
-    println!("Image loading time: {:?}", load_start.elapsed());
-
-    if let Some(combined_bytes) = combine_images_vertical(&image_bytes) {
-        let save_start = Instant::now();
-        std::fs::write("combined.jpg", combined_bytes).expect("Failed to save image");
-        println!("Combined image saving time: {:?}", save_start.elapsed());
-    }
-    println!("Total execution time: {:?}", total_start.elapsed());
 }

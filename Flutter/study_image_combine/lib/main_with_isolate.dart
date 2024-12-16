@@ -1,3 +1,4 @@
+import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_combine/image_combine.dart';
@@ -26,10 +27,6 @@ I/flutter (19096): Image 1.1 size: 2816887 bytes
 I/flutter (19096): Image 2 size: 2962509 bytes
 I/flutter (19096): Operation took: 42840 milliseconds
 I/flutter (19096): Result size: 26052038 bytes
-
-web, Apple M1 Max
-no isolate
-Operation took: 31417 milliseconds
 */
 void main() {
   runApp(const MainApp());
@@ -40,6 +37,18 @@ class MainApp extends StatefulWidget {
 
   @override
   State<MainApp> createState() => _MainAppState();
+}
+
+// Data class to pass to isolate
+class IsolateData {
+  final List<Uint8List> images;
+  IsolateData(this.images);
+}
+
+// Function to run in isolate
+Future<Uint8List> combineImagesInIsolate(IsolateData data) async {
+  final result = await ImageCombiner.combineImagesVertically(data.images);
+  return result;
 }
 
 class _MainAppState extends State<MainApp> {
@@ -66,12 +75,33 @@ class _MainAppState extends State<MainApp> {
 
       final stopwatch = Stopwatch()..start();
 
-      // Directly combine images in main thread
-      final result = await ImageCombiner.combineImagesVertically([
-        image1,
-        image1_1,
-        image2,
-      ]);
+      // Create receive port for communication with isolate
+      final receivePort = ReceivePort();
+
+      // Spawn isolate
+      final isolate = await Isolate.spawn(
+        (message) async {
+          final SendPort sendPort = message[0] as SendPort;
+          final IsolateData isolateData = message[1] as IsolateData;
+
+          // Process images in isolate
+          final result = await combineImagesInIsolate(isolateData);
+
+          // Send result back to main isolate
+          sendPort.send(result);
+        },
+        [
+          receivePort.sendPort,
+          IsolateData([image1, image1_1, image2]),
+        ],
+      );
+
+      // Wait for result from isolate
+      final result = await receivePort.first as Uint8List;
+
+      // Clean up
+      receivePort.close();
+      isolate.kill();
 
       // Stop timing and print results
       stopwatch.stop();

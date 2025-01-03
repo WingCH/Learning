@@ -13,3 +13,8 @@ Future<Uint8List?> combineImagesVertical(
         {required List<Uint8List> imageBytes}) =>
     RustLib.instance.api
         .crateApiSimpleCombineImagesVertical(imageBytes: imageBytes);
+
+Future<Uint8List?> mergeImagesVertically(
+        {required List<Uint8List> imageBuffers}) =>
+    RustLib.instance.api
+        .crateApiSimpleMergeImagesVertically(imageBuffers: imageBuffers);

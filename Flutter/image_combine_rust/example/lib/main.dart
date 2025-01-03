@@ -1,5 +1,6 @@
 import 'dart:isolate';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_combine_rust/image_combine_rust.dart';
@@ -45,10 +46,28 @@ class _MyAppState extends State<MyApp> {
 
       // Now we can safely call the Rust function
       final result = await combineImagesVertical(imageBytes: data.images);
+      // final result = await mergeImagesVertically(imageBuffers: data.images);
       data.sendPort.send(result);
     } catch (e) {
       print('Error in isolate: $e');
       data.sendPort.send(null);
+    }
+  }
+
+  // This is the function that will run in the compute function
+  static Future<Uint8List?> _computeFunction(List<Uint8List> images) async {
+    try {
+      // Initialize RustLib in the isolate
+      await RustLib.init();
+
+      // Now we can safely call the Rust function
+      // final result = await combineImagesVertical(imageBytes: images);
+      final result = await mergeImagesVertically(imageBuffers: images);
+
+      return result;
+    } catch (e) {
+      print('Error in isolate: $e');
+      return null;
     }
   }
 
@@ -75,14 +94,16 @@ class _MyAppState extends State<MyApp> {
         assetPaths.map((path) => _loadDemoImage(path)),
       );
 
-      // Create and spawn the isolate
-      await Isolate.spawn(
-        _isolateFunction,
-        IsolateData(receivePort.sendPort, images),
-      );
+      // // Create and spawn the isolate
+      // await Isolate.spawn(
+      //   _isolateFunction,
+      //   IsolateData(receivePort.sendPort, images),
+      // );
 
-      // Wait for the result
-      final result = await receivePort.first as Uint8List?;
+      // // Wait for the result
+      // final result = await receivePort.first as Uint8List?;
+
+      final result = await compute(_computeFunction, images);
 
       // Stop timing and print results
       stopwatch.stop();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'demo_list.dart';
+import 'overlay_base/overlay_base_demo.dart';
 import 'stack_base/stack_base_demo.dart';
 
 void main() {
@@ -21,6 +22,12 @@ final GoRouter _router = GoRouter(
           path: 'stack-base',
           builder: (BuildContext context, GoRouterState state) {
             return const StackBaseDemo();
+          },
+        ),
+        GoRoute(
+          path: 'overlay-base',
+          builder: (BuildContext context, GoRouterState state) {
+            return const OverlayBaseDemo();
           },
         ),
       ],

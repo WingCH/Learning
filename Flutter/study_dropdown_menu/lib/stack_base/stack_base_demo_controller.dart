@@ -1,4 +1,3 @@
-// Create a new controller file
 class StackBaseDropdownController {
   bool _isOpen = false;
   final List<Function()> _listeners = [];

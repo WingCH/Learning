@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'stack_base/stack_base_demo_controller.dart';
+import 'stack_base_demo_controller.dart';
 
 class StackBaseDemo extends StatefulWidget {
   const StackBaseDemo({super.key});
@@ -28,6 +28,7 @@ class _StackBaseDemoState extends State<StackBaseDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Dropdown Menu Demo'),
         leading: IconButton(
@@ -86,8 +87,16 @@ class _StackBaseDropdownMenuState extends State<StackBaseDropdownMenu> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      fit: StackFit.expand,
       children: [
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: () =>
+                widget.controller.isOpen ? widget.controller.toggle() : null,
+            child: Container(
+              color: Colors.transparent,
+            ),
+          ),
+        ),
         Positioned(
           top: 0,
           left: 0,
@@ -97,7 +106,7 @@ class _StackBaseDropdownMenuState extends State<StackBaseDropdownMenu> {
         AnimatedPositioned(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          top: widget.controller.isOpen ? 50 : -500,
+          top: widget.controller.isOpen ? 0 : -500,
           left: 0,
           right: 0,
           child: Container(

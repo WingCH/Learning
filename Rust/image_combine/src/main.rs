@@ -1,41 +1,68 @@
-use image::{DynamicImage, ImageBuffer, Rgb, RgbaImage};
+use image::{DynamicImage, ImageBuffer};
+use rayon::prelude::*;
 use std::time::Instant;
 
-// Vertically combines multiple images into one
-
 /*
-result:
-Image 1 processing time: 971.287209ms
-Image 2 processing time: 961.386875ms
-Image 3 processing time: 964.625792ms
-Total combining time: 2.8973845s
-Combined image saving time: 8.709253875s
-Total execution time: 18.05329475s
+Image 1 processing time: 366.332375ms
+Image 2 processing time: 369.479ms
+Image 3 processing time: 362.557917ms
+Total combining time: 3.765370208s
+Combined image saving time: 894.583µs
+Total execution time: 12.95960025s
  */
-fn combine_images_vertical(images: &[DynamicImage]) -> Option<RgbaImage> {
+fn combine_images_vertical(image_bytes: &[Vec<u8>]) -> Option<Vec<u8>> {
     let start = Instant::now();
 
-    // Return None if no images provided
+    if image_bytes.is_empty() {
+        return None;
+    }
+
+    // Parallel image loading using rayon
+    let images: Vec<DynamicImage> = image_bytes
+        .par_iter()
+        .filter_map(|bytes| {
+            image::load_from_memory(bytes)
+                .map_err(|e| {
+                    eprintln!("Failed to load image from bytes: {}", e);
+                    e
+                })
+                .ok()
+        })
+        .collect();
+
     if images.is_empty() {
         return None;
     }
 
-    // Calculate dimensions of the final image
-    let width = images.iter().map(|img| img.width()).max().unwrap();
-    let total_height: u32 = images.iter().map(|img| img.height()).sum();
+    let width = images.par_iter().map(|img| img.width()).max().unwrap();
+    let total_height: u32 = images.par_iter().map(|img| img.height()).sum();
 
-    // Create a new image buffer
     let mut combined = ImageBuffer::new(width, total_height);
-
-    // Keep track of current vertical position
     let mut current_height = 0;
 
-    // Copy each image
-    for (i, img) in images.iter().enumerate() {
+    // Pre-convert all images to RGBA8 format
+    let rgba_images: Vec<_> = images.par_iter().map(|img| img.to_rgba8()).collect();
+
+    for (i, img) in rgba_images.iter().enumerate() {
         let copy_start = Instant::now();
-        for (x, y, pixel) in img.to_rgba8().enumerate_pixels() {
-            combined.put_pixel(x, y + current_height, *pixel);
+
+        let rows: Vec<_> = (0..img.height())
+            .into_par_iter()
+            .map(|y| {
+                let mut row = Vec::with_capacity(img.width() as usize);
+                for x in 0..img.width() {
+                    row.push((x, y + current_height, *img.get_pixel(x, y)));
+                }
+                row
+            })
+            .collect();
+
+        for row in rows {
+            for (x, y, pixel) in row {
+                combined.put_pixel(x, y, pixel);
+            }
         }
+
         current_height += img.height();
         println!(
             "Image {} processing time: {:?}",
@@ -45,32 +72,34 @@ fn combine_images_vertical(images: &[DynamicImage]) -> Option<RgbaImage> {
     }
 
     println!("Total combining time: {:?}", start.elapsed());
-    Some(combined)
+
+    // Convert the combined image to JPEG bytes
+    let rgb_image = image::DynamicImage::ImageRgba8(combined).to_rgb8();
+    let mut jpeg_bytes = Vec::new();
+    match image::codecs::jpeg::JpegEncoder::new(&mut jpeg_bytes).encode_image(&rgb_image) {
+        Ok(_) => Some(jpeg_bytes),
+        Err(e) => {
+            eprintln!("Failed to encode JPEG: {}", e);
+            None
+        }
+    }
 }
 
 fn main() {
     let total_start = Instant::now();
-
-    // First create the demo images
-    // create_demo_images();
-
     // Load images
     let load_start = Instant::now();
-    let images = vec![
-        image::open("receipt_1.jpeg").expect("Failed to open receipt_1"),
-        image::open("receipt_1.1.jpeg").expect("Failed to open receipt_1.1"),
-        image::open("receipt_2.jpeg").expect("Failed to open receipt_2"),
+    let image_bytes: Vec<Vec<u8>> = vec![
+        std::fs::read("receipt_1.jpeg").unwrap(),
+        std::fs::read("receipt_1.1.jpeg").unwrap(),
+        std::fs::read("receipt_2.jpeg").unwrap(),
     ];
     println!("Image loading time: {:?}", load_start.elapsed());
 
-    // Combine images
-    if let Some(combined) = combine_images_vertical(&images) {
+    if let Some(combined_bytes) = combine_images_vertical(&image_bytes) {
         let save_start = Instant::now();
-        // Convert RGBA to RGB before saving as JPEG
-        let rgb_image = image::DynamicImage::ImageRgba8(combined).to_rgb8();
-        rgb_image.save("combined.jpg").expect("Failed to save image");
+        std::fs::write("combined.jpg", combined_bytes).expect("Failed to save image");
         println!("Combined image saving time: {:?}", save_start.elapsed());
     }
-
     println!("Total execution time: {:?}", total_start.elapsed());
 }

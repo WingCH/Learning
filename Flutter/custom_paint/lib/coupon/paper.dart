@@ -22,33 +22,33 @@ class Paper extends StatelessWidget {
 class PaperPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // 底色 (可視需要關掉)
+    // Background color (optional, can be disabled as needed)
     canvas.drawColor(Colors.grey.shade200, BlendMode.srcOver);
 
-    // 用來展示各條線段、弧線的不同顏色
+    // Paint for showcasing different colors for lines and arcs
     final paintLines = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
-    // （1）定義參數
-    const double margin = 10.0; // 與四邊的距離
-    const double notchRadius = 10.0; // 上下凹口的半徑
-    const double cornerRadius = 8.0; // 票券四角的圓角
+    // (1) Define parameters
+    const double margin = 10.0; // Distance from edges
+    const double notchRadius = 10.0; // Radius for top and bottom notches
+    const double cornerRadius = 8.0; // Corner radius for ticket edges
 
-    // 透過 size.width、size.height 動態計算
+    // Calculate dynamically using size.width and size.height
     const double left = margin;
     const double top = margin;
     final double right = size.width - margin;
     final double bottom = size.height - margin;
     final double centerX = (left + right) / 2;
 
-    // 為了最後「整塊填色」，先建立同一個 Path
+    // Create a unified Path for final filling
     final path = Path();
 
     //
-    // 第一步：moveTo 到「左上角圓角的切點」
+    // Step 1: moveTo to the starting point at the "cut point of the top-left corner"
     //
-    // 起點： (left + cornerRadius, top)
+    // Start point: (left + cornerRadius, top)
     //
     paintLines.color = Colors.red;
     paintLines.strokeWidth = 3;
@@ -57,10 +57,10 @@ class PaperPainter extends CustomPainter {
       3,
       paintLines,
     );
-    // 畫個小文字註記
+    // Draw a small label
     _drawText(
       canvas,
-      '起點',
+      'Start Point',
       const Offset(left + cornerRadius + 5, top - 20),
       color: Colors.red,
     );
@@ -68,9 +68,9 @@ class PaperPainter extends CustomPainter {
     path.moveTo(left + cornerRadius, top);
 
     //
-    // 第二步：畫上邊到「上凹口左端」的線段
+    // Step 2: Draw the top edge to the "left end of the top notch"
     //
-    // 終點： (centerX - notchRadius, top)
+    // End point: (centerX - notchRadius, top)
     //
     paintLines.color = Colors.blue;
     canvas.drawLine(
@@ -80,18 +80,18 @@ class PaperPainter extends CustomPainter {
     );
     _drawText(
       canvas,
-      '上邊線',
+      'Top Edge',
       Offset((left + cornerRadius + (centerX - notchRadius)) / 2, top - 20),
       color: Colors.blue,
     );
 
-    // Path 本身也要 lineTo 這個點
+    // Path also needs to lineTo this point
     path.lineTo(centerX - notchRadius, top);
 
     //
-    // 第三步：畫「上凹口」的弧線 arcToPoint
+    // Step 3: Draw the "top notch" arc using arcToPoint
     //
-    // 終點： (centerX + notchRadius, top)
+    // End point: (centerX + notchRadius, top)
     //
     paintLines.color = Colors.orange;
     paintLines.style = PaintingStyle.stroke;
@@ -111,26 +111,26 @@ class PaperPainter extends CustomPainter {
     );
 
     //
-    // 第四步：畫右上角直到右上角圓角
+    // Step 4: Draw the top-right edge to the corner radius
     //
-    // 從 (centerX + notchRadius, top) -> (right - cornerRadius, top)
-    // 再用 quadraticBezierTo 做右上角圓角
+    // From (centerX + notchRadius, top) -> (right - cornerRadius, top)
+    // Then use quadraticBezierTo for the corner radius
     //
     paintLines.color = Colors.purple;
-    // 先畫直線
+    // Draw the straight line first
     canvas.drawLine(
       Offset(centerX + notchRadius, top),
       Offset(right - cornerRadius, top),
       paintLines,
     );
-    // 小圓點標記 corner
+    // Mark the corner with a small circle
     canvas.drawCircle(
       Offset(right - cornerRadius, top),
       3,
       paintLines,
     );
 
-    // 用同一色再把圓角畫出來
+    // Draw the corner radius using the same color
     Path tempArc2 = Path();
     tempArc2.moveTo(right - cornerRadius, top);
     tempArc2.quadraticBezierTo(
@@ -151,16 +151,16 @@ class PaperPainter extends CustomPainter {
     );
 
     //
-    // 第五步：右側往下到「右下角圓角」
+    // Step 5: Draw the right edge down to the bottom-right corner
     //
-    // 先畫直線
+    // Draw the straight line first
     paintLines.color = Colors.brown;
     Path tempLine3 = Path();
     tempLine3.moveTo(right, top + cornerRadius);
     tempLine3.lineTo(right, bottom - cornerRadius);
     canvas.drawPath(tempLine3, paintLines);
 
-    // 再畫下方圓角
+    // Draw the bottom-right corner
     Path tempArc3 = Path();
     tempArc3.moveTo(right, bottom - cornerRadius);
     tempArc3.quadraticBezierTo(
@@ -181,7 +181,7 @@ class PaperPainter extends CustomPainter {
     );
 
     //
-    // 第六步：畫「下凹口」的 lineTo + arc
+    // Step 6: Draw the "bottom notch" lineTo + arc
     //
     // lineTo -> (centerX + notchRadius, bottom)
     // arcTo -> (centerX - notchRadius, bottom)
@@ -192,7 +192,7 @@ class PaperPainter extends CustomPainter {
       Offset(centerX + notchRadius, bottom),
       paintLines,
     );
-    // 畫 arc
+    // Draw the arc
     Path tempArc4 = Path();
     tempArc4.moveTo(centerX + notchRadius, bottom);
     tempArc4.arcToPoint(
@@ -211,16 +211,16 @@ class PaperPainter extends CustomPainter {
     );
 
     //
-    // 第七步：左下角圓角 + 左側往上
+    // Step 7: Draw the bottom-left corner and left edge
     //
     paintLines.color = Colors.cyan;
-    // 先畫到 (left + cornerRadius, bottom)
+    // Line to (left + cornerRadius, bottom)
     canvas.drawLine(
       Offset(centerX - notchRadius, bottom),
       Offset(left + cornerRadius, bottom),
       paintLines,
     );
-    // 再畫左下角圓角
+    // Bottom-left corner
     Path tempArc5 = Path();
     tempArc5.moveTo(left + cornerRadius, bottom);
     tempArc5.quadraticBezierTo(
@@ -231,13 +231,13 @@ class PaperPainter extends CustomPainter {
     );
     canvas.drawPath(tempArc5, paintLines);
 
-    // 左側向上
+    // Draw the left edge upwards
     Path tempLine4 = Path();
     tempLine4.moveTo(left, bottom - cornerRadius);
     tempLine4.lineTo(left, top + cornerRadius);
     canvas.drawPath(tempLine4, paintLines);
 
-    // 左上角圓角
+    // Top-left corner
     Path tempArc6 = Path();
     tempArc6.moveTo(left, top + cornerRadius);
     tempArc6.quadraticBezierTo(
@@ -264,13 +264,13 @@ class PaperPainter extends CustomPainter {
       top,
     );
 
-    // 至此完成整個封閉路徑
+    // Complete the closed path
     path.close();
 
     //
-    // 最終：真正的「填充」整塊形狀
+    // Final Step: Fill the entire shape
     //
-    // 可以在最上面或最下面做，這裡放在最後，讓前面分段示意的顏色不會被覆蓋太早。
+    // Can be done at the top or bottom, done here last so earlier visual hints aren't overwritten too soon.
     //
     final paintFill = Paint()
       ..color = Colors.red.withOpacity(0.3)
@@ -282,7 +282,7 @@ class PaperPainter extends CustomPainter {
   @override
   bool shouldRepaint(PaperPainter oldDelegate) => true;
 
-  // 簡易畫文字的方法
+  // Simple method to draw text
   void _drawText(
     Canvas canvas,
     String text,

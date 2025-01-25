@@ -50,18 +50,6 @@ class MyHomePage extends StatelessWidget {
                 child: Text('Disabled'),
               ),
               const SizedBox(height: 16),
-              const Text('ContactListTile'),
-              ContactListTile(
-                onPressed: () {},
-                name: 'Enabled',
-                email: 'demo@example.com',
-              ),
-              const ContactListTile(
-                onPressed: null,
-                name: 'Disabled',
-                email: 'demo@example.com',
-              ),
-              const SizedBox(height: 16),
               const Text('CustomStarImage'),
               const CustomStarImage(
                 imagePath: 'assets/images/dog.webp',

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'widgets/custom_list_tile.dart';
 import 'widgets/custom_button.dart';
 import 'widgets/custom_star_image.dart';
 

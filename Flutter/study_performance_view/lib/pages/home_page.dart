@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,10 +24,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  '/detail',
-                );
+                context.go('/detail');
               },
               child: const Text('Detail'),
             ),

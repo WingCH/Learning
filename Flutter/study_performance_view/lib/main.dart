@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:study_performance_view/feature/case1/case1_sub_page.dart';
 import 'package:study_performance_view/feature/case1/case1_page.dart';
+import 'package:study_performance_view/feature/case2/case2_page.dart';
 import 'package:study_performance_view/feature/home_page.dart';
 
 void main() {
@@ -23,6 +24,10 @@ final GoRouter _router = GoRouter(
               builder: (context, state) => const Case1SubPage(),
             ),
           ],
+        ),
+        GoRoute(
+          path: 'case2',
+          builder: (context, state) => const Case2Page(),
         ),
       ],
     ),

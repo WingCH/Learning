@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:study_performance_view/feature/case1/case1_sub_page.dart';
 import 'package:study_performance_view/feature/case1/case1_page.dart';
 import 'package:study_performance_view/feature/case2/case2_page.dart';
+import 'package:study_performance_view/feature/case3/case3_page.dart';
+import 'package:study_performance_view/feature/case3/case3_sub_page.dart';
 import 'package:study_performance_view/feature/home_page.dart';
 
 void main() {
@@ -28,6 +30,20 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'case2',
           builder: (context, state) => const Case2Page(),
+        ),
+        GoRoute(
+          path: 'case3',
+          builder: (context, state) => const Case3Page(),
+          routes: [
+            GoRoute(
+              path: 'sub',
+              builder: (context, state) {
+                return Case3SubPage(
+                  withLottie: state.uri.queryParameters['withLottie'] == 'true',
+                );
+              },
+            ),
+          ],
         ),
       ],
     ),

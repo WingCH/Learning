@@ -21,6 +21,12 @@ class HomePage extends StatelessWidget {
               context.go('/case2');
             },
           ),
+          ListTile(
+            title: const Text('Case3'),
+            onTap: () {
+              context.go('/case3');
+            },
+          ),
         ],
       ),
     );

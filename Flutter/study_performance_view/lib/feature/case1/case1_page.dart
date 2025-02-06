@@ -2,25 +2,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class Case1Page extends StatefulWidget {
+  const Case1Page({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Case1Page> createState() => _Case1PageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _Case1PageState extends State<Case1Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Timer Example'),
+        title: const Text('Case1 Page'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const TimerText(),
+            const _TimerText(),
             const SizedBox(height: 20),
             TextButton(
               onPressed: () {
@@ -35,14 +35,14 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class TimerText extends StatefulWidget {
-  const TimerText({super.key});
+class _TimerText extends StatefulWidget {
+  const _TimerText();
 
   @override
-  State<TimerText> createState() => _TimerTextState();
+  State<_TimerText> createState() => _TimerTextState();
 }
 
-class _TimerTextState extends State<TimerText> {
+class _TimerTextState extends State<_TimerText> {
   Timer? _timer; // Timer instance.
   int _seconds = 0; // Counter for seconds.
 

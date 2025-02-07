@@ -5,6 +5,7 @@ import 'package:study_performance_view/feature/case1/case1_page.dart';
 import 'package:study_performance_view/feature/case2/case2_page.dart';
 import 'package:study_performance_view/feature/case3/case3_page.dart';
 import 'package:study_performance_view/feature/case3/case3_sub_page.dart';
+import 'package:study_performance_view/feature/case4/case4_page.dart';
 import 'package:study_performance_view/feature/home_page.dart';
 
 void main() {
@@ -44,6 +45,10 @@ final GoRouter _router = GoRouter(
               },
             ),
           ],
+        ),
+        GoRoute(
+          path: 'case4',
+          builder: (context, state) => const Case4Page(),
         ),
       ],
     ),

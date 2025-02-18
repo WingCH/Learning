@@ -12,35 +12,32 @@ class Case1Page extends StatefulWidget {
 }
 
 class _Case1PageState extends State<Case1Page> {
-  @override
-  void initState() {
-    super.initState();
-    Timer.periodic(const Duration(seconds: 3), _update);
-  }
+  final Stream<Color> _colorStream =
+      Stream.periodic(const Duration(seconds: 1), (count) {
+    return count.isEven ? Colors.blue : Colors.red;
+  }).take(10);
 
-  Color _color = Colors.red;
-  int _count = 0;
-
-  void _update(Timer timer) {
-    if (_count > 10) {
-      timer.cancel();
-      _count = 0;
-      return;
-    }
-    _count++;
-    setState(() {
-      _color = _color == Colors.blue ? Colors.red : Colors.blue;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      child: SizedBox(
-        width: 100,
-        height: 100,
-        child: ColoredBox(color: _color),
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Align(
+          child: SizedBox(
+            width: 100,
+            height: 100,
+            child: StreamBuilder<Color>(
+              stream: _colorStream,
+              builder: (context, snapshot) {
+                return ColoredBox(
+                  color: snapshot.data ?? Colors.red,
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -3,9 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:study_performance_view/feature/case1/case1_sub_page.dart';
 import 'package:study_performance_view/feature/case1/case1_page.dart';
 import 'package:study_performance_view/feature/case2/case2_page.dart';
+import 'package:study_performance_view/feature/case2/case2_sub_page.dart';
 import 'package:study_performance_view/feature/case3/case3_page.dart';
 import 'package:study_performance_view/feature/case3/case3_sub_page.dart';
 import 'package:study_performance_view/feature/case4/case4_page.dart';
+import 'package:study_performance_view/feature/case5/case5_page.dart';
+import 'package:study_performance_view/feature/case5/case5_sub_page.dart';
+import 'package:study_performance_view/feature/case6/case6_page.dart';
+import 'package:study_performance_view/feature/case7/case7_page.dart';
 import 'package:study_performance_view/feature/home_page.dart';
 
 void main() {
@@ -31,6 +36,12 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'case2',
           builder: (context, state) => const Case2Page(),
+          routes: [
+            GoRoute(
+              path: 'sub',
+              builder: (context, state) => const Case2SubPage(),
+            ),
+          ],
         ),
         GoRoute(
           path: 'case3',
@@ -49,6 +60,24 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'case4',
           builder: (context, state) => const Case4Page(),
+        ),
+        GoRoute(
+          path: 'case5',
+          builder: (context, state) => const Case5Page(),
+          routes: [
+            GoRoute(
+              path: 'sub',
+              builder: (context, state) => const Case5SubPage(),
+            ),
+          ],
+        ),
+        GoRoute(
+          path: 'case6',
+          builder: (context, state) => const Case6Page(),
+        ),
+        GoRoute(
+          path: 'case7',
+          builder: (context, state) => const Case7Page(),
         ),
       ],
     ),

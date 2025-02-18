@@ -66,9 +66,11 @@ class _TimerTextState extends State<_TimerText> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'Timer: $_seconds s',
-      style: const TextStyle(fontSize: 32),
+    return RepaintBoundary(
+      child: Text(
+        'Timer: $_seconds s',
+        style: const TextStyle(fontSize: 32),
+      ),
     );
   }
 }

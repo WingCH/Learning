@@ -16,7 +16,7 @@ class _Case3PageState extends State<Case3Page> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.networkUrl(
-        Uri.parse('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'))
+        Uri.parse('https://live.btufy.com/live/53563043_b74cdf97ab27d50acc290a559e824da5_nslow.m3u8'))
       ..initialize().then((_) async {
         await _controller.play();
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.

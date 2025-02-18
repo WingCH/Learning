@@ -18,7 +18,7 @@ class _Case3SubPageState extends State<Case3SubPage> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.networkUrl(Uri.parse(
-        'https://flipfit-cdn.akamaized.net/flip_hls/664d87dfe8e47500199ee49e-dbd56b/video_h1.m3u8'))
+        'https://live.btufy.com/live/53563043_b74cdf97ab27d50acc290a559e824da5_nslow.m3u8'))
       ..initialize().then((_) async {
         await _controller.play();
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.

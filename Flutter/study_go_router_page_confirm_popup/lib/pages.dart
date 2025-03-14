@@ -39,9 +39,10 @@ class PageA extends StatelessWidget {
           return;
         }
         context.showNavigationConfirmDialog(
-            title: '確認返回',
-            content: '你確定要離開當前頁面嗎？\nTrigger by PopScope.onPopInvokedWithResult',
-            onConfirm: () => Navigator.pop(context));
+          title: '確認返回',
+          content: '你確定要離開當前頁面嗎？\nTrigger by PopScope.onPopInvokedWithResult',
+          onConfirm: () => Navigator.pop(context), // don't use context.pop(), because it will trigger GoRouter.pop
+        );
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('PageA Screen')),

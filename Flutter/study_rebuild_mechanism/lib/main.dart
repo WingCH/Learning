@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:study_rebuild_mechanism/case/case1_page.dart';
 import 'package:study_rebuild_mechanism/case/case2_page.dart';
 import 'package:study_rebuild_mechanism/case/case3_page.dart';
+import 'package:study_rebuild_mechanism/case/case4_page.dart';
+import 'package:study_rebuild_mechanism/case/case5_page.dart';
+import 'package:study_rebuild_mechanism/case/case6_page.dart';
 
 void main() {
   runApp(const MainApp());
@@ -54,6 +57,35 @@ class HomePage extends StatelessWidget {
                 context,
                 MaterialPageRoute(builder: (context) => const Case3Page()),
               );
+            },
+          ),
+          ListTile(
+            title: const Text('Case 4'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Case4Page()),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Case 5'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Case5Page(),
+                  ));
+            },
+          ),
+          ListTile(
+            title: const Text('Case 6'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Case6Page(),
+                  ));
             },
           ),
         ],

@@ -17,27 +17,42 @@ class _Case1PageState extends State<Case1Page> {
     return count.isEven ? Colors.blue : Colors.red;
   }).take(10);
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Align(
-          child: SizedBox(
-            width: 100,
-            height: 100,
-            child: StreamBuilder<Color>(
-              stream: _colorStream,
-              builder: (context, snapshot) {
-                return ColoredBox(
-                  color: snapshot.data ?? Colors.red,
-                );
-              },
-            ),
+          child: StreamBuilder<Color>(
+            stream: _colorStream,
+            builder: (context, snapshot) {
+              return ColoredBoxWrapper(
+                color: snapshot.data,
+              );
+            },
           ),
         ),
       ],
+    );
+  }
+}
+
+class ColoredBoxWrapper extends StatelessWidget {
+  final Color? color;
+
+  const ColoredBoxWrapper({
+    super.key,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 100,
+      height: 100,
+      child: ColoredBox(
+        color: color ?? Colors.red,
+      ),
     );
   }
 }

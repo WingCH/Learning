@@ -22,19 +22,20 @@ class _Case2PageState extends State<Case2Page> {
   int _count = 0;
 
   void _update(Timer timer) {
-    if (_count > 10) {
-      timer.cancel();
-      _count = 0;
-      return;
-    }
-    _count++;
-    setState(() {
-      _color = _color == Colors.blue ? Colors.red : Colors.blue;
-    });
+    // if (_count > 10) {
+    //   timer.cancel();
+    //   _count = 0;
+    //   return;
+    // }
+    // _count++;
+    // setState(() {
+    //   _color = _color == Colors.blue ? Colors.red : Colors.blue;
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('Case2Page build');
     return Align(
         child: SizedBox(
             child: SizedBox(

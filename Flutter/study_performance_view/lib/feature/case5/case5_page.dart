@@ -16,7 +16,7 @@ class _Case5PageState extends State<Case5Page> {
   void initState() {
     super.initState();
     _controller = VideoPlayerController.networkUrl(
-        Uri.parse('https://live5.hengbeixingtech.com/live/52423_nsd.m3u8'))
+        Uri.parse('https://live.cnhs777.com/live/57310697_7d40b354e787c2bf4c95525d7ed021b7_nslow.m3u8'))
       ..initialize().then(
         (_) async {
           await _controller!.play();

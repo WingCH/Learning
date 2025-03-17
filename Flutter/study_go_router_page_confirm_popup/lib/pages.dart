@@ -15,7 +15,10 @@ class HomeScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ElevatedButton(
-              onPressed: () => context.push('/pageA'),
+              onPressed: () async {
+                final pageAResult = await context.push('/pageA');
+                print('[HomeScreen] pageAResult: $pageAResult');
+              },
               child: const Text('Push to the PageA screen'),
             ),
           ],
@@ -38,12 +41,15 @@ class PageA extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () => context.push('/pageB'),
+              onPressed: () async {
+                final pageBResult = await context.push('/pageB');
+                print('[PageA] pageBResult: $pageBResult');
+              },
               child: const Text('Push to the PageB screen'),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () => context.pop(),
+              onPressed: () => context.pop('this is a result from PageA'),
               child: const Text('Pop'),
             ),
           ],
@@ -66,7 +72,7 @@ class PageB extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () => context.pop('/'),
+              onPressed: () => context.pop('This is a result from PageB'),
               child: const Text('Pop'),
             ),
           ],

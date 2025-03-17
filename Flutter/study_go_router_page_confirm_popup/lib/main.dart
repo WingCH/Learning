@@ -4,6 +4,8 @@ import 'package:study_go_router_page_confirm_popup/current_route_display.dart';
 import 'package:study_go_router_page_confirm_popup/custom_go_router.dart';
 import 'package:study_go_router_page_confirm_popup/pages.dart';
 
+import 'services/navigation_confirmation_service.dart';
+
 void main() => runApp(const MyApp());
 
 /// The route configuration.
@@ -28,6 +30,7 @@ final GoRouter _router = CustomGoRouter(
       },
     ),
   ],
+  confirmationService: NavigationConfirmationService(),
 );
 
 /// The main app.

@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:study_go_router_page_confirm_popup/build_context_ext.dart';
+import 'package:study_go_router_page_confirm_popup/services/navigation_confirmation_service.dart';
 
 class CustomGoRouter extends GoRouter {
   CustomGoRouter({
@@ -10,7 +12,9 @@ class CustomGoRouter extends GoRouter {
     super.initialLocation,
     super.observers,
     super.navigatorKey,
-  }) : super.routingConfig(
+    required NavigationConfirmationService confirmationService,
+  })  : _confirmationService = confirmationService,
+        super.routingConfig(
           routingConfig: _ConstantRoutingConfig(
             RoutingConfig(
               routes: routes,
@@ -19,47 +23,64 @@ class CustomGoRouter extends GoRouter {
           ),
         );
 
-  // Getter methods for navigation state
+  final NavigationConfirmationService _confirmationService;
+
   List<RouteMatch> get matches => routerDelegate.currentConfiguration.matches;
-  RouteMatch? get currentMatch => matches.lastOrNull;
-  String? get currentPage => currentMatch?.matchedLocation;
-  
+
   // Helper method to get current context
-  BuildContext? get _currentContext => configuration.navigatorKey.currentContext;
-  
-  // Helper method to check if current page needs confirmation
-  bool get _isCurrentPageRequiringConfirmation => currentPage == '/pageA';
+  BuildContext? get _currentContext =>
+      configuration.navigatorKey.currentContext;
 
   @override
   Future<T?> push<T extends Object?>(String location, {Object? extra}) {
+    final matches = routerDelegate.currentConfiguration.matches;
+    final currentMatch = matches.lastOrNull;
+    final currentPage = currentMatch?.matchedLocation;
+
     debugPrint('Attempting to push: $location from $currentPage');
 
-    if (_isCurrentPageRequiringConfirmation) {
-      final context = _currentContext;
-      if (context == null) return Future.value(null);
+    final context = _currentContext;
+    if (context == null) return Future.value(null);
 
-      return context.showNavigationConfirmDialog<T>(
-        title: '確認導航',
+    // 檢查是否需要確認
+    if (_confirmationService.shouldShowConfirmation(matches)) {
+      final completer = Completer<T?>();
+      _confirmationService.showConfirmationDialog(
+        context: context,
         content: '你確定要離開當前頁面嗎？\nTrigger by GoRouter.push',
-        onConfirm: () => super.push<T>(location, extra: extra),
+        onConfirm: () async {
+          completer.complete(await super.push<T>(location, extra: extra));
+        },
+        onCancel: () {
+          completer.complete(null);
+        },
       );
+      return completer.future;
     } else {
-      return super.push(location, extra: extra);
+      return super.push<T>(location, extra: extra);
     }
   }
 
   @override
   void pop<T extends Object?>([T? result]) {
+    final matches = routerDelegate.currentConfiguration.matches;
+    final currentMatch = matches.lastOrNull;
+    final currentPage = currentMatch?.matchedLocation;
+
     debugPrint('Attempting to pop from $currentPage');
-    
+
     final context = _currentContext;
     if (context == null) return;
-    
-    if (_isCurrentPageRequiringConfirmation) {
-      context.showNavigationConfirmDialog<T>(
-        title: '確認返回',
+
+    // 檢查是否需要確認
+    if (_confirmationService.shouldShowConfirmation(matches)) {
+      _confirmationService.showConfirmationDialog(
+        context: context,
         content: '你確定要離開當前頁面嗎？\nTrigger by GoRouter.pop',
-        onConfirm: () => super.pop(result),
+        onConfirm: () {
+          super.pop(result);
+        },
+        onCancel: () {},
       );
     } else {
       super.pop(result);

@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 extension BuildContextExt on BuildContext {
   // Helper method to show confirmation dialog
-  Future<T?> showNavigationConfirmDialog<T>({
+  Future<void> showNavigationConfirmDialog({
     required String title,
     required String content,
     required Function() onConfirm,
+    required Function() onCancel,
   }) {
-    return showDialog<T>(
+    return showDialog<void>(
       context: this,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -15,7 +16,10 @@ extension BuildContextExt on BuildContext {
           content: Text(content),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                Navigator.of(context).pop();
+                onCancel();
+              },
               child: const Text('取消'),
             ),
             TextButton(

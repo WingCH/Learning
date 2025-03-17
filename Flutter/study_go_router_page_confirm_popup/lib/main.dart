@@ -7,9 +7,11 @@ import 'package:study_go_router_page_confirm_popup/pages.dart';
 import 'services/navigation_confirmation_service.dart';
 
 void main() => runApp(const MyApp());
+final navigationKey = GlobalKey<NavigatorState>();
 
 /// The route configuration.
 final GoRouter _router = CustomGoRouter(
+  navigatorKey: navigationKey,
   routes: <RouteBase>[
     GoRoute(
       path: '/',
@@ -30,7 +32,9 @@ final GoRouter _router = CustomGoRouter(
       },
     ),
   ],
-  confirmationService: NavigationConfirmationService(),
+  confirmationService: NavigationConfirmationService(
+    navigationKey: navigationKey,
+  ),
 );
 
 /// The main app.

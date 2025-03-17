@@ -30,8 +30,6 @@ class CustomGoRouter extends GoRouter {
   // Helper method to check if current page needs confirmation
   bool get _isCurrentPageRequiringConfirmation => currentPage == '/pageA';
 
-
-
   @override
   Future<T?> push<T extends Object?>(String location, {Object? extra}) {
     debugPrint('Attempting to push: $location from $currentPage');

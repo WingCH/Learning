@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:study_go_router_page_confirm_popup/build_context_ext.dart';
 
 /// The home screen
 class HomeScreen extends StatelessWidget {
@@ -33,26 +34,76 @@ class PageA extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('PageA Screen')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () async {
-                final pageBResult = await context.push('/pageB');
-                print('[PageA] pageBResult: $pageBResult');
-              },
-              child: const Text('Push to the PageB screen'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () => context.pop('this is a result from PageA'),
-              child: const Text('Pop'),
-            ),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        print('[PageA] onPopInvokedWithResult: $didPop, $result');
+        if (didPop) {
+          return;
+        }
+        context.showNavigationConfirmDialog(
+          title: '確認',
+          content: '是否要離開此頁面？ trigger by onPopInvokedWithResult',
+          onConfirm: () {
+            Navigator.of(context).pop();
+          },
+          onCancel: () {},
+        );
+      },
+      child: Scaffold(
+          appBar: AppBar(title: const Text('PageA Screen')),
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    final pageAResult = await context.push('/pageA');
+                    print('[PageA] pageAResult: $pageAResult');
+                  },
+                  child: const Text('Push to the PageA screen'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    final pageBResult = await context.push('/pageB');
+                    print('[PageA] pageBResult: $pageBResult');
+                  },
+                  child: const Text('Push to the PageB screen'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    context.pushReplacement('/pageA');
+                  },
+                  child: const Text('GoRouter pushReplacement'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    context.pop('this is a result from PageA');
+                  },
+                  child: const Text('GoRouter pop'),
+                ),
+
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .maybePop('this is a result from PageA');
+                  },
+                  child: const Text('Navigator maybePop'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop('this is a result from PageA');
+                  },
+                  child: const Text('Navigator pop (cannot intercept by GoRouter and PopScope)'),
+                ),
+            ],
+          ),
         ),
       ),
     );

@@ -45,13 +45,17 @@ class CustomGoRouter extends GoRouter {
     _confirmationService.onRouteChange(routerDelegate.currentConfiguration);
   }
 
-  @override
-  Future<T?> push<T extends Object?>(String location, {Object? extra}) {
+  /// 處理需要確認的導航通用邏輯
+  Future<T?> _handleNavigationWithConfirmation<T extends Object?>(
+    String location,
+    Object? extra,
+    Future<T?> Function() superNavigationCall,
+  ) {
     final matches = routerDelegate.currentConfiguration.matches;
     final currentMatch = matches.lastOrNull;
     final currentPage = currentMatch?.matchedLocation;
 
-    debugPrint('Attempting to push: $location from $currentPage');
+    debugPrint('Attempting to $location from $currentPage');
 
     final context = _currentContext;
     if (context == null) return Future.value(null);
@@ -60,9 +64,9 @@ class CustomGoRouter extends GoRouter {
     if (_confirmationService.shouldShowConfirmation(matches)) {
       final completer = Completer<T?>();
       _confirmationService.showConfirmationDialog(
-        content: '你確定要離開當前頁面嗎？\nTrigger by GoRouter.push',
+        content: '你確定要離開當前頁面嗎？\nTrigger by GoRouter.$location',
         onConfirm: () async {
-          completer.complete(await super.push<T>(location, extra: extra));
+          completer.complete(await superNavigationCall());
         },
         onCancel: () {
           completer.complete(null);
@@ -70,12 +74,31 @@ class CustomGoRouter extends GoRouter {
       );
       return completer.future;
     } else {
-      return super.push<T>(location, extra: extra);
+      return superNavigationCall();
     }
   }
 
   @override
+  Future<T?> push<T extends Object?>(String location, {Object? extra}) {
+    return _handleNavigationWithConfirmation<T>(
+      location,
+      extra,
+      () => super.push<T>(location, extra: extra),
+    );
+  }
+
+  @override
+  Future<T?> pushReplacement<T extends Object?>(String location, {Object? extra}) {
+    return _handleNavigationWithConfirmation<T>(
+      location,
+      extra,
+      () => super.pushReplacement<T>(location, extra: extra),
+    );
+  }
+
+  @override
   void pop<T extends Object?>([T? result]) {
+    // Use PopScope only can intercept `Navigator.maybePop`, cannot intercept `GoRouter.pop`, so we need to handle it manually
     final matches = routerDelegate.currentConfiguration.matches;
     final currentMatch = matches.lastOrNull;
     final currentPage = currentMatch?.matchedLocation;

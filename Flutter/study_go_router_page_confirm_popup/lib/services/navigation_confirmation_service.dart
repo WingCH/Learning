@@ -27,6 +27,7 @@ class NavigationConfirmationService {
 
   /// Handles route changes and shows confirmation dialog if needed
   void onRouteChange(RouteMatchList routeMatchList) {
+    return; // no need to check route change now, temporary disable
     final previousLocations = _routeMatchList.matches.map((e) => e.matchedLocation).toList();
     final currentLocations = routeMatchList.matches.map((e) => e.matchedLocation).toList();
     

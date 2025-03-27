@@ -94,8 +94,8 @@ class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
     final double screenWidth = MediaQuery.sizeOf(context).width;
     final double dragPercentage = dragDistance / screenWidth;
     
-    // 當滑動距離超過螢幕寬度的15%時觸發回調
-    final bool isDragEnough = dragPercentage > 0.15;
+    // 當滑動距離超過螢幕寬度的20%時觸發回調
+    final bool isDragEnough = dragPercentage > 0.20;
     
     // 符合條件就執行回調
     if (isDragEnough) {

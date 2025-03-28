@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:study_go_router_page_confirm_popup/build_context_ext.dart';
-import 'package:study_go_router_page_confirm_popup/ios_swiper_gesture_detector.dart';
+import 'package:study_go_router_page_confirm_popup/ios_swiper_gesture_detector/ios_swiper_gesture_detector.dart';
 
 /// The home screen
 class HomeScreen extends StatelessWidget {
@@ -67,7 +67,6 @@ class PageA extends StatelessWidget {
           body: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () async {
@@ -113,6 +112,40 @@ class PageA extends StatelessWidget {
                   },
                   child: const Text(
                       'Navigator pop (cannot intercept by GoRouter and PopScope)'),
+                ),
+                Container(
+                  color: Colors.blue,
+                  child: const DefaultTabController(
+                    length: 9,
+                    child: Column(
+                      children: [
+                        TabBar(
+                          isScrollable: true,
+                          tabs: [
+                            Tab(text: 'Tab 1'),
+                            Tab(text: 'Tab 2'),
+                            Tab(text: 'Tab 4'),
+                            Tab(text: 'Tab 5'),
+                            Tab(text: 'Tab 6'),
+                            Tab(text: 'Tab 7'),
+                            Tab(text: 'Tab 8'),
+                            Tab(text: 'Tab 9'),
+                            Tab(text: 'Tab 10'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print('onPressed');
+                    },
+                    child: const Text('press me'),
+                  ),
                 ),
               ],
             ),

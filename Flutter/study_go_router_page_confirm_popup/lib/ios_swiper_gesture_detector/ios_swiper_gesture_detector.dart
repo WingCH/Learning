@@ -2,28 +2,31 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:study_go_router_page_confirm_popup/ios_swiper_gesture_detector/drag_debug_painter.dart';
 
-/// IOSSwiperGestureDetector 是一個參考 Flutter 官方 CupertinoRouteTransitionMixin 實現的手勢偵測元件。
+/// IOSSwiperGestureDetector is a gesture detection widget inspired by the official
+/// Flutter CupertinoRouteTransitionMixin.
 ///
-/// 它主要實現了類似 iOS 返回手勢的功能，允許使用者從螢幕左側邊緣向右滑動來觸發特定動作。
+/// It primarily implements an iOS-like back gesture, allowing the user to swipe
+/// right from the left edge of the screen to trigger a specific action.
 ///
-/// 實現細節：
-/// 1. 在螢幕左側建立一個透明的偵測區域
-/// 2. 當使用者從左側邊緣開始滑動，且滑動距離達到閾值時觸發回調
-/// 3. 不會阻擋其他手勢事件
+/// Implementation details:
+/// 1. Create a transparent detection area on the left edge of the screen.
+/// 2. When the user starts swiping from the left edge and the swipe distance reaches the threshold, trigger the callback.
+/// 3. This does not block other gesture events.
 ///
-/// 這個實現模仿了 Cupertino 路由過渡動畫中的 _CupertinoBackGestureDetector 類別，
-/// 但簡化為只專注於偵測右滑手勢而不處理動畫。
+/// This implementation is modeled after the _CupertinoBackGestureDetector class in
+/// Cupertino route transition animations, but it is simplified to focus only on
+/// detecting right-swipe gestures rather than handling animations.
 class IOSSwiperGestureDetector extends StatefulWidget {
-  /// 主要子Widget
+  /// The main child widget.
   final Widget child;
 
-  /// 是否啟用「往右滑」偵測
+  /// Whether to enable right-swipe detection.
   final bool enable;
 
-  /// 偵測到往右滑手勢時會呼叫此函式
+  /// Called when a right-swipe gesture is detected.
   final VoidCallback onSwipe;
-  
-  /// Enable debug logs for gesture detection
+
+  /// Enable debug logs for gesture detection.
   final bool debugLog;
 
   const IOSSwiperGestureDetector({
@@ -41,13 +44,15 @@ class IOSSwiperGestureDetector extends StatefulWidget {
 
 class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
   static const edgeWidth = 20.0;
-  
-  /// 記錄手勢開始時的X座標位置
+  static const threshold = 0.20;
+
+  /// Records the X coordinate of the starting point of the gesture.
   double? _startDragX;
-  /// 記錄當前手指位置
+
+  /// Records the current finger position.
   double? _currentDragX;
-  
-  /// 共用日誌函數，僅在 debugLog 為 true 時輸出
+
+  /// Common log function that only outputs when debugLog is true.
   void _log(String message) {
     if (widget.debugLog) {
       debugPrint('IOSSwiperGestureDetector: $message');
@@ -66,11 +71,13 @@ class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
     super.dispose();
   }
 
-  /// 建立手勢偵測層
+  /// Builds the gesture detection layer.
   Widget _buildGestureLayer(BuildContext context) {
+    // For devices with notches, the drag area needs to be larger on the side
+    // that has the notch.
     final double layerWidth =
         max(edgeWidth, MediaQuery.paddingOf(context).left);
-        
+
     _log('building gesture layer with width=$layerWidth');
 
     return PositionedDirectional(
@@ -83,8 +90,8 @@ class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
           _log('drag start at ${details.localPosition}');
           _startDragX = details.globalPosition.dx;
           _currentDragX = details.globalPosition.dx;
-          
-          // 觸發重繪來顯示視覺指示器
+
+          // Trigger a repaint to show the visual indicator.
           if (widget.debugLog) {
             setState(() {});
           }
@@ -92,44 +99,43 @@ class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
         onHorizontalDragUpdate: (DragUpdateDetails details) {
           _currentDragX = details.globalPosition.dx;
           _log('drag update at x=$_currentDragX');
-          
-          // 僅在開啟調試模式時更新視覺指示器
+
+          // Only update the visual indicator if debug mode is enabled.
           if (widget.debugLog) {
             setState(() {});
           }
         },
         onHorizontalDragEnd: (DragEndDetails details) {
-          // 如果沒有有效的開始位置，則忽略
+          // Ignore if there is no valid start position.
           if (_startDragX == null || _currentDragX == null) {
             _log('drag ignored - no valid start position');
             return;
           }
 
-          // 計算水平滑動的距離
+          // Calculate horizontal drag distance.
           final double dragDistance = _currentDragX! - _startDragX!;
 
-          // 取得螢幕寬度以計算滑動比例
+          // Get screen width to calculate drag percentage.
           final double screenWidth = MediaQuery.sizeOf(context).width;
           final double dragPercentage = dragDistance / screenWidth;
 
-          // 當滑動距離超過螢幕寬度的20%時觸發回調
-          final bool isDragEnough = dragPercentage > 0.20;
+          // Trigger the callback if the drag distance exceeds 20% of the screen width.
+          final bool isDragEnough = dragPercentage > threshold;
 
           _log('drag distance=$dragDistance px, '
               'percentage=${(dragPercentage * 100).toStringAsFixed(2)}%, '
               'threshold met=$isDragEnough');
 
-          // 符合條件就執行回調
           if (isDragEnough) {
             _log('executing onSwipe callback');
             widget.onSwipe();
           }
 
-          // 重置開始位置
+          // Reset start position.
           _startDragX = null;
           _currentDragX = null;
 
-          // 清除視覺指示器
+          // Clear the visual indicator.
           if (widget.debugLog) {
             setState(() {});
           }
@@ -138,8 +144,8 @@ class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
           _log('drag cancelled');
           _startDragX = null;
           _currentDragX = null;
-          
-          // 清除視覺指示器
+
+          // Clear the visual indicator.
           if (widget.debugLog) {
             setState(() {});
           }
@@ -148,22 +154,21 @@ class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
       ),
     );
   }
-  
-  /// 建立視覺指示器來顯示當前滑動位置
+
+  /// Builds the visual indicator to show the current swipe position in debug mode.
   Widget _buildDebugVisualizer() {
-    // 只有當手勢開始時才繪製視覺指示器
     if (_startDragX == null || _currentDragX == null) {
       return const SizedBox.shrink();
     }
-    
+
     return Positioned(
-      left: _startDragX!, // 從起點開始繪製
+      left: _startDragX!,
       top: 0,
       height: MediaQuery.sizeOf(context).height,
       child: IgnorePointer(
         child: CustomPaint(
           painter: DragDebugPainter(
-            startX: 0, // 起點在 CustomPaint 中為 0
+            startX: 0,
             currentX: _currentDragX! - _startDragX!,
             screenWidth: MediaQuery.sizeOf(context).width,
             showThreshold: true,
@@ -180,10 +185,8 @@ class _IOSSwiperGestureDetectorState extends State<IOSSwiperGestureDetector> {
       children: [
         widget.child,
         if (widget.enable) _buildGestureLayer(context),
-        // 僅在調試模式下顯示視覺指示器
         if (widget.debugLog) _buildDebugVisualizer(),
       ],
     );
   }
 }
-

@@ -20,7 +20,6 @@ class   DragDebugPainter extends CustomPainter {
     
     final double threshold = screenWidth * 0.20;
     
-    // 繪製起始位置 (現在是固定的 0)
     final startPaint = Paint()
       ..color = Colors.green
       ..style = PaintingStyle.stroke
@@ -32,7 +31,6 @@ class   DragDebugPainter extends CustomPainter {
       startPaint,
     );
     
-    // 繪製當前位置 (相對於起點)
     final currentPaint = Paint()
       ..color = Colors.red.withOpacity(0.7)
       ..style = PaintingStyle.fill
@@ -57,7 +55,7 @@ class   DragDebugPainter extends CustomPainter {
     );
     
     if (showThreshold) {
-      // 繪製滑動閾值線
+      // Draw sliding threshold line
       final thresholdPaint = Paint()
         ..color = Colors.amber
         ..strokeWidth = 2.0
@@ -82,7 +80,7 @@ class   DragDebugPainter extends CustomPainter {
       canvas.restore();
     }
     
-    // 繪製文字標籤
+    // Draw text label
     final textStyle = TextStyle(
       color: Colors.black,
       fontSize: 14,

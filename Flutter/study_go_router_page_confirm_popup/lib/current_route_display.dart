@@ -47,25 +47,25 @@ class _CurrentRouteDisplayState extends State<CurrentRouteDisplay> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.grey[200],
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             'Current Route: $_currentRoute',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
           const Text(
             'Route Stack:',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
           ...List.generate(_routeStack.length, (index) {
             return Padding(
               padding: EdgeInsets.only(left: 8.0 * (index + 1)),
-              child: Text('${index + 1}. ${_routeStack[index]}'),
+              child: Text('${index + 1}. ${_routeStack[index]}', style: const TextStyle(fontSize: 12)),
             );
           }),
         ],

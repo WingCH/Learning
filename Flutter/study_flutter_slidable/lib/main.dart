@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 void main() {
   runApp(const MainApp());
@@ -110,11 +111,13 @@ class _ActionButtonState extends State<ActionButton> {
   double get maxValue => slidable.endActionPaneExtentRatio;
   double progress = 0;
 
+  
   @override
   void initState() {
     super.initState();
     animation.addListener(handleValueChanged);
     animation.addStatusListener(handleStatusChanged);
+
     print('maxValue $maxValue');
   }
 
@@ -139,14 +142,38 @@ class _ActionButtonState extends State<ActionButton> {
 
   @override
   Widget build(BuildContext context) {
+    
+    // 計算透明度:
+    // 前10%: 完全透明 (opacity = 0.0)
+    // 10-30%: 從透明逐漸顯現 (opacity 從 0.0 變為 1.0)
+    // 超過30%: 保持完全可見 (opacity = 1.0)
+    double opacity;
+    if (progress < 0.1) {
+      // 前10%保持完全透明
+      opacity = 0.0;
+    } else if (progress <= 0.3) {
+      // 10-30%從透明逐漸顯現
+      opacity = (progress - 0.1) / 0.2;  // 將0.1-0.3的範圍映射到0.0-1.0
+    } else {
+      // 超過30%保持完全可見
+      opacity = 1.0;
+    }
+
+    
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.red,
+        color: Color(0xFFF3F5F7),
       ),
-      clipBehavior: Clip.hardEdge,
       child: Center(
-        child: Text(
-          '${progress.toStringAsFixed(2)}',
+        child: Opacity(
+          opacity: opacity,
+          child: SvgPicture.asset(
+            'assets/bookmark_non_filled.svg',
+            width: 14,
+            height: 14,
+            fit: BoxFit.none,
+            clipBehavior: Clip.hardEdge,
+          ),
         ),
       ),
     );

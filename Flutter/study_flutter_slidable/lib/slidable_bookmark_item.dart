@@ -6,6 +6,7 @@ import 'package:slidable_bookmarks/slidable_bookmark_store.dart';
 import 'package:slidable_bookmarks/slidable_tutorial_player.dart';
 import 'package:slidable_bookmarks/slidable_blocker.dart';
 
+// Widget for a slidable item with bookmark action
 class SlidableBookmarkItem extends ConsumerWidget {
   final int index;
   final double extentRatio;
@@ -27,6 +28,7 @@ class SlidableBookmarkItem extends ConsumerWidget {
     final bookmarks = ref.watch(bookmarkProvider);
     final isBookmarked = bookmarks.contains(index);
 
+    // Main content of the slidable item
     final child = GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
@@ -60,6 +62,7 @@ class SlidableBookmarkItem extends ConsumerWidget {
     return Slidable(
       closeOnScroll: false,
       key: ValueKey(index),
+      // End action pane containing bookmark button
       endActionPane: ActionPane(
         extentRatio: extentRatio,
         motion: const StretchMotion(),
@@ -72,6 +75,7 @@ class SlidableBookmarkItem extends ConsumerWidget {
           ),
         ],
       ),
+      // Apply tutorial controller if needed
       child: showTutorial ? SlidableControllerSender(
         child: child,
       ) : child,
@@ -79,6 +83,7 @@ class SlidableBookmarkItem extends ConsumerWidget {
   }
 }
 
+// Button that appears when sliding to bookmark/unbookmark items
 class BookmarkActionButton extends ConsumerStatefulWidget {
   final int index;
   final bool isBookmarked;
@@ -103,20 +108,22 @@ class _BookmarkActionButtonState extends ConsumerState<BookmarkActionButton> {
   @override
   void initState() {
     super.initState();
+    // Listen to animation changes to update the progress
     animation.addListener(handleValueChanged);
   }
 
   @override
   void dispose() {
     super.dispose();
+    // Clean up the animation listener
     animation.removeListener(handleValueChanged);
   }
 
+  // Update progress based on animation value
   void handleValueChanged() {
     if (mounted) {
       setState(() {
         progress = animation.value / maxValue;
-        print('animation.value  ${animation.value}');
       });
     }
   }
@@ -139,6 +146,7 @@ class _BookmarkActionButtonState extends ConsumerState<BookmarkActionButton> {
       opacity = 1.0;
     }
 
+    // Choose the appropriate bookmark icon based on current state
     final String assetName = widget.isBookmarked
         ? 'assets/bookmark_non_filled.svg' // Show non-filled if currently bookmarked (to remove)
         : 'assets/bookmark_filled.svg'; // Show filled if not bookmarked (to add)
@@ -150,6 +158,7 @@ class _BookmarkActionButtonState extends ConsumerState<BookmarkActionButton> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
+          // Toggle bookmark status when tapped
           ref.read(bookmarkProvider.notifier).toggleBookmark(widget.index);
         },
         child: Center(

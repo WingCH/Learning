@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:slidable_bookmarks/slidable_bookmark_item.dart';
 import 'package:slidable_bookmarks/slidable_tutorial_player.dart';
 
+// Entry point of the application
 void main() {
   runApp(
     const ProviderScope(
@@ -11,6 +12,7 @@ void main() {
   );
 }
 
+// Main application widget
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -25,6 +27,7 @@ class MainApp extends StatelessWidget {
   }
 }
 
+// Home page containing a list of slidable bookmark items
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -45,6 +48,7 @@ class HomePage extends StatelessWidget {
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
+                // Calculate the extent ratio based on screen width
                 final extentRatio = 80 / constraints.maxWidth;
                 return ListView.builder(
                   itemCount: 100,
@@ -70,6 +74,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+// Tutorial page that demonstrates slidable bookmark functionality
 class TutorialPage extends StatefulWidget {
   const TutorialPage({super.key});
 
@@ -77,24 +82,54 @@ class TutorialPage extends StatefulWidget {
   State<TutorialPage> createState() => _TutorialPageState();
 }
 
-class _TutorialPageState extends State<TutorialPage>  with SingleTickerProviderStateMixin  {
-    AnimationController? controller;
-    Animation<double>? animation;
+class _TutorialPageState extends State<TutorialPage> with SingleTickerProviderStateMixin {
+  AnimationController? controller;
+  Animation<double>? animation;
+  bool tutorialCompleted = false;
 
   @override
   void initState() {
     super.initState();
+    // Initialize animation controller
     controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 600),
       upperBound: 1.0,
     );
+    // Create animation for tutorial sliding effect
     animation = Tween<double>(begin: 0.0, end: 0.2).animate(
       CurvedAnimation(
         parent: controller!,
         curve: Curves.easeInOut,
       )
     );
+    
+    // Start tutorial sequence after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startTutorialSequence();
+    });
+    
+    // Update tutorial state when animation is complete
+    controller?.addStatusListener((status) {
+      if (status == AnimationStatus.dismissed) {
+        setState(() {
+          tutorialCompleted = true;
+        });
+      }
+    });
+  }
+  
+  // Handle the tutorial animation sequence
+  void _startTutorialSequence() async {
+    await controller!.forward().orCancel;
+    await Future.delayed(const Duration(milliseconds: 600));
+    await controller?.reverse().orCancel;
+  }
+  
+  @override
+  void dispose() {
+    controller!.dispose();
+    super.dispose();
   }
   
   @override
@@ -103,50 +138,68 @@ class _TutorialPageState extends State<TutorialPage>  with SingleTickerProviderS
       appBar: AppBar(
         title: const Text('Tutorial Page'),
       ),
-      body: SlidablePlayer(
-        animation: animation,
-        child: ListView(
-            children:  [
-              SlidableBookmarkItem(
-                index: 0,
-                extentRatio: 0.2,
-                onTap: (context) {},
-                onTapTextButton: (context) {},
-                showTutorial: true,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            color: tutorialCompleted ? Colors.green.shade100 : Colors.blue.shade100,
+            child: Text(
+              tutorialCompleted ? 'Tutorial Completed' : 'Please Complete Tutorial',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: tutorialCompleted ? Colors.green.shade900 : Colors.blue.shade900,
               ),
-              SlidableBookmarkItem(
-                index: 1,
-                extentRatio: 0.2,
-                onTap: (context) {},
-                onTapTextButton: (context) {},
-                showTutorial: true,
-              ),
-              SlidableBookmarkItem(
-                index: 2,
-                extentRatio: 0.2,
-                onTap: (context) {},
-                onTapTextButton: (context) {},
-                showTutorial: true,
-              ),
-              SlidableBookmarkItem(
-                index: 3,
-                extentRatio: 0.2,
-                onTap: (context) {},
-                onTapTextButton: (context) {},
-                showTutorial: false,
-              ),
-            ],
-          )
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (controller!.isCompleted) {
-            controller!.reverse();
-          } else if (controller!.isDismissed) {
-            controller!.forward();
-          }
-        },
-        child: const Icon(Icons.play_arrow),
+            ),
+          ),
+          Expanded(
+            child: SlidablePlayer(
+              animation: animation,
+              child: ListView(
+                children: [
+                  // Slidable items with tutorial highlight for the first three items
+                  SlidableBookmarkItem(
+                    index: 0,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 0 tapped');
+                    },
+                    showTutorial: !tutorialCompleted,
+                  ),
+                  SlidableBookmarkItem(
+                    index: 1,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 1 tapped');
+                    },
+                    showTutorial: !tutorialCompleted,
+                  ),
+                  SlidableBookmarkItem(
+                    index: 2,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 2 tapped');
+                    },
+                    showTutorial: !tutorialCompleted,
+                  ),
+                  // Fourth item without tutorial highlight
+                  SlidableBookmarkItem(
+                    index: 3,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 3 tapped');
+                    },
+                    showTutorial: false,
+                  ),
+                ],
+              )
+            ),
+          ),
+        ],
       ),
     );
   }

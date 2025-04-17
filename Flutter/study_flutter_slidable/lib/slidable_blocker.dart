@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class SlidableBlocker extends StatelessWidget {
   /// The child widget to be protected
   final Widget child;
+  /// Whether blocking is enabled
   final bool enabled;
 
   /// Creates a wrapper that blocks horizontal swipe events from reaching the parent Slidable
@@ -13,7 +14,7 @@ class SlidableBlocker extends StatelessWidget {
   const SlidableBlocker({
     super.key,
     required this.child,
-    this.enabled = true,
+    required this.enabled,
   });
 
   @override
@@ -25,6 +26,7 @@ class SlidableBlocker extends StatelessWidget {
             onHorizontalDragCancel: () {},
             onHorizontalDragStart: (_) {},
             onHorizontalDragUpdate: (_) {},
+            onHorizontalDragEnd: (_) {},
             // Wrap the provided child widget
             child: child,
           )

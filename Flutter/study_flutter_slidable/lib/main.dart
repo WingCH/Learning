@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:slidable_bookmarks/slidable_bookmark_item.dart';
+import 'package:slidable_bookmarks/slidable_tutorial_player.dart';
 
+// Entry point of the application
 void main() {
-  runApp(const MainApp());
+  runApp(
+    const ProviderScope(
+      child: MainApp(),
+    ),
+  );
 }
 
+// Main application widget
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: HomePage(),
+    return MaterialApp(
+      home: const HomePage(),
+      routes: {
+        '/tutorial': (context) => const TutorialPage(),
+      },
     );
   }
 }
 
+// Home page containing a list of slidable bookmark items
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -37,11 +48,21 @@ class HomePage extends StatelessWidget {
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
+                // Calculate the extent ratio based on screen width
                 final extentRatio = 80 / constraints.maxWidth;
                 return ListView.builder(
-                  itemCount: 10,
+                  itemCount: 100,
                   itemBuilder: (context, index) {
-                    return ListItem(index: index, extentRatio: extentRatio);
+                    return SlidableBookmarkItem(
+                      index: index,
+                      extentRatio: extentRatio,
+                      onTap: (context) {
+                        Navigator.pushNamed(context, '/tutorial');
+                      },
+                      onTapTextButton: (context) {
+                        print('TextButton Item $index tapped');
+                      },
+                    );
                   },
                 );
               },
@@ -53,128 +74,132 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class ListItem extends StatelessWidget {
-  final int index;
-  final double extentRatio;
-
-  const ListItem({
-    super.key,
-    required this.index,
-    required this.extentRatio,
-  });
+// Tutorial page that demonstrates slidable bookmark functionality
+class TutorialPage extends StatefulWidget {
+  const TutorialPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Slidable(
-      key: ValueKey(index),
-      endActionPane: ActionPane(
-        extentRatio: extentRatio,
-        motion: const StretchMotion(),
-        children: const [
-          Expanded(
-            child: ActionButton(),
-          ),
-        ],
-      ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          print('Item $index tapped');
-        },
-        child: SizedBox(
-          height: 100,
-          child: Center(
-            child: Text(
-              'Item $index',
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void doNothing(BuildContext context) {
-    print('doNothing');
-  }
+  State<TutorialPage> createState() => _TutorialPageState();
 }
 
-class ActionButton extends StatefulWidget {
-  const ActionButton({super.key});
+class _TutorialPageState extends State<TutorialPage> with SingleTickerProviderStateMixin {
+  AnimationController? controller;
+  Animation<double>? animation;
+  bool tutorialCompleted = false;
 
-  @override
-  State<ActionButton> createState() => _ActionButtonState();
-}
-
-class _ActionButtonState extends State<ActionButton> {
-  late final slidable = Slidable.of(context)!;
-  Animation<double> get animation => slidable.animation;
-  double get maxValue => slidable.endActionPaneExtentRatio;
-  double progress = 0;
-
-  
   @override
   void initState() {
     super.initState();
-    animation.addListener(handleValueChanged);
-    animation.addStatusListener(handleStatusChanged);
-
-    print('maxValue $maxValue');
+    // Initialize animation controller
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+      upperBound: 1.0,
+    );
+    // Create animation for tutorial sliding effect
+    animation = Tween<double>(begin: 0.0, end: 0.2).animate(
+      CurvedAnimation(
+        parent: controller!,
+        curve: Curves.easeInOut,
+      )
+    );
+    
+    // Start tutorial sequence after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startTutorialSequence();
+    });
+    
+    // Update tutorial state when animation is complete
+    controller?.addStatusListener((status) {
+      if (status == AnimationStatus.dismissed) {
+        setState(() {
+          tutorialCompleted = true;
+        });
+      }
+    });
   }
-
+  
+  // Handle the tutorial animation sequence
+  void _startTutorialSequence() async {
+    await controller!.forward().orCancel;
+    await Future.delayed(const Duration(milliseconds: 600));
+    await controller?.reverse().orCancel;
+  }
+  
   @override
   void dispose() {
+    controller!.dispose();
     super.dispose();
-    animation.removeListener(handleValueChanged);
-    animation.removeStatusListener(handleStatusChanged);
   }
-
-  void handleValueChanged() {
-    if (mounted) {
-      setState(() {
-        progress = animation.value / maxValue;
-      });
-    }
-  }
-
-  void handleStatusChanged(AnimationStatus status) {
-    print('handleStatusChanged $status');
-  }
-
+  
   @override
   Widget build(BuildContext context) {
-    
-    // 計算透明度:
-    // 前10%: 完全透明 (opacity = 0.0)
-    // 10-30%: 從透明逐漸顯現 (opacity 從 0.0 變為 1.0)
-    // 超過30%: 保持完全可見 (opacity = 1.0)
-    double opacity;
-    if (progress < 0.1) {
-      // 前10%保持完全透明
-      opacity = 0.0;
-    } else if (progress <= 0.3) {
-      // 10-30%從透明逐漸顯現
-      opacity = (progress - 0.1) / 0.2;  // 將0.1-0.3的範圍映射到0.0-1.0
-    } else {
-      // 超過30%保持完全可見
-      opacity = 1.0;
-    }
-
-    
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFF3F5F7),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tutorial Page'),
       ),
-      child: Center(
-        child: Opacity(
-          opacity: opacity,
-          child: SvgPicture.asset(
-            'assets/bookmark_non_filled.svg',
-            width: 14,
-            height: 14,
-            fit: BoxFit.none,
-            clipBehavior: Clip.hardEdge,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            color: tutorialCompleted ? Colors.green.shade100 : Colors.blue.shade100,
+            child: Text(
+              tutorialCompleted ? 'Tutorial Completed' : 'Please Complete Tutorial',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: tutorialCompleted ? Colors.green.shade900 : Colors.blue.shade900,
+              ),
+            ),
           ),
-        ),
+          Expanded(
+            child: SlidablePlayer(
+              animation: animation,
+              child: ListView(
+                children: [
+                  // Slidable items with tutorial highlight for the first three items
+                  SlidableBookmarkItem(
+                    index: 0,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 0 tapped');
+                    },
+                    showTutorial: !tutorialCompleted,
+                  ),
+                  SlidableBookmarkItem(
+                    index: 1,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 1 tapped');
+                    },
+                    showTutorial: !tutorialCompleted,
+                  ),
+                  SlidableBookmarkItem(
+                    index: 2,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 2 tapped');
+                    },
+                    showTutorial: !tutorialCompleted,
+                  ),
+                  // Fourth item without tutorial highlight
+                  SlidableBookmarkItem(
+                    index: 3,
+                    extentRatio: 0.2,
+                    onTap: (context) {},
+                    onTapTextButton: (context) {
+                      print('TextButton Item 3 tapped');
+                    },
+                    showTutorial: false,
+                  ),
+                ],
+              )
+            ),
+          ),
+        ],
       ),
     );
   }

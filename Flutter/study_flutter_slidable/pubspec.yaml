@@ -1,5 +1,5 @@
-name: study_flutter_slidable
-description: "A new Flutter project."
+name: slidable_bookmarks
+description: "A Flutter app demonstrating slidable bookmark functionality."
 publish_to: 'none'
 version: 0.1.0
 

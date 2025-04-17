@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // 定義一個保存書籤狀態的 Provider
-final bookmarkProvider = StateNotifierProvider<BookmarkNotifier, Set<int>>((ref) {
-  return BookmarkNotifier();
+final bookmarkProvider = StateNotifierProvider<BookmarkStore, Set<int>>((ref) {
+  return BookmarkStore();
 });
 
 // StateNotifier 用於管理書籤狀態
-class BookmarkNotifier extends StateNotifier<Set<int>> {
-  BookmarkNotifier() : super({});
+class BookmarkStore extends StateNotifier<Set<int>> {
+  BookmarkStore() : super({});
 
   bool isBookmarked(int index) {
     return state.contains(index);

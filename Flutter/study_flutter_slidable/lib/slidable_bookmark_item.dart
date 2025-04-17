@@ -2,17 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:study_flutter_slidable/bookmark_manager.dart';
-import 'package:study_flutter_slidable/slidable_blocker.dart';
+import 'package:slidable_bookmarks/slidable_bookmark_store.dart';
+import 'package:slidable_bookmarks/slidable_tutorial_player.dart';
+import 'package:slidable_bookmarks/slidable_blocker.dart';
 
-class BookmarkListItem extends ConsumerWidget {
+class SlidableBookmarkItem extends ConsumerWidget {
   final int index;
   final double extentRatio;
+  final Function(BuildContext context) onTap;
+  final Function(BuildContext context) onTapTextButton;
+  final bool showTutorial;
 
-  const BookmarkListItem({
+  const SlidableBookmarkItem({
     super.key,
     required this.index,
     required this.extentRatio,
+    required this.onTap,
+    required this.onTapTextButton,
+    this.showTutorial = false,
   });
 
   @override
@@ -20,25 +27,10 @@ class BookmarkListItem extends ConsumerWidget {
     final bookmarks = ref.watch(bookmarkProvider);
     final isBookmarked = bookmarks.contains(index);
 
-    return Slidable(
-      closeOnScroll: false,
-      key: ValueKey(index),
-      endActionPane: ActionPane(
-        extentRatio: extentRatio,
-        motion: const StretchMotion(),
-        children: [
-          Expanded(
-            child: BookmarkActionButton(
-              index: index,
-              isBookmarked: isBookmarked,
-            ),
-          ),
-        ],
-      ),
-      child: GestureDetector(
+    final child = GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          print('Item $index tapped');
+          onTap(context);
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -55,7 +47,7 @@ class BookmarkListItem extends ConsumerWidget {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
-                    print('TextButton Item $index tapped');
+                    onTapTextButton(context);
                   },
                   child: const Text('Tap me'),
                 ),
@@ -63,12 +55,27 @@ class BookmarkListItem extends ConsumerWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
+      );
 
-  void doNothing(BuildContext context) {
-    print('doNothing');
+    return Slidable(
+      closeOnScroll: false,
+      key: ValueKey(index),
+      endActionPane: ActionPane(
+        extentRatio: extentRatio,
+        motion: const StretchMotion(),
+        children: [
+          Expanded(
+            child: BookmarkActionButton(
+              index: index,
+              isBookmarked: isBookmarked,
+            ),
+          ),
+        ],
+      ),
+      child: showTutorial ? SlidableControllerSender(
+        child: child,
+      ) : child,
+    );
   }
 }
 
@@ -97,8 +104,6 @@ class _BookmarkActionButtonState extends ConsumerState<BookmarkActionButton> {
   void initState() {
     super.initState();
     animation.addListener(handleValueChanged);
-
-    print('maxValue $maxValue');
   }
 
   @override
@@ -111,6 +116,7 @@ class _BookmarkActionButtonState extends ConsumerState<BookmarkActionButton> {
     if (mounted) {
       setState(() {
         progress = animation.value / maxValue;
+        print('animation.value  ${animation.value}');
       });
     }
   }

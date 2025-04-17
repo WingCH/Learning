@@ -81,12 +81,31 @@ class ListItem extends StatelessWidget {
         onTap: () {
           print('Item $index tapped');
         },
-        child: SizedBox(
-          height: 100,
-          child: Center(
-            child: Text(
-              'Item $index',
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Item $index',
+              ),
+              GestureDetector(
+                onHorizontalDragCancel: () {},
+                onHorizontalDragStart: (details) {},
+                onHorizontalDragUpdate: (details) {},
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    print('TextButton Item $index tapped');
+                  },
+                  child: const Text('Tap me'),
+                ),
+              ),
+            ],
           ),
         ),
       ),

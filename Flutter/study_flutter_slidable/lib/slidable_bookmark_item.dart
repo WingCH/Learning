@@ -9,7 +9,7 @@ import 'package:slidable_bookmarks/slidable_blocker.dart';
 // Widget for a slidable item with bookmark action
 class SlidableBookmarkItem extends ConsumerWidget {
   final int index;
-  final double extentRatio;
+  final double minWidth;
   final Function(BuildContext context) onTap;
   final Function(BuildContext context) onTapTextButton;
   final bool showTutorial;
@@ -17,7 +17,7 @@ class SlidableBookmarkItem extends ConsumerWidget {
   const SlidableBookmarkItem({
     super.key,
     required this.index,
-    required this.extentRatio,
+    required this.minWidth,
     required this.onTap,
     required this.onTapTextButton,
     this.showTutorial = false,
@@ -30,55 +30,74 @@ class SlidableBookmarkItem extends ConsumerWidget {
 
     // Main content of the slidable item
     final child = GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          onTap(context);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Item $index'),
-              SlidableBlocker(
-                enabled: false,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    onTapTextButton(context);
-                  },
-                  child: const Text('Tap me'),
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        onTap(context);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Item $index'),
+            SlidableBlocker(
+              enabled: false,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                 ),
+                onPressed: () {
+                  onTapTextButton(context);
+                },
+                child: const Text('Tap me'),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Slidable(
+          closeOnScroll: false,
+          key: ValueKey(index),
+          // End action pane containing bookmark button
+          endActionPane: ActionPane(
+            extentRatio: minWidth / constraints.maxWidth,
+            motion: const DrawerMotion(),
+            dismissible: DismissiblePane(
+              // TODO: dismissThreshold, dismissalDuration
+              closeOnCancel: true,
+              confirmDismiss: () async {
+                ref.read(bookmarkProvider.notifier).toggleBookmark(index);
+                return false;
+              },
+              onDismissed: () {},
+            ),
+            children: [
+              BookmarkActionButtonV2(
+                index: index,
+                isBookmarked: isBookmarked,
+              ),
+
+              // BookmarkActionButton(
+              //   index: index,
+              //   isBookmarked: isBookmarked,
+              //   minWidth: minWidth,
+              // ),
             ],
           ),
-        ),
-      );
-
-    return Slidable(
-      closeOnScroll: false,
-      key: ValueKey(index),
-      // End action pane containing bookmark button
-      endActionPane: ActionPane(
-        extentRatio: extentRatio,
-        motion: const StretchMotion(),
-        children: [
-          Expanded(
-            child: BookmarkActionButton(
-              index: index,
-              isBookmarked: isBookmarked,
-            ),
-          ),
-        ],
-      ),
-      // Apply tutorial controller if needed
-      child: showTutorial ? SlidableControllerSender(
-        child: child,
-      ) : child,
+          // Apply tutorial controller if needed
+          child: showTutorial
+              ? SlidableControllerSender(
+                  child: child,
+                )
+              : child,
+        );
+      },
     );
   }
 }
@@ -87,11 +106,13 @@ class SlidableBookmarkItem extends ConsumerWidget {
 class BookmarkActionButton extends ConsumerStatefulWidget {
   final int index;
   final bool isBookmarked;
+  final double minWidth;
 
   const BookmarkActionButton({
     super.key,
     required this.index,
     required this.isBookmarked,
+    required this.minWidth,
   });
 
   @override
@@ -104,6 +125,7 @@ class _BookmarkActionButtonState extends ConsumerState<BookmarkActionButton> {
   Animation<double> get animation => slidable.animation;
   double get maxValue => slidable.endActionPaneExtentRatio;
   double progress = 0;
+  final Color backgroundColor = const Color(0xFFF3F5F7);
 
   @override
   void initState() {
@@ -151,27 +173,92 @@ class _BookmarkActionButtonState extends ConsumerState<BookmarkActionButton> {
         ? 'assets/bookmark_non_filled.svg' // Show non-filled if currently bookmarked (to remove)
         : 'assets/bookmark_filled.svg'; // Show filled if not bookmarked (to add)
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFF3F5F7),
-      ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          // Toggle bookmark status when tapped
-          ref.read(bookmarkProvider.notifier).toggleBookmark(widget.index);
-        },
-        child: Center(
-          child: Opacity(
-            opacity: opacity,
-            child: SvgPicture.asset(
-              assetName,
-              width: 14,
-              height: 14,
-              fit: BoxFit.none,
-              clipBehavior: Clip.hardEdge,
+    return Expanded(
+      child: Row(
+        children: [
+          Expanded(
+            child: ColoredBox(
+              color: Colors.red,
+              child: Text(opacity.toString()),
             ),
           ),
+          Container(
+            width: widget.minWidth,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF3F5F7),
+            ),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                // Toggle bookmark status when tapped
+                ref
+                    .read(bookmarkProvider.notifier)
+                    .toggleBookmark(widget.index);
+              },
+              child: Center(
+                child: Opacity(
+                  opacity: opacity,
+                  child: SvgPicture.asset(
+                    assetName,
+                    width: 14,
+                    height: 14,
+                    fit: BoxFit.none,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BookmarkActionButtonV2 extends ConsumerWidget {
+  const BookmarkActionButtonV2({
+    super.key,
+    required this.index,
+    required this.isBookmarked,
+  });
+
+  final int index;
+  final bool isBookmarked;
+
+  String get assetName => isBookmarked
+      ? 'assets/bookmark_non_filled.svg' // Show non-filled if currently bookmarked (to remove)
+      : 'assets/bookmark_filled.svg'; // Show filled if not bookmarked (to add)
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Expanded(
+      child: ColoredBox(
+        color: Colors.red,
+        child: Row(
+          children: [
+            const Spacer(),
+            Container(
+              width: 80,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF3F5F7),
+              ),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                     ref
+                    .read(bookmarkProvider.notifier)
+                    .toggleBookmark(index);
+                },
+                child: Center(
+                  child: SvgPicture.asset(
+                    assetName,
+                    width: 14,
+                    height: 14,
+                    fit: BoxFit.none,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

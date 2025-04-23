@@ -48,14 +48,12 @@ class HomePage extends StatelessWidget {
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Calculate the extent ratio based on screen width
-                final extentRatio = 80 / constraints.maxWidth;
                 return ListView.builder(
                   itemCount: 100,
                   itemBuilder: (context, index) {
                     return SlidableBookmarkItem(
                       index: index,
-                      extentRatio: extentRatio,
+                      minWidth: 80,
                       onTap: (context) {
                         Navigator.pushNamed(context, '/tutorial');
                       },
@@ -124,6 +122,7 @@ class _TutorialPageState extends State<TutorialPage> with SingleTickerProviderSt
     await controller!.forward().orCancel;
     await Future.delayed(const Duration(milliseconds: 600));
     await controller?.reverse().orCancel;
+    // TODO fix: TickerCanceled (This ticker was canceled: Ticker(created by _TutorialPageState#818b0))
   }
   
   @override
@@ -160,7 +159,7 @@ class _TutorialPageState extends State<TutorialPage> with SingleTickerProviderSt
                   // Slidable items with tutorial highlight for the first three items
                   SlidableBookmarkItem(
                     index: 0,
-                    extentRatio: 0.2,
+                    minWidth: 80,
                     onTap: (context) {},
                     onTapTextButton: (context) {
                       print('TextButton Item 0 tapped');
@@ -169,7 +168,7 @@ class _TutorialPageState extends State<TutorialPage> with SingleTickerProviderSt
                   ),
                   SlidableBookmarkItem(
                     index: 1,
-                    extentRatio: 0.2,
+                    minWidth: 80,
                     onTap: (context) {},
                     onTapTextButton: (context) {
                       print('TextButton Item 1 tapped');
@@ -178,7 +177,7 @@ class _TutorialPageState extends State<TutorialPage> with SingleTickerProviderSt
                   ),
                   SlidableBookmarkItem(
                     index: 2,
-                    extentRatio: 0.2,
+                    minWidth: 80,
                     onTap: (context) {},
                     onTapTextButton: (context) {
                       print('TextButton Item 2 tapped');
@@ -188,7 +187,7 @@ class _TutorialPageState extends State<TutorialPage> with SingleTickerProviderSt
                   // Fourth item without tutorial highlight
                   SlidableBookmarkItem(
                     index: 3,
-                    extentRatio: 0.2,
+                    minWidth: 80,
                     onTap: (context) {},
                     onTapTextButton: (context) {
                       print('TextButton Item 3 tapped');

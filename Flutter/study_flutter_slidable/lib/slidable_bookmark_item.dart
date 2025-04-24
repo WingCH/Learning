@@ -76,6 +76,7 @@ class SlidableBookmarkItem extends ConsumerWidget {
                 return false;
               },
               onDismissed: () {},
+              dismissThreshold: 0.5,
             ),
             children: [
               BookmarkActionButtonV2(

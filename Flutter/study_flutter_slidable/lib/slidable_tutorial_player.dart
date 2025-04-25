@@ -4,9 +4,9 @@ import 'package:slidable_bookmarks/slidable_blocker.dart';
 
 // Animation state enum
 enum TutorialAnimationState {
-  idle,      // Initial or idle state
+  idle, // Initial or idle state
   animating, // Animation in progress
-  completed  // Animation completed
+  completed // Animation completed
 }
 
 // Widget that handles animation playback for slidable tutorial
@@ -35,43 +35,46 @@ class SlidablePlayerState extends State<SlidablePlayer>
     with SingleTickerProviderStateMixin {
   // Set to store all registered slidable controllers
   final Set<SlidableController?> controllers = <SlidableController?>{};
-  
+
   // List of animation state change listeners
-  final List<void Function(TutorialAnimationState)> _animationStateListeners = [];
+  final List<void Function(TutorialAnimationState)> _animationStateListeners =
+      [];
 
   late AnimationController? controller;
   late Animation<double>? animation;
-  
+
   // Current animation state
   TutorialAnimationState _animationState = TutorialAnimationState.idle;
-  
+
   // Get current animation state
   TutorialAnimationState get animationState => _animationState;
 
   // Add animation state change listener
-  void addAnimationStateListener(void Function(TutorialAnimationState) listener) {
+  void addAnimationStateListener(
+      void Function(TutorialAnimationState) listener) {
     _animationStateListeners.add(listener);
   }
-  
+
   // Remove animation state change listener
-  void removeAnimationStateListener(void Function(TutorialAnimationState) listener) {
+  void removeAnimationStateListener(
+      void Function(TutorialAnimationState) listener) {
     _animationStateListeners.remove(listener);
   }
-  
+
   // Register a slidable controller
   void registerController(SlidableController? controller) {
     if (controller != null) {
       controllers.add(controller);
     }
   }
-  
+
   // Unregister a slidable controller
   void unregisterController(SlidableController? controller) {
     if (controller != null) {
       controllers.remove(controller);
     }
   }
-  
+
   // Update animation state and notify all listeners
   void _updateAnimationState(TutorialAnimationState newState) {
     if (_animationState != newState) {
@@ -92,10 +95,33 @@ class SlidablePlayerState extends State<SlidablePlayer>
       return;
     }
 
+    _initializeAnimationController();
+    _scheduleTutorialSequence();
+  }
+
+  // Schedule tutorial sequence to run on the next frame
+  void _scheduleTutorialSequence() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (controller == null) {
+        return;
+      }
+
+      try {
+        await controller!.forward().orCancel;
+        await Future.delayed(const Duration(milliseconds: 600));
+        await controller!.reverse().orCancel;
+      } on TickerCanceled {
+        // The animation got canceled, probably because we were disposed.
+      }
+    });
+  }
+
+  // Initialize animation controller and setup listeners
+  void _initializeAnimationController() {
     // Initialize animation controller
     controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 6000),
       upperBound: 1.0,
     );
 
@@ -110,11 +136,6 @@ class SlidablePlayerState extends State<SlidablePlayer>
     // Listen to animation changes
     animation!.addListener(handleAnimationChanged);
 
-    // Start tutorial sequence after the first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startTutorialSequence();
-    });
-
     // Update tutorial state when animation is complete
     controller!.addStatusListener((status) {
       if (status == AnimationStatus.forward) {
@@ -125,18 +146,17 @@ class SlidablePlayerState extends State<SlidablePlayer>
     });
   }
 
-  // Handle the tutorial animation sequence
-  void _startTutorialSequence() async {
-    if (controller == null) {
-      return;
-    }
+  @override
+  void didUpdateWidget(SlidablePlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
 
-    try {
-      await controller!.forward().orCancel;
-      await Future.delayed(const Duration(milliseconds: 600));
-      await controller!.reverse().orCancel;
-    } on TickerCanceled {
-      // The animation got canceled, probably because we were disposed.
+    // Check if enableTutorial changed from false to true
+    if (!oldWidget.enableTutorial && widget.enableTutorial) {
+      if (controller == null) {
+        _initializeAnimationController();
+      }
+
+      _scheduleTutorialSequence();
     }
   }
 
@@ -189,9 +209,8 @@ class SlidableControllerSender extends StatefulWidget {
 class SlidableControllerSenderState extends State<SlidableControllerSender> {
   SlidableController? slidableController;
   SlidablePlayerState? slidablePlayerState;
- 
-  TutorialAnimationState animationState = TutorialAnimationState.idle;
 
+  TutorialAnimationState animationState = TutorialAnimationState.idle;
 
   void _handleAnimationStateChanged(TutorialAnimationState state) {
     setState(() {
@@ -207,31 +226,31 @@ class SlidableControllerSenderState extends State<SlidableControllerSender> {
     // Get the player state and register this controller
     slidablePlayerState = SlidablePlayer.of(context);
     slidablePlayerState?.registerController(slidableController);
-    slidablePlayerState?.addAnimationStateListener(_handleAnimationStateChanged);
-    
+    slidablePlayerState
+        ?.addAnimationStateListener(_handleAnimationStateChanged);
+
     if (slidablePlayerState != null) {
       animationState = slidablePlayerState!.animationState;
     }
   }
-  
+
   @override
   void dispose() {
-    slidablePlayerState?.removeAnimationStateListener(_handleAnimationStateChanged);
+    slidablePlayerState
+        ?.removeAnimationStateListener(_handleAnimationStateChanged);
     slidablePlayerState?.unregisterController(slidableController);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-     bool blockUserInteraction = animationState == TutorialAnimationState.animating;
+    bool blockUserInteraction =
+        animationState == TutorialAnimationState.animating;
     // Intercept gesture events and prevent user interaction during tutorial
     return SlidableBlocker(
       enabled: blockUserInteraction,
       // AbsorbPointer seems cannot prevent user swiping the slidable item, so we use SlidableBlocker to block the gesture events
-      child: AbsorbPointer(
-        absorbing: blockUserInteraction,
-        child: widget.child,
-      ),
+      child: widget.child,
     );
   }
 }

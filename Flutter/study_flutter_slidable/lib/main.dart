@@ -99,7 +99,7 @@ class _TutorialPageState extends State<TutorialPage> {
           Expanded(
             child: SlidablePlayer(
               tutorialCount: 3,
-              enableTutorial: true,
+              enableTutorial: false,
               child: ListView.builder(
                 itemCount: 100,
                 itemBuilder: (context, index) {

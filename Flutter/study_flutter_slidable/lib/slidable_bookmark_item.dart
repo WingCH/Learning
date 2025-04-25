@@ -12,7 +12,6 @@ class SlidableBookmarkItem extends ConsumerWidget {
   final double minWidth;
   final Function(BuildContext context) onTap;
   final Function(BuildContext context) onTapTextButton;
-  final bool showTutorial;
 
   const SlidableBookmarkItem({
     super.key,
@@ -20,7 +19,6 @@ class SlidableBookmarkItem extends ConsumerWidget {
     required this.minWidth,
     required this.onTap,
     required this.onTapTextButton,
-    this.showTutorial = false,
   });
 
   @override
@@ -91,13 +89,10 @@ class SlidableBookmarkItem extends ConsumerWidget {
               // ),
             ],
           ),
-          // Apply tutorial controller if needed
-          child: showTutorial
-              ? SlidableControllerSender(
+          child: SlidableControllerSender(
                   child: child,
-                )
-              : child,
-        );
+                ),
+        );  
       },
     );
   }

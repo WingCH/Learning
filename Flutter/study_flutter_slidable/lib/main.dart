@@ -68,6 +68,12 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/tutorial');
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
@@ -80,58 +86,7 @@ class TutorialPage extends StatefulWidget {
   State<TutorialPage> createState() => _TutorialPageState();
 }
 
-class _TutorialPageState extends State<TutorialPage>
-    with SingleTickerProviderStateMixin {
-  AnimationController? controller;
-  Animation<double>? animation;
-  bool tutorialCompleted = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize animation controller
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-      upperBound: 1.0,
-    );
-    // Create animation for tutorial sliding effect
-    animation = Tween<double>(begin: 0.0, end: 0.2).animate(CurvedAnimation(
-      parent: controller!,
-      curve: Curves.easeInOut,
-    ));
-
-    // Start tutorial sequence after the first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startTutorialSequence();
-    });
-
-    // Update tutorial state when animation is complete
-    controller?.addStatusListener((status) {
-      if (status == AnimationStatus.dismissed) {
-        setState(() {
-          tutorialCompleted = true;
-        });
-      }
-    });
-  }
-
-  // Handle the tutorial animation sequence
-  void _startTutorialSequence() async {
-    try {
-      await controller?.forward().orCancel;
-      await Future.delayed(const Duration(milliseconds: 600));
-      await controller?.reverse().orCancel;
-    } on TickerCanceled {
-      // The animation got canceled, probably because we were disposed.
-    }
-  }
-
-  @override
-  void dispose() {
-    controller!.dispose();
-    super.dispose();
-  }
+class _TutorialPageState extends State<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
@@ -141,69 +96,24 @@ class _TutorialPageState extends State<TutorialPage>
       ),
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            color: tutorialCompleted
-                ? Colors.green.shade100
-                : Colors.blue.shade100,
-            child: Text(
-              tutorialCompleted
-                  ? 'Tutorial Completed'
-                  : 'Please Complete Tutorial',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: tutorialCompleted
-                    ? Colors.green.shade900
-                    : Colors.blue.shade900,
-              ),
-            ),
-          ),
           Expanded(
             child: SlidablePlayer(
-                animation: animation,
-                child: ListView(
-                  children: [
-                    // Slidable items with tutorial highlight for the first three items
-                    SlidableBookmarkItem(
-                      index: 0,
+              tutorialCount: 3,
+              enableTutorial: true,
+              child: ListView.builder(
+                itemCount: 100,
+                itemBuilder: (context, index) {
+                  return SlidableBookmarkItem(
+                      index: index,
                       minWidth: 80,
                       onTap: (context) {},
                       onTapTextButton: (context) {
-                        print('TextButton Item 0 tapped');
+                        print('TextButton Item $index tapped');
                       },
-                      showTutorial: !tutorialCompleted,
-                    ),
-                    SlidableBookmarkItem(
-                      index: 1,
-                      minWidth: 80,
-                      onTap: (context) {},
-                      onTapTextButton: (context) {
-                        print('TextButton Item 1 tapped');
-                      },
-                      showTutorial: !tutorialCompleted,
-                    ),
-                    SlidableBookmarkItem(
-                      index: 2,
-                      minWidth: 80,
-                      onTap: (context) {},
-                      onTapTextButton: (context) {
-                        print('TextButton Item 2 tapped');
-                      },
-                      showTutorial: !tutorialCompleted,
-                    ),
-                    // Fourth item without tutorial highlight
-                    SlidableBookmarkItem(
-                      index: 3,
-                      minWidth: 80,
-                      onTap: (context) {},
-                      onTapTextButton: (context) {
-                        print('TextButton Item 3 tapped');
-                      },
-                      showTutorial: false,
-                    ),
-                  ],
-                )),
+                    );
+                  },
+                ),
+              ),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class SlidableBlocker extends StatelessWidget {
   /// The child widget to be protected
   final Widget child;
+
   /// Whether blocking is enabled
   final bool enabled;
 
@@ -27,8 +28,11 @@ class SlidableBlocker extends StatelessWidget {
             onHorizontalDragStart: (_) {},
             onHorizontalDragUpdate: (_) {},
             onHorizontalDragEnd: (_) {},
-            // Wrap the provided child widget
-            child: child,
+            // AbsorbPointer seems cannot prevent user swiping the slidable item, so we use GestureDetector to block the gesture events
+            child: AbsorbPointer(
+              absorbing: enabled,
+              child: child,
+            ),
           )
         : child;
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:slidable_bookmarks/inversed_scroll_motion.dart';
 import 'package:slidable_bookmarks/slidable_bookmark_store.dart';
 import 'package:slidable_bookmarks/slidable_tutorial_player.dart';
 import 'package:slidable_bookmarks/slidable_blocker.dart';
@@ -67,7 +68,6 @@ class SlidableBookmarkItem extends ConsumerWidget {
             extentRatio: minWidth / constraints.maxWidth,
             motion: const DrawerMotion(),
             dismissible: DismissiblePane(
-              // TODO: dismissThreshold, dismissalDuration
               closeOnCancel: true,
               confirmDismiss: () async {
                 ref.read(bookmarkProvider.notifier).toggleBookmark(index);
@@ -75,6 +75,7 @@ class SlidableBookmarkItem extends ConsumerWidget {
               },
               onDismissed: () {},
               dismissThreshold: 0.5,
+              motion: const InversedScrollMotion(),
             ),
             children: [
               BookmarkActionButtonV2(
@@ -90,9 +91,9 @@ class SlidableBookmarkItem extends ConsumerWidget {
             ],
           ),
           child: SlidableControllerSender(
-                  child: child,
-                ),
-        );  
+            child: child,
+          ),
+        );
       },
     );
   }
@@ -240,9 +241,7 @@ class BookmarkActionButtonV2 extends ConsumerWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                     ref
-                    .read(bookmarkProvider.notifier)
-                    .toggleBookmark(index);
+                  ref.read(bookmarkProvider.notifier).toggleBookmark(index);
                 },
                 child: Center(
                   child: SvgPicture.asset(

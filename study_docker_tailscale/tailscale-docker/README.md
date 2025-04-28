@@ -15,21 +15,21 @@
    ./run-tailscale.sh start
    ```
 
-2. **完成 Google 登入**：
-   容器啟動後，查看容器日誌以獲取 Tailscale 登入 URL：
-   ```
-   docker logs tailscale-vpn
-   ```
-   在瀏覽器中打開該 URL，使用您的 Google 帳戶完成 Tailscale 登入流程。
-
-3. **檢查容器狀態**：
+2. **檢查容器狀態**：
    確認容器是否正在運行：
    ```
    ./run-tailscale.sh status
    ```
 
-4. **連接至 Tailscale VPN**：
+3. **連接至 Tailscale VPN**：
    Tailscale 容器啟動並完成認證後，您可以通過 SOCKS5 代理 `localhost:1080` 連接到 Tailscale VPN。配置您的網絡工具（如 Surge）使用此代理。
+
+4. **重新生成 Tailscale 登入 URL**：
+   如果您需要重新生成 Tailscale 登入 URL，可以使用以下命令：
+   ```
+   ./run-tailscale.sh relogin
+   ```
+   這將登出當前帳戶並重新啟動認證流程，新的登入 URL 會直接在終端中顯示。
 
 5. **停止 Tailscale 容器**：
    當您不再需要 Tailscale VPN 時，可以停止容器：
@@ -47,6 +47,17 @@
 cd tailscale-docker && docker exec -it tailscale-vpn ping -c 4 xxx.com
 ```
 將 `xxx.com` 替換為您想要測試的域名。這將幫助您確認是否可以通過 Tailscale VPN 訪問內部資源。
+
+## Tailscale 數據目錄說明
+`tailscale-data` 目錄是用於存儲 Tailscale 容器相關數據和配置文件的目錄。以下是目錄中各文件和子目錄的用途：
+
+- **derpmap.cached.json**：這是 Tailscale 的 DERP（Detour Encrypted Routing Protocol）伺服器映射的緩存文件，用於加速與 Tailscale 網絡的連接。
+- **tailscaled.log.conf**：這是 Tailscale 守護進程的日誌配置文件，定義了日誌記錄的設置。
+- **tailscaled.log1.txt** 和 **tailscaled.log2.txt**：這些是 Tailscale 守護進程的日誌文件，記錄了 Tailscale 的運行狀態和事件，可能包含登入 URL 和其他重要信息。
+- **tailscaled.state**：這是 Tailscale 的狀態文件，存儲了當前的連接狀態和認證信息。
+- **files/wing-hwchan-vgt-hk.net-uid-1363355260509514**：這是一個與您的 Tailscale 帳戶相關的目錄，包含了與您的用戶 ID 相關的特定數據或配置文件。
+
+這個目錄是 Tailscale 容器用來持久化數據的，以便在容器重啟後仍能保留之前的狀態和設置。
 
 ## 記憶庫文件
 專案的詳細背景和進度記錄在 `memory-bank` 目錄下的文件中：

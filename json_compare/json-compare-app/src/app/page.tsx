@@ -28,18 +28,18 @@ export default function Home() {
   // Save baseJson to localStorage whenever it changes
   useEffect(() => {
     if (baseJson) { // Avoid saving initial empty string if not intended
-        localStorage.setItem("baseJson", baseJson);
+      localStorage.setItem("baseJson", baseJson);
     } else {
-        localStorage.removeItem("baseJson"); // Clear if empty
+      localStorage.removeItem("baseJson"); // Clear if empty
     }
   }, [baseJson]);
 
   // Save actualJson to localStorage whenever it changes
   useEffect(() => {
     if (actualJson) { // Avoid saving initial empty string if not intended
-        localStorage.setItem("actualJson", actualJson);
+      localStorage.setItem("actualJson", actualJson);
     } else {
-        localStorage.removeItem("actualJson"); // Clear if empty
+      localStorage.removeItem("actualJson"); // Clear if empty
     }
   }, [actualJson]);
 
@@ -112,78 +112,77 @@ export default function Home() {
 
       {/* Display Results */}
       {results !== null && (
-         <Card>
-           <CardHeader>
-             <CardTitle>Comparison Results</CardTitle>
-             <CardDescription>
-               {results.length === 0
-                 ? "No structural differences found."
-                 : `Found ${results.length} difference(s): `}
-               {results.length > 0 && (
-                 <span className="text-sm">
-                   (
-                   <span className="text-orange-600">
-                     Type Mismatch: {results.filter(d => d.type === 'Type Mismatch').length}
-                   </span>
-                   ,{' '}
-                   <span className="text-red-600">
-                     Missing Field: {results.filter(d => d.type === 'Missing Field').length}
-                   </span>
-                   ,{' '}
-                   <span className="text-blue-600">
-                     New Field: {results.filter(d => d.type === 'New Field').length}
-                   </span>
-                   )
-                 </span>
-               )}
-             </CardDescription>
-           </CardHeader>
-           <CardContent>
-             <Table>
-               <TableCaption>A list of structure differences.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Change Type</TableHead>
-                <TableHead>Path</TableHead>
-                <TableHead>Expected Type</TableHead>
-                <TableHead>Actual Type</TableHead>
-                <TableHead>Description</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* Initial state message - only show if results are null AND no error */}
-              {results === null && !error && (
-                 <TableRow>
-                   <TableCell colSpan={5} className="text-center text-muted-foreground">
-                     Click "Compare Structures" to see the results.
-                   </TableCell>
-                 </TableRow>
-               )}
-               {/* Render differences if results exist */}
-              {results?.map((diff, index) => (
-                <TableRow key={index}>
-                  <TableCell className={`font-medium ${
-                    diff.type === 'Missing Field' ? 'text-red-600' :
-                    diff.type === 'New Field' ? 'text-blue-600' :
-                    diff.type === 'Type Mismatch' ? 'text-orange-600' : ''
-                  }`}>{diff.type}</TableCell>
-                  <TableCell className="font-mono text-sm">{diff.path}</TableCell>
-                  <TableCell className="font-mono text-xs">{diff.expectedType ?? '(none)'}</TableCell>
-                  <TableCell className="font-mono text-xs">{diff.actualType ?? '(none)'}</TableCell>
-                  <TableCell>{diff.description}</TableCell>
+        <Card>
+          <CardHeader>
+            <CardTitle>Comparison Results</CardTitle>
+            <CardDescription>
+              {results.length === 0
+                ? "No structural differences found."
+                : `Found ${results.length} difference(s): `}
+              {results.length > 0 && (
+                <span className="text-sm">
+                  (
+                  <span className="text-orange-600">
+                    Type Mismatch: {results.filter(d => d.type === 'Type Mismatch').length}
+                  </span>
+                  ,{' '}
+                  <span className="text-red-600">
+                    Missing Field: {results.filter(d => d.type === 'Missing Field').length}
+                  </span>
+                  ,{' '}
+                  <span className="text-blue-600">
+                    New Field: {results.filter(d => d.type === 'New Field').length}
+                  </span>
+                  )
+                </span>
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableCaption>A list of structure differences.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Change Type</TableHead>
+                  <TableHead>Path</TableHead>
+                  <TableHead>Expected Type</TableHead>
+                  <TableHead>Actual Type</TableHead>
+                  <TableHead>Description</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {/* Initial state message - only show if results are null AND no error */}
+                {results === null && !error && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                      Click &#34;Compare Structures&#34; to see the results.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {/* Render differences if results exist */}
+                {results?.map((diff, index) => (
+                  <TableRow key={index}>
+                    <TableCell className={`font-medium ${diff.type === 'Missing Field' ? 'text-red-600' :
+                        diff.type === 'New Field' ? 'text-blue-600' :
+                          diff.type === 'Type Mismatch' ? 'text-orange-600' : ''
+                      }`}>{diff.type}</TableCell>
+                    <TableCell className="font-mono text-sm">{diff.path}</TableCell>
+                    <TableCell className="font-mono text-xs">{diff.expectedType ?? '(none)'}</TableCell>
+                    <TableCell className="font-mono text-xs">{diff.actualType ?? '(none)'}</TableCell>
+                    <TableCell>{diff.description}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       )}
       {/* Only show initial prompt if results are null and no error */}
       {results === null && !error && (
-         <div className="text-center text-muted-foreground mt-6">
-              {/* This space intentionally left blank if results card isn't shown initially,
+        <div className="text-center text-muted-foreground mt-6">
+          {/* This space intentionally left blank if results card isn't shown initially,
                   or add a placeholder card if preferred */}
-         </div>
+        </div>
       )}
     </main>
   );

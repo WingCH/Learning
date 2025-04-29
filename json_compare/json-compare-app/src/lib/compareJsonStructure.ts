@@ -6,8 +6,10 @@ export interface Difference {
   description: string;
 }
 
-// Helper function to get the type of a value
-function getType(value: any): string {
+/**
+ * Helper function to get the type of a value
+ */
+function getType(value: unknown): string {
   if (value === null) {
     return 'null';
   }
@@ -17,21 +19,23 @@ function getType(value: any): string {
   return typeof value;
 }
 
-// Recursive function to compare structures
+/**
+ * Recursive function to compare structures
+ */
 function compareObjects(
-  base: any,
-  actual: any,
+  base: unknown,
+  actual: unknown,
   path: string = '',
   differences: Difference[] = []
 ): Difference[] {
-  const baseKeys = base ? Object.keys(base) : [];
-  const actualKeys = actual ? Object.keys(actual) : [];
+  const baseKeys = typeof base === 'object' && base !== null && !Array.isArray(base) ? Object.keys(base as Record<string, unknown>) : [];
+  const actualKeys = typeof actual === 'object' && actual !== null && !Array.isArray(actual) ? Object.keys(actual as Record<string, unknown>) : [];
   const allKeys = new Set([...baseKeys, ...actualKeys]);
 
   for (const key of allKeys) {
     const currentPath = path ? `${path}.${key}` : key;
-    const baseValue = base ? base[key] : undefined;
-    const actualValue = actual ? actual[key] : undefined;
+    const baseValue = typeof base === 'object' && base !== null && !Array.isArray(base) ? (base as Record<string, unknown>)[key] : undefined;
+    const actualValue = typeof actual === 'object' && actual !== null && !Array.isArray(actual) ? (actual as Record<string, unknown>)[key] : undefined;
     const baseType = getType(baseValue);
     const actualType = getType(actualValue);
 
@@ -75,28 +79,30 @@ function compareObjects(
     } else if (baseType === 'array' && actualType === 'array') {
       // Both are arrays, compare based on emptiness and first element structure/type
       const arrayBasePath = `${currentPath}[0]`; // Path for element comparison
-      if (baseValue.length > 0 && actualValue.length === 0) {
+      const baseArr = Array.isArray(baseValue) ? baseValue : [];
+      const actualArr = Array.isArray(actualValue) ? actualValue : [];
+      if (baseArr.length > 0 && actualArr.length === 0) {
         // Was non-empty, now empty
         differences.push({
           type: 'Type Mismatch', // Or 'Missing Content'?
           path: arrayBasePath,
-          expectedType: `array with elements (e.g., ${getType(baseValue[0])})`,
+          expectedType: `array with elements (e.g., ${getType(baseArr[0])})`,
           actualType: 'empty array',
           description: 'Array changed from having elements to empty',
         });
-      } else if (baseValue.length === 0 && actualValue.length > 0) {
+      } else if (baseArr.length === 0 && actualArr.length > 0) {
         // Was empty, now non-empty
         differences.push({
           type: 'Type Mismatch', // Or 'New Content'?
           path: arrayBasePath,
           expectedType: 'empty array',
-          actualType: `array with elements (e.g., ${getType(actualValue[0])})`,
+          actualType: `array with elements (e.g., ${getType(actualArr[0])})`,
           description: 'Array changed from empty to having elements',
         });
-      } else if (baseValue.length > 0 && actualValue.length > 0) {
+      } else if (baseArr.length > 0 && actualArr.length > 0) {
         // Both non-empty, compare first element type and structure
-        const firstBaseType = getType(baseValue[0]);
-        const firstActualType = getType(actualValue[0]);
+        const firstBaseType = getType(baseArr[0]);
+        const firstActualType = getType(actualArr[0]);
 
         if (firstBaseType !== firstActualType) {
           // First elements have different types
@@ -109,7 +115,7 @@ function compareObjects(
           });
         } else if (firstBaseType === 'object') {
           // Both first elements are objects, compare their structure recursively
-          compareObjects(baseValue[0], actualValue[0], arrayBasePath, differences);
+          compareObjects(baseArr[0], actualArr[0], arrayBasePath, differences);
         }
         // If first elements are primitives of the same type, assume structure matches
       }
@@ -121,11 +127,12 @@ function compareObjects(
   return differences;
 }
 
-
-// Main function to initiate comparison
+/**
+ * Main function to initiate comparison
+ */
 export function compareJsonStructure(baseJson: string, actualJson: string): Difference[] | { error: string } {
-  let baseObj: any;
-  let actualObj: any;
+  let baseObj: unknown;
+  let actualObj: unknown;
 
   try {
     baseObj = JSON.parse(baseJson);
@@ -163,9 +170,11 @@ export function compareJsonStructure(baseJson: string, actualJson: string): Diff
 
   // If both are arrays, compare based on the first element's structure
   if (baseInputType === 'array') {
-      if (baseObj.length > 0 && actualObj.length > 0) {
-          const firstBaseElementType = getType(baseObj[0]);
-          const firstActualElementType = getType(actualObj[0]);
+      const baseArr = Array.isArray(baseObj) ? baseObj : [];
+      const actualArr = Array.isArray(actualObj) ? actualObj : [];
+      if (baseArr.length > 0 && actualArr.length > 0) {
+          const firstBaseElementType = getType(baseArr[0]);
+          const firstActualElementType = getType(actualArr[0]);
           if (firstBaseElementType !== firstActualElementType) {
               return [{
                   type: 'Type Mismatch',
@@ -176,7 +185,7 @@ export function compareJsonStructure(baseJson: string, actualJson: string): Diff
               }];
           }
           if (firstBaseElementType === 'object') {
-              return compareObjects(baseObj[0], actualObj[0], '[0]');
+              return compareObjects(baseArr[0], actualArr[0], '[0]');
           } else {
               // Arrays of primitives - structure is considered the same if types match
               return [];

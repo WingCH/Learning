@@ -1,0 +1,18 @@
+{
+  "user": {
+    "id": "123",
+    "profile": {
+      "name": "Wing",
+      "age": 30,
+      "contact": {
+        "email": "wing@example.com",
+        "phone": "12345678"
+      }
+    },
+    "roles": ["admin", "editor"],
+    "settings": {
+      "notifications": true,
+      "theme": "dark"
+    }
+  }
+} 

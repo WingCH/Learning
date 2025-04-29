@@ -1,0 +1,16 @@
+{
+  "user": {
+    "id": 123,
+    "profile": {
+      "name": "Wing",
+      "contact": {
+        "email": "wing@example.com"
+      }
+    },
+    "roles": "admin",
+    "settings": {
+      "theme": "dark",
+      "language": "en"
+    }
+  }
+} 

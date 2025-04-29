@@ -1,0 +1,2 @@
+# 忽略 Tailscale 數據目錄
+tailscale-data/

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http_proxy/http_proxy.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 
 // Constants for STOMP connection
@@ -27,7 +30,10 @@ class StompSettings {
   };
 }
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HttpProxy httpProxy = await HttpProxy.createHttpProxy();
+  HttpOverrides.global = httpProxy;
   runApp(const MyApp());
 }
 

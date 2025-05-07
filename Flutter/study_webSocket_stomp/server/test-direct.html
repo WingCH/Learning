@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOMP Direct Exchange Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 20px;
+        }
+
+        #messages {
+            border: 1px solid #ddd;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            margin-bottom: 10px;
+        }
+
+        button {
+            margin-right: 10px;
+            padding: 5px 10px;
+        }
+
+        input {
+            padding: 5px;
+            width: 300px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>STOMP Direct Exchange Test</h1>
+
+    <div class="info">
+        <h3>Communication Channels</h3>
+        <p>This page tests multiple STOMP destinations to find which one works for cross-client communication:</p>
+        <ul>
+            <li><code>/exchange/amq.direct/flutter.direct</code> - Using direct exchange</li>
+            <li><code>/queue/flutter.queue</code> - Using queue</li>
+            <li><code>/topic/flutter.topic</code> - Using simplified topic notation</li>
+        </ul>
+    </div>
+
+    <div class="controls">
+        <button id="connect">Connect</button>
+        <button id="disconnect" disabled>Disconnect</button>
+        <span id="status">Not Connected</span>
+    </div>
+
+    <div class="section">
+        <h3>Direct Exchange (amq.direct)</h3>
+        <div class="controls">
+            <input id="direct-message" type="text" placeholder="Message to direct exchange..." disabled />
+            <button id="send-direct" disabled>Send to Direct</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Queue</h3>
+        <div class="controls">
+            <input id="queue-message" type="text" placeholder="Message to queue..." disabled />
+            <button id="send-queue" disabled>Send to Queue</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Topic</h3>
+        <div class="controls">
+            <input id="topic-message" type="text" placeholder="Message to topic..." disabled />
+            <button id="send-topic" disabled>Send to Topic</button>
+        </div>
+    </div>
+
+    <h3>Messages</h3>
+    <div id="messages"></div>
+
+    <script>
+        // UI Elements
+        const connectButton = document.getElementById('connect');
+        const disconnectButton = document.getElementById('disconnect');
+        const statusSpan = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+
+        // Direct exchange elements
+        const directMessageInput = document.getElementById('direct-message');
+        const sendDirectButton = document.getElementById('send-direct');
+
+        // Queue elements
+        const queueMessageInput = document.getElementById('queue-message');
+        const sendQueueButton = document.getElementById('send-queue');
+
+        // Topic elements
+        const topicMessageInput = document.getElementById('topic-message');
+        const sendTopicButton = document.getElementById('send-topic');
+
+        // STOMP client
+        let stompClient;
+
+        // Destinations
+        const directDestination = '/exchange/amq.direct/flutter.direct';
+        const queueDestination = '/queue/flutter.queue';
+        const topicDestination = '/topic/flutter.topic';
+
+        function addMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function enableInputs(enabled) {
+            directMessageInput.disabled = !enabled;
+            sendDirectButton.disabled = !enabled;
+            queueMessageInput.disabled = !enabled;
+            sendQueueButton.disabled = !enabled;
+            topicMessageInput.disabled = !enabled;
+            sendTopicButton.disabled = !enabled;
+            connectButton.disabled = enabled;
+            disconnectButton.disabled = !enabled;
+        }
+
+        connectButton.addEventListener('click', () => {
+            stompClient = new StompJs.Client({
+                brokerURL: 'ws://localhost:15674/ws',
+                connectHeaders: {
+                    login: 'admin',
+                    passcode: 'admin'
+                },
+                debug: function (str) {
+                    console.log(str);
+                },
+                onConnect: function (frame) {
+                    addMessage('Connected successfully!');
+                    statusSpan.textContent = 'Connected';
+                    statusSpan.style.color = 'green';
+                    enableInputs(true);
+
+                    // Subscribe to direct exchange
+                    console.log('Subscribing to direct: ' + directDestination);
+                    stompClient.subscribe(directDestination, function (msg) {
+                        console.log('Received from direct:', msg);
+                        addMessage('From direct: ' + msg.body);
+                    });
+
+                    // Subscribe to queue
+                    console.log('Subscribing to queue: ' + queueDestination);
+                    stompClient.subscribe(queueDestination, function (msg) {
+                        console.log('Received from queue:', msg);
+                        addMessage('From queue: ' + msg.body);
+                    });
+
+                    // Subscribe to topic
+                    console.log('Subscribing to topic: ' + topicDestination);
+                    stompClient.subscribe(topicDestination, function (msg) {
+                        console.log('Received from topic:', msg);
+                        addMessage('From topic: ' + msg.body);
+                    });
+
+                    // Also subscribe to the original Flutter path
+                    console.log('Subscribing to Flutter path: /exchange/amq.topic/flutter.messages');
+                    stompClient.subscribe('/exchange/amq.topic/flutter.messages', function (msg) {
+                        console.log('Received from Flutter path:', msg);
+                        addMessage('From Flutter path: ' + msg.body);
+                    });
+                },
+                onDisconnect: function () {
+                    addMessage('Disconnected');
+                    statusSpan.textContent = 'Disconnected';
+                    statusSpan.style.color = 'red';
+                    enableInputs(false);
+                },
+                onStompError: function (frame) {
+                    addMessage('Error: ' + frame.headers.message);
+                    console.log('Error details:', frame.body);
+                }
+            });
+
+            stompClient.activate();
+        });
+
+        disconnectButton.addEventListener('click', () => {
+            if (stompClient) {
+                stompClient.deactivate();
+            }
+        });
+
+        // Send to direct exchange
+        sendDirectButton.addEventListener('click', () => {
+            if (directMessageInput.value) {
+                const message = directMessageInput.value;
+                const timestamp = new Date().toISOString();
+                const fullMessage = `[direct ${timestamp}] ${message}`;
+
+                console.log('Publishing to direct: ' + directDestination);
+                stompClient.publish({
+                    destination: directDestination,
+                    body: fullMessage,
+                    headers: { 'content-type': 'text/plain' }
+                });
+                addMessage('Sent to direct: ' + fullMessage);
+                directMessageInput.value = '';
+            }
+        });
+
+        // Send to queue
+        sendQueueButton.addEventListener('click', () => {
+            if (queueMessageInput.value) {
+                const message = queueMessageInput.value;
+                const timestamp = new Date().toISOString();
+                const fullMessage = `[queue ${timestamp}] ${message}`;
+
+                console.log('Publishing to queue: ' + queueDestination);
+                stompClient.publish({
+                    destination: queueDestination,
+                    body: fullMessage,
+                    headers: { 'content-type': 'text/plain' }
+                });
+                addMessage('Sent to queue: ' + fullMessage);
+                queueMessageInput.value = '';
+            }
+        });
+
+        // Send to topic
+        sendTopicButton.addEventListener('click', () => {
+            if (topicMessageInput.value) {
+                const message = topicMessageInput.value;
+                const timestamp = new Date().toISOString();
+                const fullMessage = `[topic ${timestamp}] ${message}`;
+
+                console.log('Publishing to topic: ' + topicDestination);
+                stompClient.publish({
+                    destination: topicDestination,
+                    body: fullMessage,
+                    headers: { 'content-type': 'text/plain' }
+                });
+                addMessage('Sent to topic: ' + fullMessage);
+                topicMessageInput.value = '';
+            }
+        });
+    </script>
+</body>
+
+</html>

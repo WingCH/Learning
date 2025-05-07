@@ -1,0 +1,22 @@
+# Project-wide .gitignore
+
+# Editor files and folders
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# Log files
+*.log
+
+# Environment files
+.env
+
+# Node modules (if any)
+node_modules/
+
+# Build artifacts
+build/
+dist/
+out/ 

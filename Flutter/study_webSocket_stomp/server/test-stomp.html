@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOMP WebSocket Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 20px;
+        }
+
+        #messages {
+            border: 1px solid #ddd;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            margin-bottom: 10px;
+        }
+
+        button {
+            margin-right: 10px;
+            padding: 5px 10px;
+        }
+
+        input {
+            padding: 5px;
+            width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>STOMP WebSocket Test</h1>
+    <div class="controls">
+        <button id="connect">Connect</button>
+        <button id="disconnect" disabled>Disconnect</button>
+        <span id="status">Not Connected</span>
+    </div>
+    <div class="controls">
+        <input id="message" type="text" placeholder="Enter message..." disabled />
+        <button id="send" disabled>Send Message</button>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        const connectButton = document.getElementById('connect');
+        const disconnectButton = document.getElementById('disconnect');
+        const sendButton = document.getElementById('send');
+        const messageInput = document.getElementById('message');
+        const statusSpan = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+
+        let stompClient;
+
+        function addMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        connectButton.addEventListener('click', () => {
+            stompClient = new StompJs.Client({
+                brokerURL: 'ws://localhost:15674/ws',
+                connectHeaders: {
+                    login: 'admin',
+                    passcode: 'admin'
+                },
+                debug: function (str) {
+                    console.log(str);
+                },
+                onConnect: function (frame) {
+                    addMessage('Connected successfully!');
+                    statusSpan.textContent = 'Connected';
+                    statusSpan.style.color = 'green';
+
+                    connectButton.disabled = true;
+                    disconnectButton.disabled = false;
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+
+                    // Use the same path as the Flutter app with explicit topic subscription
+                    const exchangePath = '/exchange/amq.topic/flutter.messages';
+                    console.log('Subscribing to: ' + exchangePath);
+                    stompClient.subscribe(exchangePath, function (msg) {
+                        console.log('Received message:', msg);
+                        addMessage('Received: ' + msg.body);
+                    });
+                },
+                onDisconnect: function () {
+                    addMessage('Disconnected');
+                    statusSpan.textContent = 'Disconnected';
+                    statusSpan.style.color = 'red';
+
+                    connectButton.disabled = false;
+                    disconnectButton.disabled = true;
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+                },
+                onStompError: function (frame) {
+                    addMessage('Error: ' + frame.headers.message);
+                    console.log('Error details:', frame.body);
+                }
+            });
+
+            stompClient.activate();
+        });
+
+        disconnectButton.addEventListener('click', () => {
+            if (stompClient) {
+                stompClient.deactivate();
+            }
+        });
+
+        sendButton.addEventListener('click', () => {
+            if (messageInput.value) {
+                const message = messageInput.value;
+                const timestamp = new Date().toISOString();
+                const fullMessage = `[web ${timestamp}] ${message}`;
+
+                const exchangePath = '/exchange/amq.topic/flutter.messages';
+                console.log('Publishing to: ' + exchangePath);
+                stompClient.publish({
+                    destination: exchangePath,
+                    body: fullMessage,
+                    headers: { 'content-type': 'text/plain' }
+                });
+                addMessage('Sent: ' + fullMessage);
+                messageInput.value = '';
+            }
+        });
+    </script>
+</body>
+
+</html>

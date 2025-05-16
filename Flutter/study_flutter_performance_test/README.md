@@ -19,6 +19,7 @@
 flutter drive \
   --driver=test_driver/efficient_driver.dart \
   --target=integration_test/efficient_list_test.dart \
+  --no-dds \
   --profile
 ```
 
@@ -28,6 +29,7 @@ flutter drive \
 flutter drive \
   --driver=test_driver/inefficient_driver.dart \
   --target=integration_test/inefficient_list_test.dart \
+  --no-dds \
   --profile
 ```
 

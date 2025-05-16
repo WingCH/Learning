@@ -1,94 +1,78 @@
-# Flutter Performance Test Example
+# Flutter 效能測試示例
 
-這個項目示範如何使用Flutter的集成測試來測量應用程序的性能表現。
+這個專案展示了 Flutter 中高效能和低效能版本的比較，並提供集成測試來測量它們的效能差異。
 
-## 項目結構
+## 效能測試說明
 
-- `lib/performance_comparison.dart` - 主應用程序，包含效能比較介面
-- `lib/inefficient_item.dart` - 低效能的列表項实现
-- `lib/efficient_item.dart` - 優化過的列表項实现
-- `lib/main.dart` - 應用程序入口點
-- `integration_test/comparison_test.dart` - 低效與高效實現的比較測試
-- `integration_test/screen_size_test.dart` - 不同螢幕尺寸影響測試
-- `test_driver/comparison_driver.dart` - 比較測試驅動
-- `test_driver/screen_size_driver.dart` - 螢幕尺寸測試驅動
-- `test_driver/perf_driver.dart` - 基本測試驅動
-- `run_multiple_tests.sh` - 自動運行多次測試的腳本
-- `analyze_results.dart` - 分析測試結果的腳本
+本專案包含兩個獨立的集成測試，用於分別測量優化版本和低效能版本的滾動效能：
 
-## 運行性能測試
+1. `efficient_list_test.dart` - 測試優化版本列表的滾動效能
+2. `inefficient_list_test.dart` - 測試低效能版本列表的滾動效能
 
-### 效能比較測試
+## 運行測試
+
+### 單次測試
+
+#### 測試優化版本
 
 ```bash
 flutter drive \
-  --driver=test_driver/comparison_driver.dart \
-  --target=integration_test/comparison_test.dart \
-  -d "<設備ID>"
+  --driver=test_driver/efficient_driver.dart \
+  --target=integration_test/efficient_list_test.dart \
+  --profile
 ```
 
-### 螢幕尺寸影響測試
+#### 測試低效能版本
 
 ```bash
 flutter drive \
-  --driver=test_driver/screen_size_driver.dart \
-  --target=integration_test/screen_size_test.dart \
-  -d "<設備ID>"
+  --driver=test_driver/inefficient_driver.dart \
+  --target=integration_test/inefficient_list_test.dart \
+  --profile
 ```
 
-## 批量測試與結果分析
+### 批量測試
 
-### 運行多次測試
-
-使用提供的腳本可以自動運行10次測試並保存結果：
+我們也提供了一個腳本，可以自動連續執行多次測試，並整理結果：
 
 ```bash
-./run_multiple_tests.sh
+# 確保腳本有執行權限
+chmod +x run_performance_tests.sh
+
+# 執行批量測試
+./run_performance_tests.sh
 ```
 
-腳本會自動執行以下操作：
-1. 創建 `test_results` 目錄保存測試結果
-2. 運行10次比較測試
-3. 為每次測試保存性能數據
-4. 創建彙總的摘要文件
+此腳本會：
+1. 連續執行多次優化版本和低效能版本測試
+2. 將結果保存到 `test_results` 目錄
+3. 自動生成最終的比較報告
 
-### 分析測試結果
-
-運行結果分析腳本來處理測試數據：
-
-```bash
-dart analyze_results.dart
-```
-
-分析腳本會：
-1. 讀取所有測試結果
-2. 計算統計數據（平均值、最小值、最大值、標準差等）
-3. 生成詳細的分析報告 `test_results/analysis_report.json`
-4. 在控制台顯示簡要的結果摘要
+報告將保存在 `build/performance_comparison_report.json` 中。
 
 ## 查看測試結果
 
-測試完成後，在 `test_results` 目錄下查看以下文件：
+測試結束後，以下文件會包含有用的資訊：
 
-### 每次測試的結果文件
-- `inefficient_scrolling_N.timeline_summary.json` - 低效實現的性能摘要
-- `efficient_scrolling_N.timeline_summary.json` - 優化實現的性能摘要
-- `performance_comparison_report_N.json` - 兩種實現的比較報告
+- `build/efficient_scrolling.timeline_summary.json` - 優化版本的測試摘要
+- `build/inefficient_scrolling.timeline_summary.json` - 低效能版本的測試摘要
 
-### 彙總結果
-- `summary.json` - 所有測試運行的彙總數據
-- `analysis_report.json` - 詳細的統計分析報告
+時間線文件（.timeline.json）可以在 Chrome 的追蹤工具中打開，方法是打開 `chrome://tracing` 並載入該文件。
 
-摘要文件可以用任何文本編輯器查看，包含如下指標：
-- 平均幀構建時間
-- 最差幀構建時間
-- 錯失幀構建預算次數
-- 平均幀光柵化時間
-- 最差幀光柵化時間
-- 錯失幀光柵化預算次數
-- 幀數
+## 專案結構
 
-時間線文件可以在Chrome的追蹤工具中打開，方法是打開 `chrome://tracing` 並加載該文件。
+- `/lib` - 應用程式源碼
+  - `main.dart` - 主應用程式入口
+  - `performance_comparison.dart` - 效能比較頁面
+  - `efficient_item.dart` - 優化的列表項目組件
+  - `inefficient_item.dart` - 低效能的列表項目組件
+- `/integration_test` - 集成測試
+  - `efficient_list_test.dart` - 優化版本測試
+  - `inefficient_list_test.dart` - 低效能版本測試
+- `/test_driver` - 測試驅動器
+  - `efficient_driver.dart` - 優化版本測試驅動器
+  - `inefficient_driver.dart` - 低效能版本測試驅動器
+- `run_performance_tests.sh` - 批量測試執行腳本
 
 ## 性能指標說明
 
@@ -99,7 +83,7 @@ dart analyze_results.dart
 ## 優化範例說明
 
 ### 低效實現問題
-- 進行過多的計算（10000次循環）
+- 進行過多的計算
 - 嵌套過多的Widget
 - 過多的佈局約束
 - 動態創建色彩

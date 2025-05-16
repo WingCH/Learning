@@ -26,18 +26,20 @@ class PerformanceComparisonPage extends StatefulWidget {
   const PerformanceComparisonPage({super.key, required this.items});
 
   @override
-  State<PerformanceComparisonPage> createState() => _PerformanceComparisonPageState();
+  State<PerformanceComparisonPage> createState() =>
+      _PerformanceComparisonPageState();
 }
 
-class _PerformanceComparisonPageState extends State<PerformanceComparisonPage> with SingleTickerProviderStateMixin {
+class _PerformanceComparisonPageState extends State<PerformanceComparisonPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }
-  
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -52,26 +54,14 @@ class _PerformanceComparisonPageState extends State<PerformanceComparisonPage> w
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: '低效能版本'),
             Tab(text: '優化版本'),
+            Tab(text: '低效能版本'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // 低效能版本
-          ListView.builder(
-            key: const ValueKey('inefficient_list'),
-            itemCount: widget.items.length > 100 ? 100 : widget.items.length, // 限制項目數量以避免內存問題
-            itemBuilder: (context, index) {
-              return InefficientListItem(
-                key: ValueKey('inefficient_item_${index}_text'),
-                text: widget.items[index],
-              );
-            },
-          ),
-          
           // 優化版本
           ListView.builder(
             key: const ValueKey('efficient_list'),
@@ -83,8 +73,22 @@ class _PerformanceComparisonPageState extends State<PerformanceComparisonPage> w
               );
             },
           ),
+          // 低效能版本
+          ListView.builder(
+            key: const ValueKey('inefficient_list'),
+            itemCount: widget.items.length > 100
+                ? 100
+                : widget.items.length, // 限制項目數量以避免內存問題
+            itemBuilder: (context, index) {
+              return InefficientListItem(
+                key: ValueKey('inefficient_item_${index}_text'),
+                text: widget.items[index],
+                itemIndex: index, // 添加必要的 itemIndex 參數
+              );
+            },
+          ),
         ],
       ),
     );
   }
-} 
+}

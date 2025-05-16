@@ -99,3 +99,33 @@ chmod +x run_performance_tests.sh
 ## 參考資料
 
 本範例基於Flutter官方文檔中的[集成測試性能分析](https://docs.flutter.dev/cookbook/testing/integration/profiling)指南。
+
+---
+
+# Build
+
+```bash
+fvm flutter build ipa --profile --export-method development
+
+flutter drive \                                        
+  --driver=test_driver/inefficient_driver.dart \
+  --target=integration_test/inefficient_list_test.dart \
+  --no-dds \
+  --profile \
+  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa
+
+```
+
+
+似乎係  fvm flutter build ipa --profile --export-method development 完會missing @ntegration_test  內既test case所以--target=integration_test/inefficient_list_test.dart 會失效最後fallback用 main.dart
+
+```bash
+fvm flutter build ipa --profile --export-method development
+
+flutter drive \                                        
+  --driver=test_driver/inefficient_driver.dart \
+  --target=integration_test/inefficient_list_test.dart \
+  --no-dds \
+  --profile \
+  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa
+```

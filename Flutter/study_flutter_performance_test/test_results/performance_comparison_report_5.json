@@ -1,0 +1,26 @@
+{
+  "inefficient": {
+    "average_frame_build_time_ms": 3.252193548387097,
+    "worst_frame_build_time_ms": 17.565,
+    "missed_frame_build_budget_count": 1,
+    "average_frame_rasterizer_time_ms": 1.0673442622950817,
+    "worst_frame_rasterizer_time_ms": 2.184,
+    "missed_frame_rasterizer_budget_count": 0,
+    "frame_count": 62
+  },
+  "efficient": {
+    "average_frame_build_time_ms": 3.459250000000001,
+    "worst_frame_build_time_ms": 13.877,
+    "missed_frame_build_budget_count": 0,
+    "average_frame_rasterizer_time_ms": 1.2275555555555553,
+    "worst_frame_rasterizer_time_ms": 5.224,
+    "missed_frame_rasterizer_budget_count": 0,
+    "frame_count": 72
+  },
+  "improvement": {
+    "average_frame_build_time_percent": -6.3666706342121575,
+    "worst_frame_build_time_percent": 20.996299459151725,
+    "average_frame_rasterizer_time_percent": -15.01027352842798,
+    "worst_frame_rasterizer_time_percent": -139.19413919413918
+  }
+}

@@ -8,23 +8,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:study_flutter_performance_test/main.dart';
+import 'package:study_flutter_performance_test/performance_comparison.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('List scroll test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      PerformanceComparisonApp(items: List<String>.generate(100, (i) => 'Item $i')),
+    );
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // 切換到優化版本
+    await tester.tap(find.text('優化版本'));
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Verify that our list shows the first item.
+    expect(find.text('Item 0 - 0'), findsOneWidget);
+    expect(find.text('Item 99 - 0'), findsNothing);
+
+    // Scroll down.
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that the list has scrolled.
+    expect(find.text('Item 0 - 0'), findsNothing);
   });
 }

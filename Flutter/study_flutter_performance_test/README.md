@@ -121,3 +121,11 @@ fvm flutter drive \
   --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa \
   -d 00008130-001435102EC0001C
 ```
+
+## if no need TimelineSummary, just run test (don't support pre-build ipa)
+https://github.com/flutter/flutter/issues/114541
+```bash
+fvm flutter test integration_test/inefficient_list_test.dart \
+  --no-dds \
+  -d 00008130-001435102EC0001C
+```

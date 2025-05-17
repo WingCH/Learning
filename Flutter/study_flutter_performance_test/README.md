@@ -102,30 +102,22 @@ chmod +x run_performance_tests.sh
 
 ---
 
-# Build
+# Pre-build ipa and run test
 
 ```bash
-fvm flutter build ipa --profile --export-method development
-
-flutter drive \                                        
-  --driver=test_driver/inefficient_driver.dart \
-  --target=integration_test/inefficient_list_test.dart \
-  --no-dds \
-  --profile \
-  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa
-
+fvm flutter build ipa \
+--target=integration_test/inefficient_list_test.dart \
+--profile \
+--export-method development
 ```
 
-
-似乎係  fvm flutter build ipa --profile --export-method development 完會missing @ntegration_test  內既test case所以--target=integration_test/inefficient_list_test.dart 會失效最後fallback用 main.dart
-
 ```bash
-fvm flutter build ipa --profile --export-method development
-
-flutter drive \                                        
+# `--target` option seems can be ignored because the `build ipa` command already specifies the target.
+fvm flutter drive \
   --driver=test_driver/inefficient_driver.dart \
   --target=integration_test/inefficient_list_test.dart \
   --no-dds \
   --profile \
-  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa
+  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa \
+  -d 00008130-001435102EC0001C
 ```

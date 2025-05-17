@@ -129,3 +129,42 @@ fvm flutter test integration_test/inefficient_list_test.dart \
   --no-dds \
   -d 00008130-001435102EC0001C
 ```
+
+---
+
+# Firebase Test Lab
+https://github.com/flutter/flutter/blob/master/packages/integration_test/README.md
+
+```bash
+chmod +x ./firebase_test_lab.sh
+./firebase_test_lab.sh
+```
+
+```bash
+# find device id
+xcrun xctrace list devices
+
+== Devices ==
+Wing’s MacBook Pro (ID1)
+Hong Wing的Apple Watch (ID2)
+Wing CHAN's iPhone (ID3)
+Wing’s iPad Mimi (ID4)
+
+== Simulators ==
+iPad (10th generation) Simulator (18.2) (9E29E800-8FA8-4854-B5FA-8D6A9C76A6B8)
+iPad (10th generation) (18.3.1) (788DFE68-2683-4813-9CC2-AD159E308871)
+iPad Air 11-inch (M2) Simulator (18.2) (455C72F7-99AD-4060-995B-F46CD413A6BE)
+iPad Air 11-inch (M2) (18.3.1) (975BC2BE-EA6F-4269-9F59-101ABB0A13F8)
+iPad Air 13-inch (M2) Simulator (18.2) (FA6796CA-F8EF-455B-B9B4-42E838196C03)
+```
+
+You can verify locally that your tests are successful by running the following command:
+```bash
+XCTESTRUN_FILE=$(find build/ios_integ/Build/Products -name "Runner_*.xctestrun" | head -n 1)
+xcodebuild test-without-building \
+  -xctestrun "$XCTESTRUN_FILE" \
+  -destination id=00008130-001435102EC0001C
+```
+
+> 在Firebase Test Lab入面不支援Flutter Drive的time summary統計數據
+

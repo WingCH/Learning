@@ -43,7 +43,25 @@ void main() {
     expect(inefficientListFinder, findsOneWidget);
 
     // 測量低效能列表的滾動效能
-    await binding.traceAction(() async {
+    try {
+      await binding.traceAction(() async {
+        // 在低效能列表中滾動兩次
+        await simulateScrollWithFrames(
+          tester,
+          inefficientListFinder,
+          offset: const Offset(0, -500),
+          velocity: 1000,
+        );
+
+        await simulateScrollWithFrames(
+          tester,
+          inefficientListFinder,
+          offset: const Offset(0, -500),
+          velocity: 1000,
+        );
+      }, reportKey: 'inefficient_scrolling');
+    } catch (e) {
+      // 在不支援 timeline 的環境下執行基本測試
       // 在低效能列表中滾動兩次
       await simulateScrollWithFrames(
         tester,
@@ -58,6 +76,6 @@ void main() {
         offset: const Offset(0, -500),
         velocity: 1000,
       );
-    }, reportKey: 'inefficient_scrolling');
+    }
   });
 }

@@ -9,7 +9,7 @@ Future<void> simulateScrollWithFrames(
   Finder finder, {
   required Offset offset,
   required double velocity,
-  Duration duration = const Duration(seconds: 2),
+  Duration duration = const Duration(seconds: 3), // 增加默認持續時間到3秒
   int fps = 60,
 }) async {
   // 執行滑動操作
@@ -22,6 +22,33 @@ Future<void> simulateScrollWithFrames(
   // 模擬連續幀更新
   for (int i = 0; i < frameCount; i++) {
     await tester.pump(Duration(milliseconds: frameDurationMs));
+  }
+}
+
+/// 模擬重複滾動的輔助函數
+Future<void> simulateRepeatedScrolling(
+  WidgetTester tester,
+  Finder listFinder, {
+  int repeatCount = 4,
+  Offset offset = const Offset(0, -500),
+  double velocity = 800,
+  Duration scrollDuration = const Duration(seconds: 3),
+  Duration pauseDuration = const Duration(milliseconds: 200),
+}) async {
+  for (int i = 0; i < repeatCount; i++) {
+    // 向下滾動
+    await simulateScrollWithFrames(
+      tester,
+      listFinder,
+      offset: offset,
+      velocity: velocity,
+      duration: scrollDuration,
+    );
+
+    // 如果不是最後一次滾動，則等待短暫時間
+    if (i < repeatCount - 1) {
+      await tester.pump(pauseDuration);
+    }
   }
 }
 
@@ -45,37 +72,13 @@ void main() {
     // 測量低效能列表的滾動效能
     try {
       await binding.traceAction(() async {
-        // 在低效能列表中滾動兩次
-        await simulateScrollWithFrames(
-          tester,
-          inefficientListFinder,
-          offset: const Offset(0, -500),
-          velocity: 1000,
-        );
-
-        await simulateScrollWithFrames(
-          tester,
-          inefficientListFinder,
-          offset: const Offset(0, -500),
-          velocity: 1000,
-        );
+        // 使用共用函數執行重複滾動測試
+        await simulateRepeatedScrolling(tester, inefficientListFinder);
       }, reportKey: 'inefficient_scrolling');
     } catch (e) {
       // 在不支援 timeline 的環境下執行基本測試
-      // 在低效能列表中滾動兩次
-      await simulateScrollWithFrames(
-        tester,
-        inefficientListFinder,
-        offset: const Offset(0, -500),
-        velocity: 1000,
-      );
-
-      await simulateScrollWithFrames(
-        tester,
-        inefficientListFinder,
-        offset: const Offset(0, -500),
-        velocity: 1000,
-      );
+      // 使用共用函數執行重複滾動測試
+      await simulateRepeatedScrolling(tester, inefficientListFinder);
     }
   });
 }

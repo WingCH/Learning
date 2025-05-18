@@ -16,21 +16,23 @@
 #### 測試優化版本
 
 ```bash
-flutter drive \
+fvm flutter drive \
   --driver=test_driver/efficient_driver.dart \
   --target=integration_test/efficient_list_test.dart \
   --no-dds \
-  --profile
+  --profile \
+  -d 00008130-001435102EC0001C
 ```
 
 #### 測試低效能版本
 
 ```bash
-flutter drive \
+fvm flutter drive \
   --driver=test_driver/inefficient_driver.dart \
   --target=integration_test/inefficient_list_test.dart \
   --no-dds \
-  --profile
+  --profile \
+  -d 00008130-001435102EC0001C
 ```
 
 ### 批量測試

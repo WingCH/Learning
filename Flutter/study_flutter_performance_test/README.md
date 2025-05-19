@@ -271,8 +271,9 @@ chmod +x ./scripts/run_all.sh
 
 ---
 
-# Pre-build ipa and run test
+# Pre-build binary and run test
 
+## Pre-build ipa
 ```bash
 fvm flutter build ipa \
 --target=integration_test/inefficient_list_test.dart \
@@ -280,15 +281,34 @@ fvm flutter build ipa \
 --export-method development
 ```
 
+## Pre-build apk
+```bash
+fvm flutter build apk \
+--target=integration_test/inefficient_list_test.dart \
+--profile
+```
+
+## Run test with pre-build ipa
 ```bash
 # `--target` option seems can be ignored because the `build ipa` command already specifies the target.
 fvm flutter drive \
-  --driver=test_driver/inefficient_driver.dart \
+  --driver=test_driver/inefficient_list_test_driver.dart \
   --target=integration_test/inefficient_list_test.dart \
   --no-dds \
   --profile \
   --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa \
   -d 00008130-001435102EC0001C
+```
+
+## Run test with pre-build apk
+```
+fvm flutter drive \
+  --driver=test_driver/inefficient_list_test_driver.dart \
+  --target=integration_test/inefficient_list_test.dart \
+  --no-dds \
+  --profile \
+  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/app/outputs/flutter-apk/app-profile.apk \
+  -d 39181FDJG006N3
 ```
 
 ## if no need TimelineSummary, just run test (don't support pre-build ipa)

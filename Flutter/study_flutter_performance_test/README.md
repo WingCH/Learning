@@ -41,10 +41,14 @@ fvm flutter drive \
 
 ```bash
 # 確保腳本有執行權限
-chmod +x run_performance_tests.sh
+chmod +x ./scripts/run_all.sh
 
-# 執行批量測試
-./run_performance_tests.sh
+# 執行完整測試流程（構建IPA並運行測試）
+./scripts/run_all.sh
+
+# 或者單獨執行各個步驟
+./scripts/build_ipa.sh          # 僅構建IPA檔案
+./scripts/run_performance_tests.sh  # 僅運行測試(需要已構建的IPA)
 ```
 
 此腳本會：
@@ -76,7 +80,10 @@ chmod +x run_performance_tests.sh
 - `/test_driver` - 測試驅動器
   - `efficient_driver.dart` - 優化版本測試驅動器
   - `inefficient_driver.dart` - 低效能版本測試驅動器
-- `run_performance_tests.sh` - 批量測試執行腳本
+- `/scripts` - 測試腳本
+  - `build_ipa.sh` - 構建IPA檔案的腳本
+  - `run_performance_tests.sh` - 執行效能測試的腳本
+  - `run_all.sh` - 執行完整流程的主腳本
 
 ## 性能指標說明
 
@@ -147,10 +154,10 @@ chmod +x ./firebase_test_lab.sh
 xcrun xctrace list devices
 
 == Devices ==
-Wing’s MacBook Pro (ID1)
-Hong Wing的Apple Watch (ID2)
+Wing's MacBook Pro (ID1)
+Hong Wing's Apple Watch (ID2)
 Wing CHAN's iPhone (ID3)
-Wing’s iPad Mimi (ID4)
+Wing's iPad Mimi (ID4)
 
 == Simulators ==
 iPad (10th generation) Simulator (18.2) (9E29E800-8FA8-4854-B5FA-8D6A9C76A6B8)

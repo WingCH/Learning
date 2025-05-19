@@ -1,6 +1,166 @@
-# Flutter 效能測試示例
+# Flutter 效能測試專案
 
-這個專案展示了 Flutter 中高效能和低效能版本的比較，並提供集成測試來測量它們的效能差異。
+此專案用於比較 Flutter 不同實現方式的效能差異，特別針對列表捲動效能進行測試。
+
+## 效能測試流程
+
+本專案包含自動化測試腳本，可執行完整的構建和效能測試流程：
+
+1. 構建高效/低效版本的 IPA 檔案
+2. 運行效能測試並收集結果
+3. 生成詳細報告
+
+## 如何使用
+
+### 運行完整測試流程
+
+```bash
+./scripts/run_all.sh
+```
+
+此命令會執行完整的測試流程，包括構建 IPA 檔案、運行效能測試，並生成報告。
+
+### 只構建 IPA 檔案
+
+```bash
+./scripts/build_ipa.sh
+```
+
+此命令會分別構建高效版本和低效版本的 IPA 檔案，並記錄構建時間。
+
+### 只運行效能測試
+
+```bash
+./scripts/run_performance_tests.sh
+```
+
+此命令會使用現有的 IPA 檔案執行效能測試，並收集結果。
+
+## 測試結果檔案
+
+測試完成後，會在 `test_results/` 目錄中生成以下檔案：
+
+- `efficient_scrolling_1.timeline_summary.json` - 高效版本測試結果摘要
+- `inefficient_scrolling_1.timeline_summary.json` - 低效版本測試結果摘要
+- `performance_report.json` - 完整測試報告
+- `build_times.json` - 構建時間記錄
+- `test_times.json` - 測試時間記錄
+
+## 報告格式
+
+完整測試後，會在 `test_results/performance_report.json` 生成一份詳細的 JSON 報告，按照測試用例分組整理結果：
+
+```json
+{
+  "timestamp": "2023-05-01T10:00:00Z",
+  "test_cases": {
+    "efficient": {
+      "build_time": {
+        "total_seconds": 60,
+        "formatted": "00:01:00",
+        "status": "success"
+      },
+      "test_times": {
+        "runs": {
+          "test_1": {
+            "total_seconds": 30,
+            "formatted": "00:00:30",
+            "status": "success"
+          }
+        },
+        "total": {
+          "total_seconds": 30,
+          "formatted": "00:00:30"
+        }
+      },
+      "results": [
+        {
+          "average_frame_build_time_millis": 4.0,
+          "worst_frame_build_time_millis": 8.0,
+          "missed_frame_build_budget_count": 0
+        }
+      ],
+      "files": [
+        "/Users/username/project/test_results/efficient_scrolling_1.timeline_summary.json"
+      ]
+    },
+    "inefficient": {
+      "build_time": {
+        "total_seconds": 60,
+        "formatted": "00:01:00",
+        "status": "success"
+      },
+      "test_times": {
+        "runs": {
+          "test_1": {
+            "total_seconds": 35,
+            "formatted": "00:00:35",
+            "status": "success"
+          }
+        },
+        "total": {
+          "total_seconds": 35,
+          "formatted": "00:00:35"
+        }
+      },
+      "results": [
+        {
+          "average_frame_build_time_millis": 12.0,
+          "worst_frame_build_time_millis": 20.0,
+          "missed_frame_build_budget_count": 5
+        }
+      ],
+      "files": [
+        "/Users/username/project/test_results/inefficient_scrolling_1.timeline_summary.json"
+      ]
+    }
+  },
+  "summary": {
+    "build_status": "success",
+    "test_status": "success",
+    "build_time": {
+      "total_seconds": 120,
+      "formatted": "00:02:00"
+    },
+    "test_time": {
+      "total_seconds": 65,
+      "formatted": "00:01:05"
+    },
+    "total_duration": {
+      "total_seconds": 185,
+      "formatted": "00:03:05"
+    },
+    "completed_at": "2023-05-01T10:30:00Z"
+  }
+}
+```
+
+## 查看報告
+
+可以使用以下命令查看報告：
+
+```bash
+# 查看完整報告
+jq . test_results/performance_report.json | less
+
+# 查看高效版本測試結果
+jq '.test_cases.efficient' test_results/performance_report.json
+
+# 查看低效版本測試結果
+jq '.test_cases.inefficient' test_results/performance_report.json
+
+# 查看高效版本測試結果檔案路徑
+jq '.test_cases.efficient.files' test_results/performance_report.json
+
+# 查看低效版本測試結果檔案路徑
+jq '.test_cases.inefficient.files' test_results/performance_report.json
+```
+
+## 注意事項
+
+- 確保已安裝 `jq` 工具，用於處理 JSON 數據
+- 確保已安裝 Flutter 和 FVM（Flutter Version Manager）
+- 設備 ID 需要在 `run_performance_tests.sh` 中設定，可透過 `flutter devices` 或 `xcrun xctrace list devices` 獲取
 
 ## 效能測試說明
 
@@ -176,4 +336,3 @@ xcodebuild test-without-building \
 ```
 
 > 在Firebase Test Lab入面不支援Flutter Drive的time summary統計數據
-

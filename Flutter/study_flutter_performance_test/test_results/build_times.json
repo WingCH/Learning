@@ -1,0 +1,16 @@
+{
+  "efficient_build": {
+    "total_seconds": 84,
+    "formatted": "00:01:24",
+    "status": "success"
+  },
+  "inefficient_build": {
+    "total_seconds": 90,
+    "formatted": "00:01:30",
+    "status": "success"
+  },
+  "total": {
+    "total_seconds": 174,
+    "formatted": "00:02:54"
+  }
+}

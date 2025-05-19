@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-05-19T02:58:06Z",
+  "test_cases": {
+    "efficient": {
+      "build_time": {"total_seconds":84,"formatted":"00:01:24","status":"success"},
+      "files": ["/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/test_results/ios/efficient_scrolling/efficient_scrolling_1.timeline_summary.json"]
+    },
+    "inefficient": {
+      "build_time": {"total_seconds":90,"formatted":"00:01:30","status":"success"},
+      "files": ["/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/test_results/ios/inefficient_scrolling/inefficient_scrolling_1.timeline_summary.json"]
+    }
+  },
+  "summary": {
+    "build_time": {
+      "total_seconds": 174,
+      "formatted": "00:02:54"
+    },
+    "build_status": "success",
+    "test_time": {
+      "total_seconds": 99,
+      "formatted": "00:01:39"
+    },
+    "test_status": "success",
+    "total_duration": {
+      "total_seconds": 273,
+      "formatted": "00:04:33"
+    },
+    "completed_at": "2025-05-19T02:58:06Z"
+  }
+}

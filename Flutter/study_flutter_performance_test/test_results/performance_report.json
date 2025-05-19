@@ -1,66 +1,43 @@
 {
-  "timestamp": "2025-05-19T03:58:26Z",
+  "timestamp": "2025-05-19T06:13:10Z",
+  "platform": "ios",
   "build": {
   "builds": [
     {
       "name": "efficient_list_test",
       "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/efficient_list_test.dart",
-      "total_seconds": 87,
-      "formatted": "00:01:27",
+      "total_seconds": 91,
+      "formatted": "00:01:31",
       "status": "success"
     },
     {
       "name": "inefficient_list_test",
       "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/inefficient_list_test.dart",
-      "total_seconds": 91,
-      "formatted": "00:01:31",
+      "total_seconds": 88,
+      "formatted": "00:01:28",
       "status": "success"
     }
   ],
   "total": {
-    "total_seconds": 178,
-    "formatted": "00:02:58"
-  }
-},
-  "tests": {
-  "tests": [
-    {
-      "name": "efficient_list_test",
-      "run": 1,
-      "total_seconds": 27,
-      "formatted": "00:00:27",
-      "status": "success",
-      "result_file": "test_results/ios/efficient_list_test/efficient_scrolling_1.timeline_summary.json"
-    },
-    {
-      "name": "inefficient_list_test",
-      "run": 1,
-      "total_seconds": 47,
-      "formatted": "00:00:47",
-      "status": "success",
-      "result_file": "test_results/ios/inefficient_list_test/inefficient_scrolling_1.timeline_summary.json"
-    }
-  ],
-  "total": {
-    "total_seconds": 74,
-    "formatted": "00:01:14"
+    "total_seconds": 179,
+    "formatted": "00:02:59"
   }
 },
   "summary": {
     "build_time": {
-      "total_seconds": 178,
-      "formatted": "00:02:58"
+      "total_seconds": 179,
+      "formatted": "00:02:59"
     },
     "build_status": "success",
     "test_time": {
-      "total_seconds": 81,
-      "formatted": "00:01:21"
+      "total_seconds": 19,
+      "formatted": "00:00:19"
     },
     "test_status": "success",
     "total_duration": {
-      "total_seconds": 259,
-      "formatted": "00:04:19"
+      "total_seconds": 198,
+      "formatted": "00:03:18"
     },
-    "completed_at": "2025-05-19T03:58:26Z"
+    "completed_at": "2025-05-19T06:13:10Z"
   }
 }

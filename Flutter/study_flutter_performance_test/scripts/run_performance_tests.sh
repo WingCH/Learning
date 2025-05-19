@@ -4,9 +4,28 @@
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+# 載入環境變數配置
+ENV_FILE="$(cd "$(dirname "$0")" && pwd)/.env"
+if [ -f "$ENV_FILE" ]; then
+  echo "載入 scripts/.env 配置文件"
+  # 讀取環境變數
+  while IFS='=' read -r key value || [ -n "$key" ]; do
+    # 跳過註釋和空行
+    [[ $key =~ ^#.*$ || -z $key ]] && continue
+    # 設定環境變數
+    export "$key"="$value"
+    echo "設定環境變數: $key"
+  done < "$ENV_FILE"
+else
+  echo "錯誤：找不到 scripts/.env 配置文件"
+  echo "請複製 scripts/.env.template 文件為 scripts/.env 並填入正確的設備 ID"
+  exit 1
+fi
+
 # 創建結果目錄
 mkdir -p test_results
 mkdir -p test_results/ios
+mkdir -p test_results/android
 
 # 時間格式化函數 (兼容 macOS)
 format_duration() {
@@ -20,32 +39,71 @@ format_duration() {
 # 要運行的測試次數
 TEST_COUNT=1
 
-# 獲取設備 ID
-get_device_id() {
-  # 使用 xcrun xctrace 獲取可用的 iOS 設備清單
-  local devices=$(xcrun xctrace list devices)
-  
-  # 尋找第一個 iPhone 或 iPad 設備
-  local device_id=$(echo "$devices" | grep -E 'iPhone|iPad' | grep -v "Simulator" | head -1 | sed -E 's/^.* ([A-Fa-f0-9\-]+)$/\1/')
-  
-  if [ -z "$device_id" ]; then
-    echo "無法自動找到連接的 iOS 設備。"
-    echo "請手動指定設備 ID，可以通過運行 'xcrun xctrace list devices' 獲取："
-    read -p "設備 ID: " device_id
+# 初始化平台變數（不預設值）
+PLATFORM=""
+
+# 解析命令行參數
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    --platform)
+      PLATFORM="$2"
+      shift
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+# 驗證平台參數
+if [[ "$PLATFORM" != "ios" && "$PLATFORM" != "android" ]]; then
+  echo "錯誤：必須指定平台為 'ios' 或 'android'"
+  echo "使用方式：$0 --platform ios|android"
+  exit 1
+fi
+
+# 獲取 iOS 設備 ID
+get_ios_device_id() {
+  # 檢查環境變數
+  if [ -n "$IOS_DEVICE_ID" ]; then
+    echo "使用 scripts/.env 中的 iOS 設備 ID: $IOS_DEVICE_ID"
+    echo "$IOS_DEVICE_ID"
+    return
   fi
   
-  echo "$device_id"
+  # 若環境變數未設定，顯示錯誤
+  echo "錯誤：未在 scripts/.env 文件中設定 IOS_DEVICE_ID"
+  echo "請在 scripts/.env 文件中設定正確的 iOS 設備 ID"
+  exit 1
 }
 
-# 獲取設備 ID
-DEVICE_ID=$(get_device_id)
-if [ -z "$DEVICE_ID" ]; then
-  echo "錯誤：未指定設備 ID，無法繼續"
+# 獲取 Android 設備 ID
+get_android_device_id() {
+  # 檢查環境變數
+  if [ -n "$ANDROID_DEVICE_ID" ]; then
+    echo "使用 scripts/.env 中的 Android 設備 ID: $ANDROID_DEVICE_ID"
+    echo "$ANDROID_DEVICE_ID"
+    return
+  fi
+  
+  # 若環境變數未設定，顯示錯誤
+  echo "錯誤：未在 scripts/.env 文件中設定 ANDROID_DEVICE_ID"
+  echo "請在 scripts/.env 文件中設定正確的 Android 設備 ID"
   exit 1
+}
+
+# 根據選擇的平台獲取設備 ID
+if [ "$PLATFORM" == "ios" ]; then
+  DEVICE_ID=$(get_ios_device_id)
+else
+  DEVICE_ID=$(get_android_device_id)
 fi
 
 echo "===== 開始效能測試 ====="
 echo "將會運行每個測試 $TEST_COUNT 次"
+echo "平台: $PLATFORM"
 echo "設備 ID: $DEVICE_ID"
 
 # 尋找 integration_test 目錄中所有的測試檔案
@@ -76,25 +134,40 @@ for test_file in "${TEST_FILES[@]}"; do
   test_name=$(basename "$test_file" .dart)
   
   # 創建測試結果目錄
-  mkdir -p "test_results/ios/${test_name}"
+  mkdir -p "test_results/$PLATFORM/${test_name}"
   
   echo -e "\n===== 運行 $test_name 測試 ====="
   
-  # 檢查是否有預構建的 IPA
-  IPA_PATH="$PROJECT_ROOT/build/${test_name}_ipa/study_flutter_performance_test.ipa"
-  if [ ! -f "$IPA_PATH" ]; then
-    echo "警告：找不到 $test_name 的預構建 IPA：$IPA_PATH"
-    echo "將使用默認 IPA 路徑..."
-    IPA_PATH="$PROJECT_ROOT/build/ios/ipa/study_flutter_performance_test.ipa"
-    
-    if [ ! -f "$IPA_PATH" ]; then
-      echo "錯誤：找不到默認 IPA 檔案：$IPA_PATH"
-      echo "請先運行 './scripts/build_ipa.sh' 構建 IPA 檔案"
-      continue
+  # 檢查是否有預構建的二進制檔案
+  if [ "$PLATFORM" == "ios" ]; then
+    BINARY_PATH="$PROJECT_ROOT/build/${test_name}_ipa/study_flutter_performance_test.ipa"
+    if [ ! -f "$BINARY_PATH" ]; then
+      echo "警告：找不到 $test_name 的預構建 IPA：$BINARY_PATH"
+      echo "將使用默認 IPA 路徑..."
+      BINARY_PATH="$PROJECT_ROOT/build/ios/ipa/study_flutter_performance_test.ipa"
+      
+      if [ ! -f "$BINARY_PATH" ]; then
+        echo "錯誤：找不到默認 IPA 檔案：$BINARY_PATH"
+        echo "請先運行 './scripts/build_ipa.sh' 構建 IPA 檔案"
+        continue
+      fi
+    fi
+  else
+    BINARY_PATH="$PROJECT_ROOT/build/${test_name}_apk/app-profile.apk"
+    if [ ! -f "$BINARY_PATH" ]; then
+      echo "警告：找不到 $test_name 的預構建 APK：$BINARY_PATH"
+      echo "將使用默認 APK 路徑..."
+      BINARY_PATH="$PROJECT_ROOT/build/app/outputs/flutter-apk/app-profile.apk"
+      
+      if [ ! -f "$BINARY_PATH" ]; then
+        echo "錯誤：找不到默認 APK 檔案：$BINARY_PATH"
+        echo "請先運行 './scripts/build_apk.sh' 構建 APK 檔案"
+        continue
+      fi
     fi
   fi
   
-  echo "使用 IPA 檔案: $IPA_PATH"
+  echo "使用二進制檔案: $BINARY_PATH"
   
   # 根據測試名稱直接匹配對應的 driver 檔案
   driver_file="${PROJECT_ROOT}/test_driver/${test_name}_driver.dart"
@@ -116,12 +189,12 @@ for test_file in "${TEST_FILES[@]}"; do
     # 記錄測試開始時間
     START_TIME=$(date +%s)
     
-    # 使用 IPA 運行測試
+    # 使用二進制檔案運行測試
     fvm flutter drive \
       --driver="$driver_file" \
       --target="$test_file" \
       --profile \
-      --use-application-binary "$IPA_PATH" \
+      --use-application-binary "$BINARY_PATH" \
       -d $DEVICE_ID
     
     # 檢查測試是否成功
@@ -137,7 +210,7 @@ for test_file in "${TEST_FILES[@]}"; do
     
     if [ $TEST_STATUS -eq 0 ] && [ -f "$RESULT_FILE" ]; then
       # 複製結果文件並添加序號
-      TARGET_FILE="test_results/ios/${test_name}/${result_mode}_scrolling_$i.timeline_summary.json"
+      TARGET_FILE="test_results/$PLATFORM/${test_name}/${result_mode}_scrolling_$i.timeline_summary.json"
       cp "$RESULT_FILE" "$TARGET_FILE"
       
       echo "$test_name 測試 #$i 完成並保存結果"
@@ -157,4 +230,4 @@ TOTAL_TEST_FORMATTED=$(format_duration $TOTAL_TEST_DURATION)
 echo -e "\n===== 測試完成 ====="
 echo "總計運行了 ${#TEST_FILES[@]} 個測試檔案，每個檔案 $TEST_COUNT 次測試"
 echo "總測試時間: $TOTAL_TEST_FORMATTED"
-echo "所有結果已保存到: test_results/ios/ 目錄"
+echo "所有結果已保存到: test_results/$PLATFORM/ 目錄"

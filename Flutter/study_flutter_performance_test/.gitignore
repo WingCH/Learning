@@ -48,4 +48,5 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 
-ios/build
+ios/build.env
+scripts/.env

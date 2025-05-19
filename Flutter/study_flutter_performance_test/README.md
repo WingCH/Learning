@@ -15,35 +15,51 @@
 ### 運行完整測試流程
 
 ```bash
-./scripts/run_all.sh
+# iOS 測試流程
+./scripts/run_all.sh --platform ios
+
+# Android 測試流程
+./scripts/run_all.sh --platform android
 ```
 
-此命令會執行完整的測試流程，包括構建 IPA 檔案、運行效能測試，並生成報告。
+此命令會執行完整的測試流程，包括構建 IPA/APK 檔案、運行效能測試，並生成報告。
 
-### 只構建 IPA 檔案
+### 只構建 IPA/APK 檔案
 
 ```bash
+# 構建 iOS IPA 檔案
 ./scripts/build_ipa.sh
+
+# 構建 Android APK 檔案
+./scripts/build_apk.sh
 ```
 
-此命令會分別構建高效版本和低效版本的 IPA 檔案，並記錄構建時間。
+此命令會分別構建高效版本和低效版本的 IPA/APK 檔案，並記錄構建時間。
 
 ### 只運行效能測試
 
 ```bash
-./scripts/run_performance_tests.sh
+# 運行 iOS 測試
+./scripts/run_performance_tests.sh --platform ios
+
+# 運行 Android 測試
+./scripts/run_performance_tests.sh --platform android
 ```
 
-此命令會使用現有的 IPA 檔案執行效能測試，並收集結果。
+此命令會使用現有的 IPA/APK 檔案執行效能測試，並收集結果。測試會使用在 `scripts/.env` 中配置的設備 ID。
 
 ## 測試結果檔案
 
-測試完成後，會在 `test_results/` 目錄中生成以下檔案：
+測試完成後，會在 `test_results/[平台名稱]/` 目錄中生成以下檔案：
 
 - `efficient_scrolling_1.timeline_summary.json` - 高效版本測試結果摘要
 - `inefficient_scrolling_1.timeline_summary.json` - 低效版本測試結果摘要
 - `performance_report.json` - 完整測試報告
 - `build_times.json` - 構建時間記錄
+
+不同平台的結果會分別保存在對應的目錄中：
+- iOS 測試結果：`test_results/ios/`
+- Android 測試結果：`test_results/android/`
 
 ## 報告格式
 
@@ -159,7 +175,10 @@ jq '.test_cases.inefficient.files' test_results/performance_report.json
 
 - 確保已安裝 `jq` 工具，用於處理 JSON 數據
 - 確保已安裝 Flutter 和 FVM（Flutter Version Manager）
-- 設備 ID 需要在 `run_performance_tests.sh` 中設定，可透過 `flutter devices` 或 `xcrun xctrace list devices` 獲取
+- 必須在 `scripts/.env` 文件中設定測試設備的 ID
+- iOS 設備 ID 可以透過 `xcrun xctrace list devices` 獲取
+- Android 設備需要連接並啟用 USB 調試，設備 ID 可以通過 `adb devices` 獲取
+- 請確保 Android 設備已經在開發者選項中啟用 USB 調試模式
 
 ## 效能測試說明
 
@@ -172,7 +191,7 @@ jq '.test_cases.inefficient.files' test_results/performance_report.json
 
 ### 單次測試
 
-#### 測試優化版本
+#### 測試 iOS 上的優化版本
 
 ```bash
 fvm flutter drive \
@@ -183,7 +202,7 @@ fvm flutter drive \
   -d 00008130-001435102EC0001C
 ```
 
-#### 測試低效能版本
+#### 測試 iOS 上的低效能版本
 
 ```bash
 fvm flutter drive \
@@ -194,6 +213,28 @@ fvm flutter drive \
   -d 00008130-001435102EC0001C
 ```
 
+#### 測試 Android 上的優化版本
+
+```bash
+fvm flutter drive \
+  --driver=test_driver/efficient_driver.dart \
+  --target=integration_test/efficient_list_test.dart \
+  --no-dds \
+  --profile \
+  -d 39181FDJG006N3
+```
+
+#### 測試 Android 上的低效能版本
+
+```bash
+fvm flutter drive \
+  --driver=test_driver/inefficient_driver.dart \
+  --target=integration_test/inefficient_list_test.dart \
+  --no-dds \
+  --profile \
+  -d 39181FDJG006N3
+```
+
 ### 批量測試
 
 我們也提供了一個腳本，可以自動連續執行多次測試，並整理結果：
@@ -202,12 +243,15 @@ fvm flutter drive \
 # 確保腳本有執行權限
 chmod +x ./scripts/run_all.sh
 
-# 執行完整測試流程（構建IPA並運行測試）
-./scripts/run_all.sh
+# 執行完整測試流程（構建二進制檔案並運行測試）
+./scripts/run_all.sh --platform ios    # 運行 iOS 測試
+./scripts/run_all.sh --platform android  # 運行 Android 測試
 
 # 或者單獨執行各個步驟
-./scripts/build_ipa.sh          # 僅構建IPA檔案
-./scripts/run_performance_tests.sh  # 僅運行測試(需要已構建的IPA)
+./scripts/build_ipa.sh          # 僅構建 iOS IPA 檔案
+./scripts/build_apk.sh          # 僅構建 Android APK 檔案
+./scripts/run_performance_tests.sh --platform ios    # 僅運行 iOS 測試(需要已構建的 IPA)
+./scripts/run_performance_tests.sh --platform android  # 僅運行 Android 測試(需要已構建的 APK)
 ```
 
 此腳本會：
@@ -272,7 +316,9 @@ chmod +x ./scripts/run_all.sh
 
 # Pre-build binary and run test
 
-## Pre-build ipa
+## iOS 平台
+
+### Pre-build IPA
 ```bash
 fvm flutter build ipa \
 --target=integration_test/inefficient_list_test.dart \
@@ -280,14 +326,7 @@ fvm flutter build ipa \
 --export-method development
 ```
 
-## Pre-build apk
-```bash
-fvm flutter build apk \
---target=integration_test/inefficient_list_test.dart \
---profile
-```
-
-## Run test with pre-build ipa
+### Run test with pre-build IPA
 ```bash
 # `--target` option seems can be ignored because the `build ipa` command already specifies the target.
 fvm flutter drive \
@@ -299,8 +338,17 @@ fvm flutter drive \
   -d 00008130-001435102EC0001C
 ```
 
-## Run test with pre-build apk
+## Android 平台
+
+### Pre-build APK
+```bash
+fvm flutter build apk \
+--target=integration_test/inefficient_list_test.dart \
+--profile
 ```
+
+### Run test with pre-build APK
+```bash
 fvm flutter drive \
   --driver=test_driver/inefficient_list_test_driver.dart \
   --target=integration_test/inefficient_list_test.dart \
@@ -310,7 +358,9 @@ fvm flutter drive \
   -d 39181FDJG006N3
 ```
 
-## if no need TimelineSummary, just run test (don't support pre-build ipa)
+## 通用測試指令
+
+### If no need TimelineSummary, just run test (don't support pre-build binary)
 https://github.com/flutter/flutter/issues/114541
 ```bash
 fvm flutter test integration_test/inefficient_list_test.dart \
@@ -355,3 +405,33 @@ xcodebuild test-without-building \
 ```
 
 > 在Firebase Test Lab入面不支援Flutter Drive的time summary統計數據
+
+## 配置設備 ID
+
+為了方便測試，必須通過 `scripts/.env` 文件設置 iOS 和 Android 設備的 ID。
+
+### 設置方法
+
+1. 複製 `scripts/.env.template` 文件為 `scripts/.env`：
+
+```bash
+cp scripts/.env.template scripts/.env
+```
+
+2. 編輯 `scripts/.env` 文件，填入你的設備 ID：
+
+```bash
+# 設備 ID 環境設定
+
+# iOS 設備 ID (可通過 xcrun xctrace list devices 獲取)
+IOS_DEVICE_ID=你的iOS設備ID
+
+# Android 設備 ID (可通過 adb devices 獲取)
+ANDROID_DEVICE_ID=你的Android設備ID
+```
+
+3. 獲取設備 ID 的方法：
+   - iOS 設備：執行 `xcrun xctrace list devices` 命令
+   - Android 設備：執行 `adb devices` 命令
+
+所有測試腳本現在都必須使用 `.env` 文件中設定的設備 ID，不再支援自動檢測或手動輸入設備 ID。

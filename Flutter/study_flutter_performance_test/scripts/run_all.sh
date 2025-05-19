@@ -4,9 +4,34 @@
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+# 初始化平台變數（不預設值）
+PLATFORM=""
+
+# 解析命令行參數
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    --platform)
+      PLATFORM="$2"
+      shift
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+# 驗證平台參數
+if [[ "$PLATFORM" != "ios" && "$PLATFORM" != "android" ]]; then
+  echo "錯誤：必須指定平台為 'ios' 或 'android'"
+  echo "使用方式：$0 --platform ios|android"
+  exit 1
+fi
+
 # 創建報告目錄
 mkdir -p test_results
-mkdir -p test_results/ios
+mkdir -p test_results/$PLATFORM
 
 # 時間格式化函數 (兼容 macOS)
 format_duration() {
@@ -18,21 +43,29 @@ format_duration() {
 }
 
 echo "===== Flutter 效能測試全流程 ====="
-echo "1. 構建測試 IPA 檔案"
+echo "平台: $PLATFORM"
+echo "1. 構建測試二進制檔案"
 echo "2. 運行效能測試"
 echo "3. 生成測試報告"
 
 # 確保腳本有執行權限
 chmod +x ./scripts/build_ipa.sh
+chmod +x ./scripts/build_apk.sh
 chmod +x ./scripts/run_performance_tests.sh
 
 # 初始化報告檔案路徑
 REPORT_FILE="$PROJECT_ROOT/test_results/performance_report.json"
 
-# 步驟 1: 構建 IPA 檔案
-echo -e "\n===== 步驟 1: 構建 IPA 檔案 ====="
+# 步驟 1: 構建二進制檔案
+echo -e "\n===== 步驟 1: 構建二進制檔案 ====="
 START_BUILD_TIME=$(date +%s)
-./scripts/build_ipa.sh
+
+# 根據平台選擇構建命令
+if [ "$PLATFORM" == "ios" ]; then
+  ./scripts/build_ipa.sh
+else
+  ./scripts/build_apk.sh
+fi
 
 # 檢查構建是否成功
 BUILD_STATUS=$?
@@ -48,13 +81,14 @@ fi
 
 # 如果構建失敗，則生成報告並退出
 if [ $BUILD_STATUS -ne 0 ]; then
-  echo "IPA構建失敗，退出測試"
+  echo "二進制檔案構建失敗，退出測試"
   BUILD_STATUS_STR="failed"
   
   # 創建失敗的報告
   cat > $REPORT_FILE << EOF
 {
   "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "platform": "$PLATFORM",
   "build": $BUILD_TIMES,
   "tests": [],
   "summary": {
@@ -77,7 +111,8 @@ BUILD_STATUS_STR="success"
 # 步驟 2: 運行效能測試
 echo -e "\n===== 步驟 2: 運行效能測試 ====="
 START_TEST_TIME=$(date +%s)
-./scripts/run_performance_tests.sh
+# 將平台參數傳遞給測試腳本
+./scripts/run_performance_tests.sh --platform $PLATFORM
 
 # 檢查測試是否成功
 TEST_STATUS=$?
@@ -91,7 +126,7 @@ echo -e "\n===== 步驟 3: 生成測試報告 ====="
 # 查找測試結果目錄的所有測試目錄
 echo "搜尋測試結果目錄..."
 TEST_DIRECTORIES=()
-for dir in "$PROJECT_ROOT/test_results/ios"/*; do
+for dir in "$PROJECT_ROOT/test_results/$PLATFORM"/*; do
   if [ -d "$dir" ]; then
     TEST_DIRECTORIES+=("$(basename "$dir")")
   fi
@@ -103,7 +138,7 @@ for dir in "${TEST_DIRECTORIES[@]}"; do
   
   # 查找每個測試目錄中的所有 timeline_summary 檔案
   RESULT_FILES=()
-  for file in "$PROJECT_ROOT/test_results/ios/$dir"/*.timeline_summary.json; do
+  for file in "$PROJECT_ROOT/test_results/$PLATFORM/$dir"/*.timeline_summary.json; do
     if [ -f "$file" ]; then
       RESULT_FILES+=("$(basename "$file")")
     fi
@@ -122,6 +157,7 @@ echo "生成最終報告..."
 cat > $REPORT_FILE << EOF
 {
   "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "platform": "$PLATFORM",
   "build": $BUILD_TIMES,
   "summary": {
     "build_time": {

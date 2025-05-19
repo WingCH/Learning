@@ -44,7 +44,6 @@
 - `inefficient_scrolling_1.timeline_summary.json` - 低效版本測試結果摘要
 - `performance_report.json` - 完整測試報告
 - `build_times.json` - 構建時間記錄
-- `test_times.json` - 測試時間記錄
 
 ## 報告格式
 

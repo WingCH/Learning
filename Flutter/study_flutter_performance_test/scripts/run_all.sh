@@ -85,12 +85,6 @@ END_TEST_TIME=$(date +%s)
 TEST_DURATION=$((END_TEST_TIME - START_TEST_TIME))
 TEST_DURATION_FORMATTED=$(format_duration $TEST_DURATION)
 
-# 讀取測試時間
-TEST_TIMES="{}"
-if [ -f "$PROJECT_ROOT/test_results/test_times.json" ]; then
-  TEST_TIMES=$(cat "$PROJECT_ROOT/test_results/test_times.json")
-fi
-
 # 步驟 3: 生成測試報告
 echo -e "\n===== 步驟 3: 生成測試報告 ====="
 
@@ -129,7 +123,6 @@ cat > $REPORT_FILE << EOF
 {
   "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
   "build": $BUILD_TIMES,
-  "tests": $TEST_TIMES,
   "summary": {
     "build_time": {
       "total_seconds": $BUILD_DURATION,
@@ -167,6 +160,4 @@ echo "詳細報告已保存到: $REPORT_FILE"
 echo "可以使用以下命令查看報告摘要:"
 echo "jq . $REPORT_FILE | less"
 echo -e "\n查看構建詳情:"
-echo "jq '.build' $REPORT_FILE | less"
-echo -e "\n查看測試詳情:"
-echo "jq '.tests' $REPORT_FILE | less" 
+echo "jq '.build' $REPORT_FILE | less" 

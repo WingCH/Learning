@@ -68,10 +68,6 @@ for file in "${TEST_FILES[@]}"; do
   echo "- $(basename "$file")"
 done
 
-# 初始化測試時間記錄檔案
-TEST_TIMES_FILE="$PROJECT_ROOT/test_results/test_times.json"
-echo '{"tests": []}' > $TEST_TIMES_FILE
-
 # 總測試時間
 TOTAL_TEST_DURATION=0
 
@@ -147,32 +143,8 @@ for test_file in "${TEST_FILES[@]}"; do
       echo "$test_name 測試 #$i 完成並保存結果"
       echo "測試時間: $DURATION_FORMATTED"
       echo "結果文件路徑: $TARGET_FILE"
-      
-      # 更新測試時間 JSON
-      TMP_FILE=$(mktemp)
-      jq ".tests += [{
-        \"name\": \"$test_name\",
-        \"run\": $i,
-        \"total_seconds\": $DURATION,
-        \"formatted\": \"$DURATION_FORMATTED\",
-        \"status\": \"success\",
-        \"result_file\": \"$TARGET_FILE\"
-      }]" "$TEST_TIMES_FILE" > "$TMP_FILE"
-      mv "$TMP_FILE" "$TEST_TIMES_FILE"
     else
       echo "$test_name 測試 #$i 失敗或找不到結果檔案"
-      
-      # 更新測試時間 JSON（失敗）
-      TMP_FILE=$(mktemp)
-      jq ".tests += [{
-        \"name\": \"$test_name\",
-        \"run\": $i,
-        \"total_seconds\": $DURATION,
-        \"formatted\": \"$DURATION_FORMATTED\",
-        \"status\": \"failed\",
-        \"result_file\": null
-      }]" "$TEST_TIMES_FILE" > "$TMP_FILE"
-      mv "$TMP_FILE" "$TEST_TIMES_FILE"
     fi
     
     # 等待設備冷卻
@@ -180,14 +152,9 @@ for test_file in "${TEST_FILES[@]}"; do
   done
 done
 
-# 更新測試總時間
 TOTAL_TEST_FORMATTED=$(format_duration $TOTAL_TEST_DURATION)
-TMP_FILE=$(mktemp)
-jq ".total = { \"total_seconds\": $TOTAL_TEST_DURATION, \"formatted\": \"$TOTAL_TEST_FORMATTED\" }" "$TEST_TIMES_FILE" > "$TMP_FILE"
-mv "$TMP_FILE" "$TEST_TIMES_FILE"
 
 echo -e "\n===== 測試完成 ====="
 echo "總計運行了 ${#TEST_FILES[@]} 個測試檔案，每個檔案 $TEST_COUNT 次測試"
 echo "總測試時間: $TOTAL_TEST_FORMATTED"
 echo "所有結果已保存到: test_results/ios/ 目錄"
-echo "測試時間詳情已保存到: $TEST_TIMES_FILE"

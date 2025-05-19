@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "efficient_list_test",
+      "run": 1,
+      "total_seconds": 27,
+      "formatted": "00:00:27",
+      "status": "success",
+      "result_file": "test_results/ios/efficient_list_test/efficient_scrolling_1.timeline_summary.json"
+    },
+    {
+      "name": "inefficient_list_test",
+      "run": 1,
+      "total_seconds": 47,
+      "formatted": "00:00:47",
+      "status": "success",
+      "result_file": "test_results/ios/inefficient_list_test/inefficient_scrolling_1.timeline_summary.json"
+    }
+  ],
+  "total": {
+    "total_seconds": 74,
+    "formatted": "00:01:14"
+  }
+}

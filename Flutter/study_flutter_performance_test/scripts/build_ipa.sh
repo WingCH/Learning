@@ -4,16 +4,13 @@
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
-# 確保build目錄存在
+# 確保構建目錄存在
 mkdir -p build
 mkdir -p test_results
 
 # 初始化構建時間 JSON
 BUILD_TIMES_FILE="$PROJECT_ROOT/test_results/build_times.json"
-echo '{
-  "efficient_build": {},
-  "inefficient_build": {}
-}' > $BUILD_TIMES_FILE
+echo '{"builds": []}' > $BUILD_TIMES_FILE
 
 # 時間格式化函數 (兼容 macOS)
 format_duration() {
@@ -24,87 +21,83 @@ format_duration() {
   printf "%02d:%02d:%02d" $hours $minutes $secs
 }
 
-echo "===== 開始構建IPA檔案 ====="
+echo "===== 開始動態構建IPA檔案 ====="
 
-# 構建高效版本的IPA
-echo -e "\n===== 預先構建高效版本IPA ====="
-START_EFFICIENT_BUILD=$(date +%s)
+# 尋找 integration_test 目錄中所有的測試檔案
+TEST_FILES=()
+for file in "$PROJECT_ROOT/integration_test"/*.dart; do
+  if [[ -f "$file" && $(basename "$file") != "_"* ]]; then
+    # 排除以下划線開頭的檔案（可能是幫助檔案或其他非測試檔案）
+    TEST_FILES+=("$file")
+  fi
+done
 
-fvm flutter build ipa \
-  --target=integration_test/efficient_list_test.dart \
-  --profile \
-  --export-method development
-
-BUILD_STATUS=$?
-END_EFFICIENT_BUILD=$(date +%s)
-EFFICIENT_BUILD_DURATION=$((END_EFFICIENT_BUILD - START_EFFICIENT_BUILD))
-EFFICIENT_BUILD_FORMATTED=$(format_duration $EFFICIENT_BUILD_DURATION)
-
-# 更新構建時間 JSON
-TMP_FILE=$(mktemp)
-jq ".efficient_build = { \"total_seconds\": $EFFICIENT_BUILD_DURATION, \"formatted\": \"$EFFICIENT_BUILD_FORMATTED\", \"status\": \"$([ $BUILD_STATUS -eq 0 ] && echo "success" || echo "failed")\" }" $BUILD_TIMES_FILE > $TMP_FILE
-mv $TMP_FILE $BUILD_TIMES_FILE
-
-if [ $BUILD_STATUS -ne 0 ]; then
-  echo "構建高效版本IPA失敗，退出"
+# 如果沒有找到測試檔案，則退出
+if [ ${#TEST_FILES[@]} -eq 0 ]; then
+  echo "錯誤：在 integration_test 目錄中沒有找到測試檔案"
   exit 1
 fi
 
-EFFICIENT_IPA_PATH="$PROJECT_ROOT/build/ios/ipa/study_flutter_performance_test.ipa"
-echo "高效版本IPA已構建: $EFFICIENT_IPA_PATH"
-echo "構建時間: $EFFICIENT_BUILD_FORMATTED"
+echo "找到 ${#TEST_FILES[@]} 個測試檔案："
+for file in "${TEST_FILES[@]}"; do
+  echo "- $(basename "$file")"
+done
 
-# 備份高效版本IPA
-mkdir -p build/efficient_ipa
-cp -r build/ios/ipa/* build/efficient_ipa/
-echo "高效版本IPA已備份到: build/efficient_ipa/"
+# 總構建時間
+TOTAL_BUILD_DURATION=0
 
-# 構建低效版本的IPA
-echo -e "\n===== 預先構建低效版本IPA ====="
-START_INEFFICIENT_BUILD=$(date +%s)
+# 循環構建每個測試檔案的 IPA
+for test_file in "${TEST_FILES[@]}"; do
+  test_name=$(basename "$test_file" .dart)
+  echo -e "\n===== 構建 $test_name IPA ====="
+  START_BUILD=$(date +%s)
 
-fvm flutter build ipa \
-  --target=integration_test/inefficient_list_test.dart \
-  --profile \
-  --export-method development
+  # 構建 IPA
+  fvm flutter build ipa \
+    --target="$test_file" \
+    --profile \
+    --export-method development
 
-BUILD_STATUS=$?
-END_INEFFICIENT_BUILD=$(date +%s)
-INEFFICIENT_BUILD_DURATION=$((END_INEFFICIENT_BUILD - START_INEFFICIENT_BUILD))
-INEFFICIENT_BUILD_FORMATTED=$(format_duration $INEFFICIENT_BUILD_DURATION)
+  BUILD_STATUS=$?
+  END_BUILD=$(date +%s)
+  BUILD_DURATION=$((END_BUILD - START_BUILD))
+  BUILD_DURATION_FORMATTED=$(format_duration $BUILD_DURATION)
+  TOTAL_BUILD_DURATION=$((TOTAL_BUILD_DURATION + BUILD_DURATION))
 
-# 更新構建時間 JSON
-TMP_FILE=$(mktemp)
-jq ".inefficient_build = { \"total_seconds\": $INEFFICIENT_BUILD_DURATION, \"formatted\": \"$INEFFICIENT_BUILD_FORMATTED\", \"status\": \"$([ $BUILD_STATUS -eq 0 ] && echo "success" || echo "failed")\" }" $BUILD_TIMES_FILE > $TMP_FILE
-mv $TMP_FILE $BUILD_TIMES_FILE
+  # 更新構建時間 JSON
+  TMP_FILE=$(mktemp)
+  jq ".builds += [{
+    \"name\": \"$test_name\",
+    \"file\": \"$test_file\",
+    \"total_seconds\": $BUILD_DURATION,
+    \"formatted\": \"$BUILD_DURATION_FORMATTED\",
+    \"status\": \"$([ $BUILD_STATUS -eq 0 ] && echo "success" || echo "failed")\"
+  }]" $BUILD_TIMES_FILE > $TMP_FILE
+  mv $TMP_FILE $BUILD_TIMES_FILE
 
-if [ $BUILD_STATUS -ne 0 ]; then
-  echo "構建低效版本IPA失敗，退出"
-  exit 1
-fi
+  if [ $BUILD_STATUS -ne 0 ]; then
+    echo "構建 $test_name IPA失敗，跳過"
+    continue
+  fi
 
-INEFFICIENT_IPA_PATH="$PROJECT_ROOT/build/ios/ipa/study_flutter_performance_test.ipa"
-echo "低效版本IPA已構建: $INEFFICIENT_IPA_PATH"
-echo "構建時間: $INEFFICIENT_BUILD_FORMATTED"
+  IPA_PATH="$PROJECT_ROOT/build/ios/ipa/study_flutter_performance_test.ipa"
+  echo "$test_name IPA已構建: $IPA_PATH"
+  echo "構建時間: $BUILD_DURATION_FORMATTED"
 
-# 備份低效版本IPA
-mkdir -p build/inefficient_ipa
-cp -r build/ios/ipa/* build/inefficient_ipa/
-echo "低效版本IPA已備份到: build/inefficient_ipa/"
+  # 備份當前測試的 IPA
+  mkdir -p "build/${test_name}_ipa"
+  cp -r build/ios/ipa/* "build/${test_name}_ipa/"
+  echo "$test_name IPA已備份到: build/${test_name}_ipa/"
+done
 
-# 將構建時間添加到總構建時間 JSON
-TOTAL_BUILD_DURATION=$((EFFICIENT_BUILD_DURATION + INEFFICIENT_BUILD_DURATION))
+# 將總構建時間添加到構建時間 JSON
 TOTAL_BUILD_FORMATTED=$(format_duration $TOTAL_BUILD_DURATION)
 TMP_FILE=$(mktemp)
 jq ".total = { \"total_seconds\": $TOTAL_BUILD_DURATION, \"formatted\": \"$TOTAL_BUILD_FORMATTED\" }" $BUILD_TIMES_FILE > $TMP_FILE
 mv $TMP_FILE $BUILD_TIMES_FILE
 
 echo -e "\n===== IPA構建完成 ====="
-echo "高效版本IPA位置: build/efficient_ipa/study_flutter_performance_test.ipa"
-echo "低效版本IPA位置: $INEFFICIENT_IPA_PATH (當前IPA檔案)"
-echo "構建時間總結:"
-echo "- 高效版本: $EFFICIENT_BUILD_FORMATTED"
-echo "- 低效版本: $INEFFICIENT_BUILD_FORMATTED"
-echo "- 總計: $TOTAL_BUILD_FORMATTED"
-echo "構建時間已保存到: $BUILD_TIMES_FILE"
+echo "總共構建了 ${#TEST_FILES[@]} 個測試的 IPA 檔案"
+echo "構建時間總計: $TOTAL_BUILD_FORMATTED"
+echo "構建時間詳情已保存到: $BUILD_TIMES_FILE"
 echo "可以運行 './scripts/run_performance_tests.sh' 開始測試" 

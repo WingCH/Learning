@@ -1,16 +1,22 @@
 {
-  "efficient_build": {
-    "total_seconds": 84,
-    "formatted": "00:01:24",
-    "status": "success"
-  },
-  "inefficient_build": {
-    "total_seconds": 90,
-    "formatted": "00:01:30",
-    "status": "success"
-  },
+  "builds": [
+    {
+      "name": "efficient_list_test",
+      "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/efficient_list_test.dart",
+      "total_seconds": 87,
+      "formatted": "00:01:27",
+      "status": "success"
+    },
+    {
+      "name": "inefficient_list_test",
+      "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/inefficient_list_test.dart",
+      "total_seconds": 91,
+      "formatted": "00:01:31",
+      "status": "success"
+    }
+  ],
   "total": {
-    "total_seconds": 174,
-    "formatted": "00:02:54"
+    "total_seconds": 178,
+    "formatted": "00:02:58"
   }
 }

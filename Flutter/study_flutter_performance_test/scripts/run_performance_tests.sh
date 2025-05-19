@@ -68,14 +68,14 @@ fi
 get_ios_device_id() {
   # 檢查環境變數
   if [ -n "$IOS_DEVICE_ID" ]; then
-    echo "使用 scripts/.env 中的 iOS 設備 ID: $IOS_DEVICE_ID"
+    echo "使用 scripts/.env 中的 iOS 設備 ID: $IOS_DEVICE_ID" >&2
     echo "$IOS_DEVICE_ID"
     return
   fi
   
   # 若環境變數未設定，顯示錯誤
-  echo "錯誤：未在 scripts/.env 文件中設定 IOS_DEVICE_ID"
-  echo "請在 scripts/.env 文件中設定正確的 iOS 設備 ID"
+  echo "錯誤：未在 scripts/.env 文件中設定 IOS_DEVICE_ID" >&2
+  echo "請在 scripts/.env 文件中設定正確的 iOS 設備 ID" >&2
   exit 1
 }
 
@@ -83,14 +83,14 @@ get_ios_device_id() {
 get_android_device_id() {
   # 檢查環境變數
   if [ -n "$ANDROID_DEVICE_ID" ]; then
-    echo "使用 scripts/.env 中的 Android 設備 ID: $ANDROID_DEVICE_ID"
+    echo "使用 scripts/.env 中的 Android 設備 ID: $ANDROID_DEVICE_ID" >&2
     echo "$ANDROID_DEVICE_ID"
     return
   fi
   
   # 若環境變數未設定，顯示錯誤
-  echo "錯誤：未在 scripts/.env 文件中設定 ANDROID_DEVICE_ID"
-  echo "請在 scripts/.env 文件中設定正確的 Android 設備 ID"
+  echo "錯誤：未在 scripts/.env 文件中設定 ANDROID_DEVICE_ID" >&2
+  echo "請在 scripts/.env 文件中設定正確的 Android 設備 ID" >&2
   exit 1
 }
 

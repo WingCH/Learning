@@ -21,7 +21,8 @@ do
   flutter drive \
     --driver=test_driver/efficient_driver.dart \
     --target=integration_test/efficient_list_test.dart \
-    --profile
+    --profile \
+    -d 00008120-000E71AA3E90C01E
   
   # 檢查測試是否成功
   if [ $? -eq 0 ]; then
@@ -45,7 +46,8 @@ do
   flutter drive \
     --driver=test_driver/inefficient_driver.dart \
     --target=integration_test/inefficient_list_test.dart \
-    --profile
+    --profile \
+    -d 00008120-000E71AA3E90C01E
   
   # 檢查測試是否成功
   if [ $? -eq 0 ]; then

@@ -1,5 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:study_riverpod_provider_scope_overrides/other_service.dart';
+
+part 'sports_service.g.dart';
 
 class SportsServiceModel {
   final String sport;
@@ -29,14 +31,13 @@ class SportsServiceModel {
   int get hashCode => sport.hashCode ^ description.hashCode ^ otherValue.hashCode;
 }
 
-class SportsService extends AutoDisposeNotifier<SportsServiceModel> {
+@riverpod
+class SportsService extends _$SportsService {
   SportsService();
-
-
   @override
   SportsServiceModel build() {
     ref.keepAlive();
-    final otherData = ref.watch(otherProvider);
+    final otherData = ref.watch(otherServiceProvider);
     return SportsServiceModel(
       sport: 'Basketball ${otherData.value}',
       description: 'A team sport played with a ball and hoop.',
@@ -52,5 +53,3 @@ class SportsService extends AutoDisposeNotifier<SportsServiceModel> {
     state = state.copyWith(description: newDescription);
   }
 }
-
-final sportsProvider = AutoDisposeNotifierProvider<SportsService, SportsServiceModel>(SportsService.new);

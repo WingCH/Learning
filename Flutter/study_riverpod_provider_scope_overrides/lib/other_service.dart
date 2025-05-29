@@ -1,4 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'other_service.g.dart';
 
 class OtherServiceModel {
   final String value;
@@ -22,9 +24,11 @@ class OtherServiceModel {
   int get hashCode => value.hashCode;
 }
 
-class OtherService extends AutoDisposeNotifier<OtherServiceModel> {
+@riverpod
+class OtherService extends _$OtherService {
   @override
   OtherServiceModel build() {
+    ref.keepAlive();
     return OtherServiceModel(value: 'Initial Value');
   }
 
@@ -33,4 +37,3 @@ class OtherService extends AutoDisposeNotifier<OtherServiceModel> {
   }
 }
 
-final otherProvider = AutoDisposeNotifierProvider<OtherService, OtherServiceModel>(() => OtherService());

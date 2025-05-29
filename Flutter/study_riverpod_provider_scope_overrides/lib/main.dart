@@ -29,8 +29,8 @@ class MyHomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sportsData = ref.watch(sportsProvider);
-    final otherData = ref.watch(otherProvider);
+    final sportsData = ref.watch(sportsServiceProvider);
+    final otherData = ref.watch(otherServiceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +61,7 @@ class MyHomePage extends ConsumerWidget {
                   MaterialPageRoute(
                     builder: (context) => ProviderScope(
                       overrides: [
-                        sportsProvider.overrideWith(MockSportsService.new)
+                        sportsServiceProvider.overrideWith(MockSportsService.new)
                       ],
                       child: const SecondPage(),
                     ),
@@ -72,7 +72,7 @@ class MyHomePage extends ConsumerWidget {
             ),
             ElevatedButton(
                 onPressed: () {
-                  ref.read(otherProvider.notifier).updateValue('New Value');
+                  ref.read(otherServiceProvider.notifier).updateValue('New Value');
                 },
                 child: const Text('Update Other Value'))
           ],
@@ -87,8 +87,8 @@ class SecondPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sportsData = ref.watch(sportsProvider);
-    final otherData = ref.watch(otherProvider);
+    final sportsData = ref.watch(sportsServiceProvider);
+    final otherData = ref.watch(otherServiceProvider);
 
     return Scaffold(
       appBar: AppBar(

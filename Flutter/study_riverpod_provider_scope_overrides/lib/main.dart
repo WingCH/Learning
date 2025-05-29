@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:study_riverpod_provider_scope_overrides/mock_sports_service.dart';
-import 'package:study_riverpod_provider_scope_overrides/other_service.dart';
-import 'package:study_riverpod_provider_scope_overrides/sports_service.dart';
+import 'package:study_riverpod_provider_scope_overrides/child_service.dart';
+import 'package:study_riverpod_provider_scope_overrides/root_service.dart';
 
 void main() {
   runApp(
@@ -29,9 +29,7 @@ class MyHomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sportsData = ref.watch(sportsServiceProvider);
-    final otherData = ref.watch(otherServiceProvider);
-
+    final rootData = ref.watch(rootServiceProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Riverpod Override Example'),
@@ -41,27 +39,17 @@ class MyHomePage extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Other Value: ${otherData.value}',
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              'Sport: ${sportsData.sport}',
-            ),
-            Text(
-              'Description: ${sportsData.description}',
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              'Other Value: ${sportsData.otherValue}',
-              textAlign: TextAlign.center,
+              'Root Value: ${rootData.value}',
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => ProviderScope(
+                      parent: ProviderScope.containerOf(context),
                       overrides: [
-                        sportsServiceProvider.overrideWith(MockSportsService.new)
+                        rootServiceProvider
+                            .overrideWith(MockRootService.new)
                       ],
                       child: const SecondPage(),
                     ),
@@ -70,11 +58,6 @@ class MyHomePage extends ConsumerWidget {
               },
               child: const Text('Go to Second Page with Override'),
             ),
-            ElevatedButton(
-                onPressed: () {
-                  ref.read(otherServiceProvider.notifier).updateValue('New Value');
-                },
-                child: const Text('Update Other Value'))
           ],
         ),
       ),
@@ -87,8 +70,8 @@ class SecondPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sportsData = ref.watch(sportsServiceProvider);
-    final otherData = ref.watch(otherServiceProvider);
+    final rootData = ref.watch(rootServiceProvider);
+    final childData = ref.watch(childServiceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -99,15 +82,10 @@ class SecondPage extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Sport: ${sportsData.sport}',
+              'Root Value: ${rootData.value}',
             ),
             Text(
-              'Description: ${sportsData.description}',
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              'Other Value: ${sportsData.otherValue}',
-              textAlign: TextAlign.center,
+              'Child Value: ${childData.value}',
             ),
           ],
         ),

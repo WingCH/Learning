@@ -34,7 +34,6 @@ class NestedScrollDemo extends StatelessWidget {
               margin: const EdgeInsets.all(8),
               child: ListView.builder(
                 itemCount: 3,
-                physics: const ClampingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (_, j) => Container(
                   width: 100,

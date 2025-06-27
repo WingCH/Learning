@@ -13,53 +13,67 @@ class HorizontalScrollDemo extends StatelessWidget {
         title: const Text('水平滾動範例'),
       ),
       body: Center(
-        child: Slidable(
-          endActionPane: ActionPane(
-            motion: const ScrollMotion(),
-            children: [
-              SlidableAction(
-                onPressed: (context) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('分享動作')),
-                  );
-                },
-                backgroundColor: const Color(0xFF21B7CA),
-                foregroundColor: Colors.white,
-                icon: Icons.share,
-                label: '分享',
-              ),
-            ],
-          ),
-          child: Container(
-            height: 200,
-            width: 200,
-            color: Colors.grey[300],
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Placeholder(
-                  fallbackHeight: 100,
-                  fallbackWidth: 100,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Slidable(
+              key: const ValueKey('slidable'),
+              endActionPane: ActionPane(
+                motion: const DrawerMotion(),
+                dismissible: DismissiblePane(
+                  closeOnCancel: true,
+                  confirmDismiss: () async {
+                    return false;
+                  },
+                  onDismissed: () {},
+                  dismissThreshold: 0.5,
                 ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: List.generate(4, (index) {
-                        return const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Placeholder(
-                            fallbackWidth: 100,
-                          ),
-                        );
-                      }),
-                    ),
+                children: [
+                  SlidableAction(
+                    onPressed: (context) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('分享動作')),
+                      );
+                    },
+                    backgroundColor: const Color(0xFF21B7CA),
+                    foregroundColor: Colors.white,
+                    icon: Icons.share,
+                    label: '分享',
                   ),
+                ],
+              ),
+              child: Container(
+                height: 200,
+                width: 200,
+                color: Colors.grey[300],
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Placeholder(
+                      fallbackHeight: 100,
+                      fallbackWidth: 100,
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(4, (index) {
+                            return const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Placeholder(
+                                fallbackWidth: 100,
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

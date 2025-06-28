@@ -8,6 +8,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 /// - 在滾動到右邊界時，禁用內部滾動，讓 Slidable 可以正常工作
 /// - 當 Slidable 開啟時，禁用內部滾動
 /// - 在右邊界向右滑動時，暫時啟用滾動讓使用者可以向左滾動
+/// 限制說明：
+/// - 此解決方案在某個時機切換 physics 為 NeverScrollableScrollPhysics
+/// - 單次滑動的響應者只能有一個，比如 Flutter 列表滑動完之後，
+///   如果不抬起手指而繼續滑動，是不會刷新 physics 的
 class SlidableNestedScrollView extends StatefulWidget {
   /// Slidable 的 controller
   final SlidableController slidableController;

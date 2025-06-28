@@ -1,16 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-void main() => runApp(const MaterialApp(home: HorizontalScrollDemo()));
+// 引入解決方案
+import 'solution1_disable_at_edge.dart' as solution1;
 
-class HorizontalScrollDemo extends StatelessWidget {
-  const HorizontalScrollDemo({super.key});
+void main() => runApp(const MaterialApp(home: HomePage()));
+
+/// 首頁 - 顯示問題和解決方案列表
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('水平滾動範例'),
+        title: const Text('巢狀橫向滾動問題研究'),
+      ),
+      body: ListView(
+        children: [
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.error_outline, color: Colors.red),
+              title: const Text('原始問題展示'),
+              subtitle: const Text('內層滾動到邊緣時無法觸發外層滑動'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OriginalProblemDemo(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const Divider(),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              '解決方案',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.touch_app, color: Colors.blue),
+              title: const Text('方案 1: 邊界禁用滾動'),
+              subtitle: const Text('在滾動邊界時暫時禁用內層滾動'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const solution1.Solution1DisableAtEdge(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 原始問題展示頁面
+class OriginalProblemDemo extends StatelessWidget {
+  const OriginalProblemDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('原始問題展示'),
       ),
       body: Center(
         child: Row(

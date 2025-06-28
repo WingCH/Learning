@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 // 引入解決方案
 import 'solution1_disable_at_edge.dart' as solution1;
+import 'solution2.dart' as solution2;
 
 void main() => runApp(const MaterialApp(home: HomePage()));
 
@@ -54,6 +55,22 @@ class HomePage extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) =>
                         const solution1.Solution1DisableAtEdge(),
+                  ),
+                );
+              },
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.gesture, color: Colors.green),
+              title: const Text('方案 2'),
+              subtitle: const Text(''),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const solution2.Solution2(),
                   ),
                 );
               },

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -15,10 +16,14 @@ class SlidableNestedScrollView extends StatefulWidget {
   final Widget Function(BuildContext context, ScrollController controller)
       scrollContentBuilder;
 
+  /// 是否顯示 debug view
+  final bool showDebugView;
+
   const SlidableNestedScrollView({
     super.key,
     required this.slidableController,
     required this.scrollContentBuilder,
+    this.showDebugView = false,
   });
 
   @override
@@ -30,7 +35,6 @@ class _SlidableNestedScrollViewState extends State<SlidableNestedScrollView> {
   final ScrollController _scrollController = ScrollController();
   final Axis _scrollDirection = Axis.horizontal;
 
-  // 簡化的狀態管理
   bool _isAtRightEdge = false;
   ActionPaneType _actionPaneType = ActionPaneType.none;
   bool _isManualScrollToRight = false;
@@ -128,6 +132,49 @@ class _SlidableNestedScrollViewState extends State<SlidableNestedScrollView> {
     }
   }
 
+  Widget _buildDebugView() {
+    return _DebugView(
+      getIsAtRightEdge: () => _isAtRightEdge,
+      getActionPaneType: () => _actionPaneType,
+      getIsManualScrollToRight: () => _isManualScrollToRight,
+      getHasClients: () => _scrollController.hasClients,
+      getScrollPosition: () {
+        try {
+          if (_scrollController.hasClients &&
+              _scrollController.positions.isNotEmpty) {
+            return _scrollController.positions.first.pixels;
+          }
+        } catch (e) {
+          // Ignore error
+        }
+        return 0.0;
+      },
+      getMaxScrollExtent: () {
+        try {
+          if (_scrollController.hasClients &&
+              _scrollController.positions.isNotEmpty) {
+            return _scrollController.positions.first.maxScrollExtent;
+          }
+        } catch (e) {
+          // Ignore error
+        }
+        return 0.0;
+      },
+      getMinScrollExtent: () {
+        try {
+          if (_scrollController.hasClients &&
+              _scrollController.positions.isNotEmpty) {
+            return _scrollController.positions.first.minScrollExtent;
+          }
+        } catch (e) {
+          // Ignore error
+        }
+        return 0.0;
+      },
+      scrollPhysicsNotifier: _scrollPhysicsNotifier,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Listener(
@@ -136,14 +183,127 @@ class _SlidableNestedScrollViewState extends State<SlidableNestedScrollView> {
       child: ValueListenableBuilder<ScrollPhysics?>(
         valueListenable: _scrollPhysicsNotifier,
         builder: (context, scrollPhysics, child) {
-          return SingleChildScrollView(
+          final scrollView = SingleChildScrollView(
             controller: _scrollController,
             scrollDirection: _scrollDirection,
             physics: scrollPhysics,
             child: child!,
           );
+
+          if (!widget.showDebugView) {
+            return scrollView;
+          }
+
+          return Stack(
+            children: [
+              scrollView,
+              _buildDebugView(),
+            ],
+          );
         },
         child: widget.scrollContentBuilder(context, _scrollController),
+      ),
+    );
+  }
+}
+
+/// Debug view that auto-refreshes to show real-time data
+class _DebugView extends StatefulWidget {
+  final bool Function() getIsAtRightEdge;
+  final ActionPaneType Function() getActionPaneType;
+  final bool Function() getIsManualScrollToRight;
+  final bool Function() getHasClients;
+  final double Function() getScrollPosition;
+  final double Function() getMaxScrollExtent;
+  final double Function() getMinScrollExtent;
+  final ValueNotifier<ScrollPhysics?> scrollPhysicsNotifier;
+
+  const _DebugView({
+    required this.getIsAtRightEdge,
+    required this.getActionPaneType,
+    required this.getIsManualScrollToRight,
+    required this.getHasClients,
+    required this.getScrollPosition,
+    required this.getMaxScrollExtent,
+    required this.getMinScrollExtent,
+    required this.scrollPhysicsNotifier,
+  });
+
+  @override
+  State<_DebugView> createState() => _DebugViewState();
+}
+
+class _DebugViewState extends State<_DebugView> {
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // 每 50ms 更新一次 debug view
+    _refreshTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (mounted) {
+        setState(() {
+          // 只是觸發重建，不需要更新任何狀態
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: IgnorePointer(
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DefaultTextStyle(
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontFamily: 'monospace',
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('===== Debug View =====',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text('isAtRightEdge: ${widget.getIsAtRightEdge()}'),
+                Text('actionPaneType: ${widget.getActionPaneType().name}'),
+                Text(
+                    'isManualScrollToRight: ${widget.getIsManualScrollToRight()}'),
+                if (widget.getHasClients()) ...[
+                  Text(
+                      'scrollPosition: ${widget.getScrollPosition().toStringAsFixed(2)}'),
+                  Text(
+                      'maxScrollExtent: ${widget.getMaxScrollExtent().toStringAsFixed(2)}'),
+                  Text(
+                      'minScrollExtent: ${widget.getMinScrollExtent().toStringAsFixed(2)}'),
+                ],
+                ValueListenableBuilder<ScrollPhysics?>(
+                  valueListenable: widget.scrollPhysicsNotifier,
+                  builder: (context, physics, _) {
+                    return Text(
+                        'scrollPhysics: ${physics?.runtimeType ?? "null (default)"}');
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

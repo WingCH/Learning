@@ -63,20 +63,48 @@ class HomePage extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.gesture, color: Colors.green),
-              title: const Text('方案 2'),
-              subtitle: const Text(''),
+              title: const Text('方案 2: 使用封裝 Widget'),
+              subtitle: const Text('使用 SlidableNestedScrollView 封裝'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const solution2.Solution2(),
+                    builder: (context) => const Solution2WithDebug(),
                   ),
                 );
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Solution2 with debug toggle
+class Solution2WithDebug extends StatefulWidget {
+  const Solution2WithDebug({super.key});
+
+  @override
+  State<Solution2WithDebug> createState() => _Solution2WithDebugState();
+}
+
+class _Solution2WithDebugState extends State<Solution2WithDebug> {
+  bool _showDebugView = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: solution2.Solution2(showDebugView: _showDebugView),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _showDebugView = !_showDebugView;
+          });
+        },
+        backgroundColor: _showDebugView ? Colors.red : Colors.blue,
+        child: Icon(_showDebugView ? Icons.bug_report : Icons.bug_report_outlined),
       ),
     );
   }

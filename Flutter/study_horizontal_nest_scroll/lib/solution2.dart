@@ -3,7 +3,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'widgets/slidable_nested_scroll_view.dart';
 
 class Solution2 extends StatefulWidget {
-  const Solution2({super.key});
+  final bool showDebugView;
+  
+  const Solution2({super.key, this.showDebugView = false});
 
   @override
   State<Solution2> createState() => _Solution2State();
@@ -89,6 +91,7 @@ class _Solution2State extends State<Solution2>
                           height: 150,
                           child: SlidableNestedScrollView(
                             slidableController: _slidableController,
+                            showDebugView: widget.showDebugView,
                             scrollContentBuilder: (context, controller) {
                               return Row(
                                 children: List.generate(6, (index) {

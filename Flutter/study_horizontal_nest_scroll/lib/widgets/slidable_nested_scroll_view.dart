@@ -30,14 +30,13 @@ class _SlidableNestedScrollViewState extends State<SlidableNestedScrollView> {
   final ScrollController _scrollController = ScrollController();
   final Axis _scrollDirection = Axis.horizontal;
 
-  // 使用 ValueNotifier 管理狀態，避免不必要的 setState
-  final ValueNotifier<bool> _isAtRightEdgeNotifier = ValueNotifier(false);
-  final ValueNotifier<bool> _isSwipingRightNotifier = ValueNotifier(false);
-  final ValueNotifier<ActionPaneType> _actionPaneTypeNotifier = 
-      ValueNotifier(ActionPaneType.none);
-  
+  // 簡化的狀態管理
+  bool _isAtRightEdge = false;
+  ActionPaneType _actionPaneType = ActionPaneType.none;
+  bool _isManualScrollToRight = false;
+
   // 統一的滾動物理狀態管理
-  final ValueNotifier<ScrollPhysics?> _scrollPhysicsNotifier = 
+  final ValueNotifier<ScrollPhysics?> _scrollPhysicsNotifier =
       ValueNotifier(null);
 
   @override
@@ -48,104 +47,84 @@ class _SlidableNestedScrollViewState extends State<SlidableNestedScrollView> {
       _scrollController.addListener(_handleScrollUpdate);
       widget.slidableController.actionPaneType
           .addListener(_handleSlidableUpdate);
-      
-      // 監聽狀態變化並更新滾動物理
-      _isAtRightEdgeNotifier.addListener(_updateScrollPhysics);
-      _isSwipingRightNotifier.addListener(_updateScrollPhysics);
-      _actionPaneTypeNotifier.addListener(_updateScrollPhysics);
     });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _isAtRightEdgeNotifier.dispose();
-    _isSwipingRightNotifier.dispose();
-    _actionPaneTypeNotifier.dispose();
     _scrollPhysicsNotifier.dispose();
     super.dispose();
   }
-  
+
   // 更新滾動物理狀態
   void _updateScrollPhysics() {
-    final isAtRightEdge = _isAtRightEdgeNotifier.value;
-    final isSwipingRight = _isSwipingRightNotifier.value;
-    final actionPaneType = _actionPaneTypeNotifier.value;
-    
     ScrollPhysics? newPhysics;
-    
-    // 邏輯優先順序：
-    // 1. 如果正在向右滑動且在右邊界，允許滾動
-    if (isSwipingRight && isAtRightEdge && actionPaneType == ActionPaneType.none) {
-      newPhysics = null; // 允許滾動
-    }
-    // 2. 如果 Slidable 開啟，禁用滾動
-    else if (actionPaneType == ActionPaneType.end) {
+
+    // 簡化的邏輯：
+    // 1. 如果 Slidable 開啟，禁用滾動
+    // 2. 如果在右邊界，禁用滾動（避免與 Slidable 衝突）
+    // 3. 其他情況允許滾動
+    if (_actionPaneType == ActionPaneType.end || _isAtRightEdge) {
       newPhysics = const NeverScrollableScrollPhysics();
-    }
-    // 3. 如果在右邊界，禁用滾動（避免與 Slidable 衝突）
-    else if (isAtRightEdge) {
-      newPhysics = const NeverScrollableScrollPhysics();
-    }
-    // 4. 預設情況，允許滾動
-    else {
+    } else {
       newPhysics = null;
     }
-    
+
     _scrollPhysicsNotifier.value = newPhysics;
   }
 
   // 處理滾動位置更新
   void _handleScrollUpdate() {
     if (!_scrollController.hasClients) return;
+    if (_isManualScrollToRight) return;
 
     final pixels = _scrollController.position.pixels;
     final maxScroll = _scrollController.position.maxScrollExtent;
-    final newIsAtRightEdge = pixels >= maxScroll;
+    final wasAtRightEdge = _isAtRightEdge;
+    _isAtRightEdge = pixels >= maxScroll;
 
-    if (_isAtRightEdgeNotifier.value != newIsAtRightEdge) {
-      _isAtRightEdgeNotifier.value = newIsAtRightEdge;
-      // 當離開右邊界時，重置向右滑動狀態
-      if (!newIsAtRightEdge) {
-        _isSwipingRightNotifier.value = false;
-      }
+    // 只在狀態改變時更新滾動物理
+    if (wasAtRightEdge != _isAtRightEdge) {
+      _updateScrollPhysics();
     }
   }
 
   // 處理 Slidable 狀態更新
   void _handleSlidableUpdate() {
     final newActionPaneType = widget.slidableController.actionPaneType.value;
-    if (_actionPaneTypeNotifier.value != newActionPaneType) {
-      _actionPaneTypeNotifier.value = newActionPaneType;
+    if (_actionPaneType != newActionPaneType) {
+      _actionPaneType = newActionPaneType;
+      _updateScrollPhysics();
     }
   }
 
-  // 處理手勢偵測
+  // 處理手勢偵測 - 提供即時視覺反饋
+  // 由於SingleChildScrollView 的滾動會被禁用以避免與 Slidable 衝突
+  // 因此需要向右滑動時手動處理滾動，提供即時視覺反饋
   void _handlePointerMove(PointerMoveEvent event) {
-    final isMovingRight = event.delta.dx > 0;
+    // 當在右邊界且滾動被禁用時，手動處理滾動
+    if (_isAtRightEdge &&
+        _actionPaneType == ActionPaneType.none &&
+        _scrollController.hasClients) {
+      final currentPosition = _scrollController.position.pixels;
+      // 根據手指移動的距離來更新滾動位置
+      // 注意：向左滑動時 delta.dx 為負值，所以需要減去它
+      final targetPosition = (currentPosition - event.delta.dx).clamp(
+        _scrollController.position.minScrollExtent,
+        _scrollController.position.maxScrollExtent,
+      );
 
-    // 只在右邊界且 Slidable 關閉時處理向右滑動
-    if (isMovingRight &&
-        _isAtRightEdgeNotifier.value &&
-        _actionPaneTypeNotifier.value == ActionPaneType.none) {
-      if (!_isSwipingRightNotifier.value) {
-        _isSwipingRightNotifier.value = true;
-      }
+      _isManualScrollToRight = true;
+      // 使用 jumpTo 提供即時反饋，跟隨手指移動
+      _scrollController.jumpTo(targetPosition);
     }
   }
 
-  // 處理手勢結束
   void _handlePointerUp(PointerUpEvent event) {
-    if (_isSwipingRightNotifier.value) {
-      // 立即重置右邊界狀態，讓滾動可以開始
-      _isAtRightEdgeNotifier.value = false;
-
-      // 延遲重置滑動狀態
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (mounted) {
-          _isSwipingRightNotifier.value = false;
-        }
-      });
+    if (_isManualScrollToRight) {
+      _isManualScrollToRight = false;
+      _handleScrollUpdate();
     }
   }
 

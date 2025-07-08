@@ -10,14 +10,15 @@ services:
     volumes:
       - ./tailscale-data:/var/lib/tailscale
     ports:
-      - "1080:1080"
+      - "1080:1080"  # SOCKS5 代理
+      - "8888:8888"  # HTTP 代理
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
       - NET_RAW
     privileged: true
-    command: tailscaled -socks5-server=0.0.0.0:1080
-
+    command: tailscaled -socks5-server=0.0.0.0:1080 -outbound-http-proxy-listen=0.0.0.0:8888
+    
 networks:
   default:
     driver: bridge

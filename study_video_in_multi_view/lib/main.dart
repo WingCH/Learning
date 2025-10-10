@@ -5,8 +5,27 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final GlobalPipController _pipController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pipController = GlobalPipController();
+  }
+
+  @override
+  void dispose() {
+    _pipController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +35,13 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const VideoMultiViewPage(),
+      builder: (context, child) {
+        return GlobalPipOverlay(
+          pipController: _pipController,
+          child: child ?? const SizedBox(),
+        );
+      },
+      home: VideoMultiViewPage(pipController: _pipController),
     );
   }
 }
@@ -68,10 +93,122 @@ class VideoPlayerManager {
 }
 
 // ============================================================================
+// 全局 PIP 控制器 - 管理跨頁面的 PIP 狀態
+// ============================================================================
+class GlobalPipController extends ChangeNotifier {
+  VideoPlayerManager? _videoManager;
+  bool _isViewA = true;
+  bool _isPipVisible = false;
+  Offset _pipPosition = const Offset(20, 100);
+
+  VideoPlayerManager? get videoManager => _videoManager;
+  bool get isViewA => _isViewA;
+  bool get isPipVisible => _isPipVisible;
+  Offset get pipPosition => _pipPosition;
+
+  void initialize(VideoPlayerManager manager) {
+    _videoManager = manager;
+    _isPipVisible = true;
+    notifyListeners();
+  }
+
+  void switchView() {
+    _isViewA = !_isViewA;
+    notifyListeners();
+  }
+
+  void updatePipPosition(Offset position) {
+    _pipPosition = position;
+    notifyListeners();
+  }
+
+  void showPip() {
+    _isPipVisible = true;
+    notifyListeners();
+  }
+
+  void hidePip() {
+    _isPipVisible = false;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _videoManager?.dispose();
+    super.dispose();
+  }
+}
+
+// ============================================================================
+// 全局 PIP Overlay - 顯示在整個 app 最上層
+// ============================================================================
+class GlobalPipOverlay extends StatelessWidget {
+  final GlobalPipController pipController;
+  final Widget child;
+
+  const GlobalPipOverlay({
+    super.key,
+    required this.pipController,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        // 全局 PIP 窗口（固定綠色背景）
+        AnimatedBuilder(
+          animation: pipController,
+          builder: (context, _) {
+            if (!pipController.isPipVisible || 
+                pipController.videoManager == null) {
+              return const SizedBox.shrink();
+            }
+
+            final screenSize = MediaQuery.of(context).size;
+            // PIP 窗口固定為綠色，不隨視頻位置改變
+            final pipIsActive = !pipController.isViewA; // 視頻是否在 PIP 窗口
+
+            return Positioned(
+              left: pipController.pipPosition.dx,
+              top: pipController.pipPosition.dy,
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  final newPosition = Offset(
+                    (pipController.pipPosition.dx + details.delta.dx)
+                        .clamp(0.0, screenSize.width - 200),
+                    (pipController.pipPosition.dy + details.delta.dy)
+                        .clamp(0.0, screenSize.height - 200),
+                  );
+                  pipController.updatePipPosition(newPosition);
+                },
+                child: PipFloatingWindow(
+                  color: Colors.green.shade300, // 固定綠色
+                  title: '綠色格', // 固定標題
+                  isActive: pipIsActive,
+                  videoManager: pipController.videoManager!,
+                  onRetry: () {},
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================================
 // 主頁面 - PIP 模式視圖
 // ============================================================================
 class VideoMultiViewPage extends StatefulWidget {
-  const VideoMultiViewPage({super.key});
+  final GlobalPipController pipController;
+
+  const VideoMultiViewPage({
+    super.key,
+    required this.pipController,
+  });
 
   @override
   State<VideoMultiViewPage> createState() => _VideoMultiViewPageState();
@@ -79,13 +216,13 @@ class VideoMultiViewPage extends StatefulWidget {
 
 class _VideoMultiViewPageState extends State<VideoMultiViewPage> {
   late final VideoPlayerManager _videoManager;
-  bool _isViewA = true; // true = View A (紅色), false = View B (綠色)
 
   @override
   void initState() {
     super.initState();
     _videoManager = VideoPlayerManager();
     _initializeVideo();
+    widget.pipController.initialize(_videoManager);
   }
 
   Future<void> _initializeVideo() async {
@@ -100,14 +237,8 @@ class _VideoMultiViewPageState extends State<VideoMultiViewPage> {
 
   @override
   void dispose() {
-    _videoManager.dispose();
+    // 不在這裡 dispose videoManager，由 GlobalPipController 管理
     super.dispose();
-  }
-
-  void _switchView() {
-    setState(() {
-      _isViewA = !_isViewA;
-    });
   }
 
   void _togglePlayPause() {
@@ -122,23 +253,152 @@ class _VideoMultiViewPageState extends State<VideoMultiViewPage> {
     }
   }
 
+  void _navigateToSecondPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SecondPage(pipController: widget.pipController),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: widget.pipController,
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            title: Text('PIP 模式 - 視頻在: ${widget.pipController.isViewA ? "紅色格" : "綠色格"}'),
+          ),
+          body: PipViewLayout(
+            isViewA: widget.pipController.isViewA,
+            videoManager: _videoManager,
+            onRetry: _initializeVideo,
+          ),
+          floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                heroTag: 'navigate',
+                onPressed: _navigateToSecondPage,
+                tooltip: '前往第二頁',
+                child: const Icon(Icons.arrow_forward),
+              ),
+              const SizedBox(height: 16),
+              FloatingActionButton(
+                heroTag: 'switch',
+                onPressed: widget.pipController.switchView,
+                tooltip: '切換播放格子',
+                child: const Icon(Icons.swap_horiz),
+              ),
+              const SizedBox(height: 16),
+              FloatingActionButton(
+                heroTag: 'playPause',
+                onPressed: _togglePlayPause,
+                tooltip: '播放/暫停',
+                child: Icon(
+                  _videoManager.controller?.value.isPlaying ?? false
+                      ? Icons.pause
+                      : Icons.play_arrow,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ============================================================================
+// 第二頁面 - 展示 PIP 跨頁面顯示
+// ============================================================================
+class SecondPage extends StatelessWidget {
+  final GlobalPipController pipController;
+
+  const SecondPage({
+    super.key,
+    required this.pipController,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('PIP 模式 - 視頻在: ${_isViewA ? "紅色格" : "綠色格"}'),
+        backgroundColor: Colors.purple.shade300,
+        title: const Text('第二頁'),
       ),
-      body: PipViewLayout(
-        isViewA: _isViewA,
-        videoManager: _videoManager,
-        onRetry: _initializeVideo,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.purple.shade100,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.video_library,
+                size: 100,
+                color: Colors.purple,
+              ),
+              const SizedBox(height: 30),
+              const Text(
+                '這是第二頁',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'PIP 窗口仍然顯示在最上層！',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.purple,
+                ),
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back),
+                label: const Text('返回主頁面'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 15,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              AnimatedBuilder(
+                animation: pipController,
+                builder: (context, _) {
+                  return ElevatedButton.icon(
+                    onPressed: pipController.switchView,
+                    icon: const Icon(Icons.swap_horiz),
+                    label: const Text('切換視頻位置'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
-      floatingActionButton: VideoControlButtons(
-        onSwitch: _switchView,
-        onPlayPause: _togglePlayPause,
-        isPlaying: _videoManager.controller?.value.isPlaying ?? false,
-      ),
+      // 底部信息框
+      bottomSheet: pipController.videoManager != null
+          ? VideoInfoDisplay(videoManager: pipController.videoManager!)
+          : null,
     );
   }
 }
@@ -517,7 +777,7 @@ class VideoInfoContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              const Text(
+            const Text(
                 'Buffering...',
                 style: TextStyle(color: Colors.white70, fontSize: 12),
               ),
@@ -549,36 +809,25 @@ class PipViewLayout extends StatefulWidget {
 }
 
 class _PipViewLayoutState extends State<PipViewLayout> {
-  Offset _pipPosition = const Offset(20, 100); // PIP 窗口初始位置
-
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
-    // 確定哪個是主視圖，哪個是 PIP
-    // isViewA = true 表示視頻在紅色格（View A）
-    final mainColor = widget.isViewA ? Colors.red.shade300 : Colors.green.shade300;
-    final mainTitle = widget.isViewA ? '紅色格' : '綠色格';
+    // 主視圖固定為紅色
     final mainIsActive = widget.isViewA; // 主視圖是否有視頻
-    
-    final pipColor = widget.isViewA ? Colors.green.shade300 : Colors.red.shade300;
-    final pipTitle = widget.isViewA ? '綠色格' : '紅色格';
-    final pipIsActive = !widget.isViewA; // PIP 視圖是否有視頻
 
     return Stack(
       children: [
-        // 主視圖（全屏背景）
+        // 主視圖（全屏背景 - 固定紅色）
         Container(
           width: double.infinity,
           height: double.infinity,
-          color: mainColor,
+          color: Colors.red.shade300, // 固定紅色
           child: Center(
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 20),
-                  ViewTitle(title: mainTitle, isActive: mainIsActive),
+                  ViewTitle(title: '紅色格', isActive: mainIsActive), // 固定標題
                   const SizedBox(height: 20),
                   // 根據狀態顯示視頻或佔位符（不包含信息框）
                   mainIsActive
@@ -590,29 +839,6 @@ class _PipViewLayoutState extends State<PipViewLayout> {
                   const SizedBox(height: 120), // 為底部信息框預留空間
                 ],
               ),
-            ),
-          ),
-        ),
-        
-        // PIP 浮動窗口（可拖動）
-        Positioned(
-          left: _pipPosition.dx,
-          top: _pipPosition.dy,
-          child: GestureDetector(
-            onPanUpdate: (details) {
-              setState(() {
-                _pipPosition = Offset(
-                  (_pipPosition.dx + details.delta.dx).clamp(0.0, screenSize.width - 200),
-                  (_pipPosition.dy + details.delta.dy).clamp(0.0, screenSize.height - 200),
-                );
-              });
-            },
-            child: PipFloatingWindow(
-              color: pipColor,
-              title: pipTitle,
-              isActive: pipIsActive,
-              videoManager: widget.videoManager,
-              onRetry: widget.onRetry,
             ),
           ),
         ),
@@ -808,45 +1034,6 @@ class PipFloatingWindow extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// 視頻控制按鈕 - 純組件
-// ============================================================================
-class VideoControlButtons extends StatelessWidget {
-  final VoidCallback onSwitch;
-  final VoidCallback onPlayPause;
-  final bool isPlaying;
-
-  const VideoControlButtons({
-    super.key,
-    required this.onSwitch,
-    required this.onPlayPause,
-    required this.isPlaying,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FloatingActionButton(
-          heroTag: 'switch',
-          onPressed: onSwitch,
-          tooltip: '切換播放格子',
-          child: const Icon(Icons.swap_horiz),
-        ),
-        const SizedBox(height: 16),
-        FloatingActionButton(
-          heroTag: 'playPause',
-          onPressed: onPlayPause,
-          tooltip: '播放/暫停',
-          child: Icon(
-            isPlaying ? Icons.pause : Icons.play_arrow,
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 // ============================================================================
 // 純函數 - 時間格式化

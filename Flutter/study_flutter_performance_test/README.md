@@ -24,6 +24,129 @@
 
 此命令會執行完整的測試流程，包括構建 IPA/APK 檔案、運行效能測試，並生成報告。
 
+### 完整測試流程日志示例
+
+#### iOS 完整測試流程成功日志（2025年11月7日）
+
+```bash
+./scripts/run_all.sh --platform ios
+
+# ===== Flutter 效能測試全流程 =====
+# 平台: ios
+# 1. 構建測試二進制檔案
+# 2. 運行效能測試
+# 3. 生成測試報告
+
+# ===== 步驟 1: 構建二進制檔案 =====
+# ===== 開始動態構建IPA檔案 =====
+# 找到 2 個測試檔案：
+# - efficient_list_test.dart
+# - inefficient_list_test.dart
+
+# ===== 構建 efficient_list_test IPA =====
+# Archiving com.example.studyFlutterPerformanceTest...
+# Automatically signing iOS for device deployment using specified development team in Xcode project: AL869FRMV6
+# Running Xcode build...
+# Xcode archive done.                                         13.5s
+# ✓ Built build/ios/archive/Runner.xcarchive (32.1MB)
+# Building debugging IPA...                                           8.2s
+# ✓ Built IPA to build/ios/ipa (8.9MB)
+# efficient_list_test IPA已構建
+# 構建時間: 00:00:24
+# efficient_list_test IPA已備份到: build/efficient_list_test_ipa/
+
+# ===== 構建 inefficient_list_test IPA =====
+# Archiving com.example.studyFlutterPerformanceTest...
+# Automatically signing iOS for device deployment using specified development team in Xcode project: AL869FRMV6
+# Running Xcode build...
+# Xcode archive done.                                         10.4s
+# ✓ Built build/ios/archive/Runner.xcarchive (32.1MB)
+# Building debugging IPA...                                           8.1s
+# ✓ Built IPA to build/ios/ipa (8.9MB)
+# inefficient_list_test IPA已構建
+# 構建時間: 00:00:21
+# inefficient_list_test IPA已備份到: build/inefficient_list_test_ipa/
+
+# ===== IPA構建完成 =====
+# 總共構建了 2 個測試的 IPA 檔案
+# 構建時間總計: 00:00:45
+
+# ===== 步驟 2: 運行效能測試 =====
+# 載入 scripts/.env 配置文件
+# 使用 scripts/.env 中的 iOS 設備 ID: 00008130-001435102EC0001C
+# ===== 開始效能測試 =====
+# 將會運行每個測試 1 次
+# 平台: ios
+# 設備 ID: 00008130-001435102EC0001C
+
+# ===== 運行 efficient_list_test 測試 #1 =====
+# Installing and launching...                                         9.5s
+# VMServiceFlutterDriver: Connected to Flutter application.
+# flutter: 00:00 +0: Test efficient list scrolling performance
+# flutter: 00:07 +1: (tearDownAll)
+# flutter: 00:07 +2: All tests passed!
+# All tests passed.
+# efficient_list_test 測試 #1 完成並保存結果
+# 測試時間: 00:00:21
+# 結果文件路徑: test_results/ios/efficient_list_test/efficient_scrolling_1.timeline_summary.json
+
+# ===== 運行 inefficient_list_test 測試 #1 =====
+# Installing and launching...                                         9.2s
+# VMServiceFlutterDriver: Connected to Flutter application.
+# flutter: 00:00 +0: Test inefficient list scrolling performance
+# flutter: 00:31 +1: (tearDownAll)
+# flutter: 00:31 +2: All tests passed!
+# All tests passed.
+# inefficient_list_test 測試 #1 完成並保存結果
+# 測試時間: 00:00:46
+# 結果文件路徑: test_results/ios/inefficient_list_test/inefficient_scrolling_1.timeline_summary.json
+
+# ===== 測試完成 =====
+# 總計運行了 2 個測試檔案，每個檔案 1 次測試
+# 總測試時間: 00:01:07
+# 所有結果已保存到: test_results/ios/ 目錄
+
+# ===== 步驟 3: 生成測試報告 =====
+# 搜尋測試結果目錄...
+# 找到 2 個測試目錄：
+# - efficient_list_test (找到 1 個結果檔案)
+# - inefficient_list_test (找到 1 個結果檔案)
+# 生成最終報告...
+
+# ===== 測試結果摘要 =====
+# 總共找到 2 個測試目錄
+# - efficient_list_test
+# - inefficient_list_test
+
+# ===== 全流程完成 =====
+# 恭喜！構建和測試流程已全部完成
+# 詳細報告已保存到: test_results/performance_report.json
+```
+
+**完整流程摘要：**
+
+**步驟 1: 構建階段**
+- efficient_list_test IPA：24 秒
+- inefficient_list_test IPA：21 秒
+- 構建總時間：45 秒
+
+**步驟 2: 測試階段**
+- efficient_list_test：21 秒（實際測試 7 秒）
+- inefficient_list_test：46 秒（實際測試 31 秒）
+- 測試總時間：1 分 7 秒
+
+**步驟 3: 報告生成**
+- 成功生成 performance_report.json
+- 包含所有測試結果的詳細數據
+
+**總時長：** 約 1 分 52 秒（45秒構建 + 67秒測試）
+
+**關鍵觀察：**
+- 完整流程自動化，無需手動干預
+- inefficient 版本測試時間是 efficient 版本的 **2.2 倍**（46秒 vs 21秒）
+- 實際測試執行時間差距更明顯：**4.4 倍**（31秒 vs 7秒）
+- 所有測試均通過，結果已保存到對應目錄
+
 ### 只構建 IPA/APK 檔案
 
 ```bash

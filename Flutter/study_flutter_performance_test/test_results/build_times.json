@@ -3,20 +3,20 @@
     {
       "name": "efficient_list_test",
       "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/efficient_list_test.dart",
-      "total_seconds": 25,
-      "formatted": "00:00:25",
+      "total_seconds": 21,
+      "formatted": "00:00:21",
       "status": "success"
     },
     {
       "name": "inefficient_list_test",
       "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/inefficient_list_test.dart",
-      "total_seconds": 25,
-      "formatted": "00:00:25",
+      "total_seconds": 21,
+      "formatted": "00:00:21",
       "status": "success"
     }
   ],
   "total": {
-    "total_seconds": 50,
-    "formatted": "00:00:50"
+    "total_seconds": 42,
+    "formatted": "00:00:42"
   }
 }

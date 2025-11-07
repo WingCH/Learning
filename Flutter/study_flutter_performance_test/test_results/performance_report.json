@@ -1,43 +1,43 @@
 {
-  "timestamp": "2025-11-07T16:48:55Z",
+  "timestamp": "2025-11-07T17:46:18Z",
   "platform": "ios",
   "build": {
   "builds": [
     {
       "name": "efficient_list_test",
       "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/efficient_list_test.dart",
-      "total_seconds": 21,
-      "formatted": "00:00:21",
+      "total_seconds": 25,
+      "formatted": "00:00:25",
       "status": "success"
     },
     {
       "name": "inefficient_list_test",
       "file": "/Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/integration_test/inefficient_list_test.dart",
-      "total_seconds": 21,
-      "formatted": "00:00:21",
+      "total_seconds": 24,
+      "formatted": "00:00:24",
       "status": "success"
     }
   ],
   "total": {
-    "total_seconds": 42,
-    "formatted": "00:00:42"
+    "total_seconds": 49,
+    "formatted": "00:00:49"
   }
 },
   "summary": {
     "build_time": {
-      "total_seconds": 42,
-      "formatted": "00:00:42"
+      "total_seconds": 49,
+      "formatted": "00:00:49"
     },
     "build_status": "success",
     "test_time": {
-      "total_seconds": 72,
-      "formatted": "00:01:12"
+      "total_seconds": 0,
+      "formatted": "00:00:00"
     },
     "test_status": "success",
     "total_duration": {
-      "total_seconds": 114,
-      "formatted": "00:01:54"
+      "total_seconds": 49,
+      "formatted": "00:00:49"
     },
-    "completed_at": "2025-11-07T16:48:55Z"
+    "completed_at": "2025-11-07T17:46:18Z"
   }
 }

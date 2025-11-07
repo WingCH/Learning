@@ -36,6 +36,64 @@
 
 此命令會分別構建高效版本和低效版本的 IPA/APK 檔案，並記錄構建時間。
 
+### 構建日志示例
+
+#### iOS IPA 構建成功日志（2025年11月7日）
+
+```bash
+# 清理項目
+fvm flutter clean
+# Cleaning Xcode workspace...                                      1,219ms
+# Cleaning Xcode workspace...                                      1,743ms
+# Deleting build...                                                  291ms
+# Deleting .dart_tool...                                             287ms
+
+# 構建 IPA 檔案
+./scripts/build_ipa.sh
+
+# ===== 開始動態構建IPA檔案 =====
+# 找到 2 個測試檔案：
+# - efficient_list_test.dart
+# - inefficient_list_test.dart
+
+# ===== 構建 efficient_list_test IPA =====
+# Archiving com.example.studyFlutterPerformanceTest...
+# Automatically signing iOS for device deployment using specified development team in Xcode project: AL869FRMV6
+# Running Xcode build...
+# Xcode archive done.                                         15.8s
+# ✓ Built build/ios/archive/Runner.xcarchive (32.1MB)
+# Building debugging IPA...                                           7.5s
+# ✓ Built IPA to build/ios/ipa (8.9MB)
+# efficient_list_test IPA已構建: /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa
+# 構建時間: 00:00:25
+# efficient_list_test IPA已備份到: build/efficient_list_test_ipa/
+
+# ===== 構建 inefficient_list_test IPA =====
+# Archiving com.example.studyFlutterPerformanceTest...
+# Automatically signing iOS for device deployment using specified development team in Xcode project: AL869FRMV6
+# Running Xcode build...
+# Xcode archive done.                                         14.3s
+# ✓ Built build/ios/archive/Runner.xcarchive (32.1MB)
+# Building debugging IPA...                                           7.5s
+# ✓ Built IPA to build/ios/ipa (8.9MB)
+# inefficient_list_test IPA已構建: /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa
+# 構建時間: 00:00:25
+# inefficient_list_test IPA已備份到: build/inefficient_list_test_ipa/
+
+# ===== IPA構建完成 =====
+# 總共構建了 2 個測試的 IPA 檔案
+# 構建時間總計: 00:00:50
+# 構建時間詳情已保存到: /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/test_results/build_times.json
+# 可以運行 './scripts/run_performance_tests.sh' 開始測試
+```
+
+**構建摘要：**
+- efficient_list_test IPA：25 秒
+- inefficient_list_test IPA：25 秒
+- 總構建時間：50 秒
+- 構建產物大小：8.9MB（每個 IPA）
+- Archive 大小：32.1MB
+
 ### 只運行效能測試
 
 ```bash
@@ -47,6 +105,87 @@
 ```
 
 此命令會使用現有的 IPA/APK 檔案執行效能測試，並收集結果。測試會使用在 `scripts/.env` 中配置的設備 ID。
+
+### 測試運行日志示例
+
+#### iOS 效能測試運行成功日志（2025年11月7日）
+
+```bash
+./scripts/run_performance_tests.sh --platform ios
+
+# 載入 scripts/.env 配置文件
+# 設定環境變數: IOS_DEVICE_ID
+# 設定環境變數: ANDROID_DEVICE_ID
+# 使用 scripts/.env 中的 iOS 設備 ID: 00008130-001435102EC0001C
+# ===== 開始效能測試 =====
+# 將會運行每個測試 1 次
+# 平台: ios
+# 設備 ID: 00008130-001435102EC0001C
+# 找到 2 個測試檔案：
+# - efficient_list_test.dart
+# - inefficient_list_test.dart
+
+# ===== 運行 efficient_list_test 測試 =====
+# 使用二進制檔案: /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/efficient_list_test_ipa/study_flutter_performance_test.ipa
+# driver_file: /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/test_driver/efficient_list_test_driver.dart
+
+# ===== 運行 efficient_list_test 測試 #1 =====
+# Resolving dependencies... 
+# Got dependencies!
+# Installing and launching...                                         9.3s
+# VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:62487/iQ1Joz40HsI=/
+# VMServiceFlutterDriver: Isolate found with number: 1808562034494311
+# VMServiceFlutterDriver: Connected to Flutter application.
+# flutter: 00:00 +0: Test efficient list scrolling performance
+# flutter: 00:07 +1: (tearDownAll)
+# flutter: 00:07 +2: All tests passed!
+# All tests passed.
+# RESULT_FILE: build/efficient_scrolling.timeline_summary.json
+# TARGET_FILE: test_results/ios/efficient_list_test/efficient_scrolling_1.timeline_summary.json
+# efficient_list_test 測試 #1 完成並保存結果
+# 測試時間: 00:00:21
+# 結果文件路徑: test_results/ios/efficient_list_test/efficient_scrolling_1.timeline_summary.json
+
+# ===== 運行 inefficient_list_test 測試 =====
+# 使用二進制檔案: /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/inefficient_list_test_ipa/study_flutter_performance_test.ipa
+# driver_file: /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/test_driver/inefficient_list_test_driver.dart
+
+# ===== 運行 inefficient_list_test 測試 #1 =====
+# Resolving dependencies... 
+# Got dependencies!
+# Installing and launching...                                         9.2s
+# VMServiceFlutterDriver: Connecting to Flutter application at http://127.0.0.1:62641/nbW8v3LlAmg=/
+# VMServiceFlutterDriver: Isolate found with number: 8849909928030975
+# VMServiceFlutterDriver: Connected to Flutter application.
+# flutter: 00:00 +0: Test inefficient list scrolling performance
+# flutter: 00:31 +1: (tearDownAll)
+# flutter: 00:31 +2: All tests passed!
+# All tests passed.
+# RESULT_FILE: build/inefficient_scrolling.timeline_summary.json
+# TARGET_FILE: test_results/ios/inefficient_list_test/inefficient_scrolling_1.timeline_summary.json
+# inefficient_list_test 測試 #1 完成並保存結果
+# 測試時間: 00:00:46
+# 結果文件路徑: test_results/ios/inefficient_list_test/inefficient_scrolling_1.timeline_summary.json
+```
+
+**測試摘要：**
+- **efficient_list_test**：
+  - 測試時間：21 秒
+  - 實際測試執行時間：7 秒（flutter 測試部分）
+  - 安裝和啟動時間：9.3 秒
+  - 狀態：✓ 所有測試通過
+  - 結果文件：`test_results/ios/efficient_list_test/efficient_scrolling_1.timeline_summary.json`
+
+- **inefficient_list_test**：
+  - 測試時間：46 秒
+  - 實際測試執行時間：31 秒（flutter 測試部分）
+  - 安裝和啟動時間：9.2 秒
+  - 狀態：✓ 所有測試通過
+  - 結果文件：`test_results/ios/inefficient_list_test/inefficient_scrolling_1.timeline_summary.json`
+
+**效能對比觀察：**
+- inefficient 版本的測試執行時間（31秒）明顯長於 efficient 版本（7秒），**差距約 4.4 倍**
+- 這顯示了低效實現對滾動效能的顯著影響
 
 ## 測試結果檔案
 
@@ -195,7 +334,7 @@ jq '.test_cases.inefficient.files' test_results/performance_report.json
 
 ```bash
 fvm flutter drive \
-  --driver=test_driver/efficient_driver.dart \
+  --driver=test_driver/efficient_list_test_driver.dart \
   --target=integration_test/efficient_list_test.dart \
   --no-dds \
   --profile \
@@ -334,8 +473,17 @@ fvm flutter drive \
   --target=integration_test/inefficient_list_test.dart \
   --no-dds \
   --profile \
-  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/ios/ipa/study_flutter_performance_test.ipa \
+  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/inefficient_list_test_ipa/study_flutter_performance_test.ipa \
   -d 00008130-001435102EC0001C
+
+fvm flutter drive \
+  --driver=test_driver/efficient_list_test_driver.dart \
+  --target=integration_test/efficient_list_test.dart \
+  --no-dds \
+  --profile \
+  --use-application-binary /Users/wingchan/Project/Learning/Flutter/study_flutter_performance_test/build/efficient_list_test_ipa/study_flutter_performance_test.ipa \
+  -d 00008130-001435102EC0001C
+
 ```
 
 ## Android 平台

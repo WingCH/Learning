@@ -180,19 +180,24 @@ for test_file in "${TEST_FILES[@]}"; do
   fi
   
   driver_name=$(basename "$driver_file")
-  echo "使用 driver 檔案: $driver_name"
-  
+  echo "driver_file: $driver_file"
+  echo "driver_name: $driver_name"
+  echo "DEVICE_ID: $DEVICE_ID"
+
+
   # 運行多次測試
   for i in $(seq 1 $TEST_COUNT); do
     echo -e "\n===== 運行 $test_name 測試 #$i ====="
     
     # 記錄測試開始時間
     START_TIME=$(date +%s)
-    
+
+    # REMARK: if `--no-dds` is not set, the result may cannot save to the build directory, seems is flutter driver bug.
     # 使用二進制檔案運行測試
     fvm flutter drive \
       --driver="$driver_file" \
       --target="$test_file" \
+      --no-dds \
       --profile \
       --use-application-binary "$BINARY_PATH" \
       -d $DEVICE_ID
@@ -206,11 +211,14 @@ for test_file in "${TEST_FILES[@]}"; do
     
     # 確定結果檔案的模式，從測試名稱中提取（如 efficient_list_test -> efficient_scrolling）
     result_mode=$(echo "$test_name" | sed -E 's/_list_test$//' | sed -E 's/_test$//')
+    echo "result_mode: $result_mode"
     RESULT_FILE="build/${result_mode}_scrolling.timeline_summary.json"
+    echo "RESULT_FILE: $RESULT_FILE"
     
     if [ $TEST_STATUS -eq 0 ] && [ -f "$RESULT_FILE" ]; then
       # 複製結果文件並添加序號
       TARGET_FILE="test_results/$PLATFORM/${test_name}/${result_mode}_scrolling_$i.timeline_summary.json"
+      echo "TARGET_FILE: $TARGET_FILE"
       cp "$RESULT_FILE" "$TARGET_FILE"
       
       echo "$test_name 測試 #$i 完成並保存結果"

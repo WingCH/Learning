@@ -1,0 +1,1 @@
+ /Users/wingchan/Project/packages/packages/video_player/video_player/example/.dart_tool/flutter_build/ba1c960c4b0451509ec5eb4b737e7e4c/native_assets.json: 

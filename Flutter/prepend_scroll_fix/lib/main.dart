@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'package:prepend_scroll_fix/prepend_scroll_fixer.dart';
+import 'package:prepend_scroll_fix/top_prepend_scroll_fixer.dart';
 
 void main() {
   runApp(const MaterialApp(home: ManualScrollFixPage()));
@@ -59,49 +59,52 @@ class _ManualScrollFixPageState extends State<ManualScrollFixPage> {
         label: const Text("頂部插入資料"),
         icon: const Icon(Icons.vertical_align_top),
       ),
-      body: CustomScrollView(
+      body: PrimaryScrollController(
         controller: _scrollController,
-        slivers: [
-          SliverToBoxAdapter(
-            child: TopPrependScrollFixer(
-              scrollController: _scrollController,
-              child: Column(
-                children: [
-                  // 標題
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    color: Colors.yellow[100],
-                    width: double.infinity,
-                    child: const Text(
-                      "這是 Column 頂部\n點擊右下角按鈕插入資料\n注意觀察這裡不會被擠開",
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  // 列表內容
-                  ..._items.map((item) {
-                    // 為了明顯區分新舊資料，新資料(>=9000)用紅色
-                    final isNew = item >= 9000;
-                    return Container(
-                      height: 80, // 固定高度方便測試，實際動態高度也能運作
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 4, horizontal: 16),
-                      color: isNew ? Colors.red[100] : Colors.blue[100],
-                      alignment: Alignment.center,
-                      child: Text(
-                        isNew ? "新資料 Item $item" : "舊資料 Item $item",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isNew ? Colors.red : Colors.blue,
-                        ),
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            SliverToBoxAdapter(
+              child: TopPrependScrollFixer(
+                // scrollController: _scrollController, // 唔使傳，佢會自動搵到上面個 PrimaryScrollController
+                child: Column(
+                  children: [
+                    // 標題
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      color: Colors.yellow[100],
+                      width: double.infinity,
+                      child: const Text(
+                        "這是 Column 頂部\n點擊右下角按鈕插入資料\n注意觀察這裡不會被擠開",
+                        textAlign: TextAlign.center,
                       ),
-                    );
-                  }),
-                ],
+                    ),
+
+                    // 列表內容
+                    ..._items.map((item) {
+                      // 為了明顯區分新舊資料，新資料(>=9000)用紅色
+                      final isNew = item >= 9000;
+                      return Container(
+                        height: 80, // 固定高度方便測試，實際動態高度也能運作
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 16),
+                        color: isNew ? Colors.red[100] : Colors.blue[100],
+                        alignment: Alignment.center,
+                        child: Text(
+                          isNew ? "新資料 Item $item" : "舊資料 Item $item",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isNew ? Colors.red : Colors.blue,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

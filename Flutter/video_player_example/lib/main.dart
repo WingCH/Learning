@@ -24,14 +24,8 @@ class VideoApp extends StatefulWidget {
 class _VideoAppState extends State<VideoApp> {
   late VideoPlayerController _controller;
   int _currentVideoIndex = 0;
-  final List<String> _videoPaths = [
-    'assets/cannot_read_duration_in_android_fixed.mp4',
-    'assets/can_read_duration_in_android.mp4',
-  ];
-  final List<String> _videoNames = [
-    'cannot_read_duration_in_android_fixed',
-    'can_read_duration_in_android',
-  ];
+  final List<String> _videoPaths = ['assets/ios_fixed_video.mp4'];
+  final List<String> _videoNames = ['ios_fixed_video'];
 
   @override
   void initState() {
@@ -50,6 +44,9 @@ class _VideoAppState extends State<VideoApp> {
             // Update UI when video state changes
             if (mounted) {
               setState(() {});
+            }
+            if (_controller.value.hasError) {
+              print('VideoPlayer error: ${_controller.value.errorDescription}');
             }
           });
   }
@@ -102,7 +99,7 @@ class _VideoAppState extends State<VideoApp> {
                             Text(
                               '當前影片: ${_videoNames[_currentVideoIndex]}',
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                               ),

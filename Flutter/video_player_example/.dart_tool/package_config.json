@@ -501,7 +501,7 @@
     },
     {
       "name": "video_player",
-      "rootUri": "../../",
+      "rootUri": "file:///Users/wingchan/.pub-cache/hosted/pub.dev/video_player-2.10.1",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },

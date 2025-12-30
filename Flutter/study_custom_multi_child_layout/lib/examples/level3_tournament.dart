@@ -122,6 +122,7 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
       child: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(20),
+          color: Colors.red,
           child: CustomMultiChildLayout(
             delegate: TournamentLayoutDelegate(
               nodes: _nodes,

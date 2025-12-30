@@ -96,6 +96,7 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      physics: _SnappingScrollPhysics(itemWidth: _cardWidth + _horizontalGap),
       child: SingleChildScrollView(
         scrollDirection:
             Axis.vertical, // 雖然需求說僅限左右，但為了能看到垂直方向的內容，通常還是需要垂直滾動，或者確保父層有足夠高度
@@ -145,6 +146,64 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SnappingScrollPhysics extends ScrollPhysics {
+  final double itemWidth;
+
+  const _SnappingScrollPhysics({required this.itemWidth, super.parent});
+
+  @override
+  _SnappingScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return _SnappingScrollPhysics(
+      itemWidth: itemWidth,
+      parent: buildParent(ancestor),
+    );
+  }
+
+  @override
+  Simulation? createBallisticSimulation(
+    ScrollMetrics position,
+    double velocity,
+  ) {
+    // If we're out of range, defer to default parent physics
+    if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
+        (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
+      return super.createBallisticSimulation(position, velocity);
+    }
+
+    final Tolerance tolerance = toleranceFor(position);
+    // Calculate which item index we are closest to
+    // The "pixels" is the scroll offset.
+    // round(pixels / itemWidth) gives the nearest index.
+
+    // We can use the velocity to "predict" where the user wants to go.
+    // If velocity is high enough, we jump to next/prev page.
+
+    double target = position.pixels;
+    if (velocity.abs() > tolerance.velocity) {
+      // User flung the list
+      target += velocity * 0.3; // Simple prediction
+    }
+
+    // Find the nearest snap point
+    double page = target / itemWidth;
+    int index = page.round();
+
+    double destination = index * itemWidth;
+
+    // Ensure we don't snap outside bounds (though clamp simulation handles this mostly)
+    // but good to be explicit for the destination
+    // (We rely on standard physics to handle overscroll bounds mostly, but the spring target should be valid)
+
+    return ScrollSpringSimulation(
+      spring,
+      position.pixels,
+      destination,
+      velocity,
+      tolerance: tolerance,
     );
   }
 }

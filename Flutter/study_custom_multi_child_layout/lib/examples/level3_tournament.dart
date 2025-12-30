@@ -271,6 +271,9 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
   final double horizontalGap;
   final double verticalGap;
   final double focusRoundIndex;
+  // 增加 Curve 屬性，讓高度變化有動畫曲線感
+  // 雖然是 Scroll Driven，但在不同階段應用曲線會讓收縮感更自然
+  final Curve sizeCurve;
 
   TournamentLayoutDelegate({
     required this.nodes,
@@ -279,6 +282,7 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
     required this.horizontalGap,
     required this.verticalGap,
     required this.focusRoundIndex,
+    this.sizeCurve = Curves.easeInOut, // 默認使用 EaseInOut
   });
 
   @override
@@ -304,7 +308,9 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
     // 向上取整，找到當前區間的右邊輪次 (ceilRound)
     int ceilRound = focusRoundIndex.ceil();
     // 計算插值進度 t (0.0 ~ 1.0)
-    double t = focusRoundIndex - floorRound;
+    double rawT = focusRoundIndex - floorRound;
+    // 應用曲線，讓變化非線性 (Animations!)
+    double t = sizeCurve.transform(rawT);
 
     // 分別計算兩個輪次所需的理論高度
     double h1 = _calculateHeightForRound(floorRound);
@@ -340,125 +346,28 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
       positionChild('lines', Offset.zero);
     }
 
-    Map<int, List<Offset>> positionsByRound = {};
+    // 使用共用的插值邏輯計算位置
+    Map<int, List<Offset>> finalPositionsByRound =
+        calculateInterpolatedPositions(
+          nodes: nodes,
+          focusRoundIndex: focusRoundIndex,
+          cardWidth: cardWidth,
+          cardHeight: cardHeight,
+          horizontalGap: horizontalGap,
+          verticalGap: verticalGap,
+          sizeCurve: sizeCurve,
+        );
 
-    // Determine the "Anchor Round"
-    // We round to nearest integer to get the round that should be "normal spaced"
-    int anchorRound = focusRoundIndex.round();
-
-    // Find max round
-    int maxRound = 0;
-    for (var node in nodes) {
-      if (node.round > maxRound) maxRound = node.round;
-    }
-
-    // 步驟 1: 佈局 Anchor Round (基準輪次)
-    // ------------------------------------------------
-    // "Anchor Round" 是當前視覺上的焦點輪次 (例如 Scroll 到 8強時，8強就是 Anchor)。
-    // 這一輪的節點使用 "標準間距 (verticalGap)" 進行排列。
-    // 這決定了當前畫面上看到的最緊湊的間距。
-    List<MatchNode> anchorNodes = nodes
-        .where((n) => n.round == anchorRound)
-        .toList();
-    anchorNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
-    List<Offset> anchorPositions = [];
-
-    // 從頂部開始排列，加上一些垂直間距
-    double startY = verticalGap;
-
-    for (int i = 0; i < anchorNodes.length; i++) {
-      double x = anchorRound * (cardWidth + horizontalGap) + 20;
-      double y = startY + i * (cardHeight + verticalGap);
-      anchorPositions.add(Offset(x, y));
-    }
-    positionsByRound[anchorRound] = anchorPositions;
-
-    // 步驟 2: 向前佈局 (Forward Layout)
-    // 處理比 AnchorRound 大的輪次 (例如從 8強 推算 4強 的位置)。
-    // ------------------------------------------------
-    // 邏輯: "居中對齊" (Center on Previous Round)
-    // 每一場比賽的兩個勝者會晉級到下一輪，所以下一輪的節點應該位於上一輪兩個節點的中間。
-    for (int r = anchorRound + 1; r <= maxRound; r++) {
-      List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
-      roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
-      List<Offset> currentPositions = [];
-
-      var prevPositions = positionsByRound[r - 1];
-
-      for (int i = 0; i < roundNodes.length; i++) {
-        double x = r * (cardWidth + horizontalGap) + 20;
-        double y = 0;
-
-        // 如果上一輪有足夠的節點 (2*i 和 2*i+1)，我們就取它們 Y 坐標的平均值
-        if (prevPositions != null && prevPositions.length > 2 * i + 1) {
-          double y1 = prevPositions[2 * i].dy;
-          double y2 = prevPositions[2 * i + 1].dy;
-          y = (y1 + y2) / 2;
-        }
-        currentPositions.add(Offset(x, y));
-      }
-      positionsByRound[r] = currentPositions;
-    }
-
-    // 步驟 3: 向後佈局 (Backward Layout)
-    // 處理比 AnchorRound 小的輪次 (例如從 8強 往回推算 16強 的位置)。
-    // ------------------------------------------------
-    // 邏輯: "反向發散" (Reverse Centering / Fanning Out)
-    // 當我們聚焦在後面輪次時，前面的輪次已經移出畫面，但它們的相對位置應該取決於 當前可見的輪次。
-    // 這其實是 Step 2 的反向操作：
-    // 父節點 (Round r) 的位置，是由 子節點 (Round r+1) 的位置 "反推" 出來的。
-
-    // 優化：只處理可見範圍內的輪次
-    // 如果當前聚焦在 Round 1 (8強)，就不需要繪製 Round 0 (16強)
     int minVisibleRound = focusRoundIndex.floor();
-
-    for (int r = anchorRound - 1; r >= minVisibleRound; r--) {
-      List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
-      roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
-      // 初始化位置列表
-      List<Offset> currentPositions = List.filled(
-        roundNodes.length,
-        Offset.zero,
-      );
-
-      // 我們需要參考 "下一輪" (r+1) 的位置，因為它是我們的佈局基準
-      var nextPositions = positionsByRound[r + 1];
-
-      // 每個 (r+1) 的節點，都是由 (r) 的兩個節點晉級而來的。
-      // 所以 Node J (在 r+1 輪) 連接著 Node 2*J 和 Node 2*J+1 (在 r 輪)。
-      if (nextPositions != null) {
-        for (int j = 0; j < nextPositions.length; j++) {
-          Offset childPos = nextPositions[j];
-
-          double x = r * (cardWidth + horizontalGap) + 20;
-
-          // 我們需要計算兩個"父節點" (Parent) 的 Y 坐標
-          // 為了對稱，我們讓這兩個父節點相對於子節點上下對稱分佈。
-          // 偏移量 = (卡片高度 + 垂直間距) / 2
-
-          // Parent 1 (上方)
-          if (2 * j < roundNodes.length) {
-            double y1 = childPos.dy - (cardHeight + verticalGap) / 2;
-            currentPositions[2 * j] = Offset(x, y1);
-          }
-          // Parent 2 (下方)
-          if (2 * j + 1 < roundNodes.length) {
-            double y2 = childPos.dy + (cardHeight + verticalGap) / 2;
-            currentPositions[2 * j + 1] = Offset(x, y2);
-          }
-        }
-      }
-      positionsByRound[r] = currentPositions;
-    }
 
     // Apply positions to children
     for (var node in nodes) {
       // 優化：如果該輪次小於最小可見輪次，則不進行佈局 (不顯示)
       if (node.round < minVisibleRound) continue;
 
-      if (hasChild(node.id) && positionsByRound[node.round] != null) {
+      if (hasChild(node.id) && finalPositionsByRound[node.round] != null) {
         // Use indexInRound to find safe position
-        List<Offset> roundPos = positionsByRound[node.round]!;
+        List<Offset> roundPos = finalPositionsByRound[node.round]!;
         if (node.indexInRound < roundPos.length) {
           Offset pos = roundPos[node.indexInRound];
           layoutChild(
@@ -485,6 +394,7 @@ class TournamentLinesPainter extends CustomPainter {
   final double horizontalGap;
   final double verticalGap;
   final double focusRoundIndex;
+  final Curve sizeCurve;
 
   TournamentLinesPainter({
     required this.nodes,
@@ -493,6 +403,7 @@ class TournamentLinesPainter extends CustomPainter {
     required this.horizontalGap,
     required this.verticalGap,
     required this.focusRoundIndex,
+    this.sizeCurve = Curves.easeInOut,
   });
 
   @override
@@ -505,110 +416,90 @@ class TournamentLinesPainter extends CustomPainter {
     // Reuse Logic (Simplified copy of LayoutDelegate logic)
     // In production, this logic should be shared.
 
-    Map<int, List<Offset>> positionsByRound = {};
-    int anchorRound = focusRoundIndex.round();
-    int maxRound = 0;
-    for (var node in nodes) {
-      if (node.round > maxRound) maxRound = node.round;
-    }
+    // 使用共用的插值邏輯計算位置
+    Map<int, List<Offset>> finalPositionsByRound =
+        calculateInterpolatedPositions(
+          nodes: nodes,
+          focusRoundIndex: focusRoundIndex,
+          cardWidth: cardWidth,
+          cardHeight: cardHeight,
+          horizontalGap: horizontalGap,
+          verticalGap: verticalGap,
+          sizeCurve: sizeCurve,
+        );
 
-    // Step 1: Anchor
-    List<MatchNode> anchorNodes = nodes
-        .where((n) => n.round == anchorRound)
-        .toList();
-    anchorNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
-    List<Offset> anchorPositions = [];
-    double startY = verticalGap;
-    for (int i = 0; i < anchorNodes.length; i++) {
-      double x = anchorRound * (cardWidth + horizontalGap) + 20;
-      double y = startY + i * (cardHeight + verticalGap);
-      anchorPositions.add(Offset(x, y));
-    }
-    positionsByRound[anchorRound] = anchorPositions;
-
-    // Step 2: Forward
-    for (int r = anchorRound + 1; r <= maxRound; r++) {
-      List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
-      roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
-      List<Offset> currentPositions = [];
-      var prevPositions = positionsByRound[r - 1];
-      for (int i = 0; i < roundNodes.length; i++) {
-        double x = r * (cardWidth + horizontalGap) + 20;
-        double y = 0;
-        if (prevPositions != null && prevPositions.length > 2 * i + 1) {
-          double y1 = prevPositions[2 * i].dy;
-          double y2 = prevPositions[2 * i + 1].dy;
-          y = (y1 + y2) / 2;
-
-          // Draw lines (Logic is same: Prev -> Current)
-          Offset targetLeft = Offset(x, y + cardHeight / 2);
-          Offset source1Right = Offset(
-            prevPositions[2 * i].dx + cardWidth,
-            y1 + cardHeight / 2,
-          );
-          Offset source2Right = Offset(
-            prevPositions[2 * i + 1].dx + cardWidth,
-            y2 + cardHeight / 2,
-          );
-          drawBezierLine(canvas, paint, source1Right, targetLeft);
-          drawBezierLine(canvas, paint, source2Right, targetLeft);
-        }
-        currentPositions.add(Offset(x, y));
-      }
-      positionsByRound[r] = currentPositions;
-    }
-
-    // Step 3: Backward
-    // 優化：只繪製可見範圍內的連線
     int minVisibleRound = focusRoundIndex.floor();
+    // anchorRound is only used to iterate rounds.
+    // Actually we should iterate all keys in finalPositionsByRound.
 
-    for (int r = anchorRound - 1; r >= minVisibleRound; r--) {
-      List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
-      roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
-      List<Offset> currentPositions = List.filled(
-        roundNodes.length,
-        Offset.zero,
-      );
-      var nextPositions = positionsByRound[r + 1];
-      if (nextPositions != null) {
-        for (int j = 0; j < nextPositions.length; j++) {
-          Offset childPos = nextPositions[j];
+    int maxRound = 0;
+    for (var k in finalPositionsByRound.keys) {
+      if (k > maxRound) {
+        maxRound = k;
+      }
+    }
 
-          double x = r * (cardWidth + horizontalGap) + 20;
+    // Drawing lines:
+    // We iterate from maxRound-1 down to minVisibleRound (Backward / Fan-out style logic matches drawing order)
+    // Or iterate from minVisibleRound to maxRound.
+    // Logic: Connect Round R to Round R+1.
+    // Source: R. Target: R+1.
 
-          // 我們需要計算兩個"父節點" (Parent) 的 Y 坐標
-          // 為了對稱，我們讓這兩個父節點相對於子節點上下對稱分佈。
-          // 偏移量 = (卡片高度 + 垂直間距) / 2
+    // Let's iterate R from minVisibleRound to maxRound - 1.
+    // For each node in R+1 (Target), find its parents in R (Source).
 
-          // Parent 1 (上方)
-          if (2 * j < roundNodes.length) {
-            double y1 = childPos.dy - (cardHeight + verticalGap) / 2;
-            currentPositions[2 * j] = Offset(x, y1);
+    List<int> sortedRounds = finalPositionsByRound.keys.toList()..sort();
 
-            // Draw Lines (Prev -> Current is r -> r+1)
-            // Start: this node (r) right. End: child node (r+1) left.
-            Offset sourceRight = Offset(x + cardWidth, y1 + cardHeight / 2);
-            Offset targetLeft = Offset(
-              childPos.dx,
-              childPos.dy + cardHeight / 2,
-            );
-            drawBezierLine(canvas, paint, sourceRight, targetLeft);
-          }
-          // Parent 2 (下方)
-          if (2 * j + 1 < roundNodes.length) {
-            double y2 = childPos.dy + (cardHeight + verticalGap) / 2;
-            currentPositions[2 * j + 1] = Offset(x, y2);
+    for (int r in sortedRounds) {
+      if (r < minVisibleRound) {
+        continue;
+      }
+      if (r == maxRound) {
+        continue; // No lines from last round to nowhere? No, lines are usually between R and R+1.
+      }
 
-            Offset sourceRight = Offset(x + cardWidth, y2 + cardHeight / 2);
-            Offset targetLeft = Offset(
-              childPos.dx,
-              childPos.dy + cardHeight / 2,
-            );
-            drawBezierLine(canvas, paint, sourceRight, targetLeft);
-          }
+      // Current R is the "Source" side (Left). Next R+1 is "Target" side (Right).
+      // Wait, the original logic was:
+      // Round R nodes.
+      // Round R+1 positions.
+      // For each node in R+1, connect to parents in R.
+
+      // Let's look at R+1.
+      int nextR = r + 1;
+      if (!finalPositionsByRound.containsKey(nextR)) {
+        continue;
+      }
+
+      List<Offset> nextPosList = finalPositionsByRound[nextR]!;
+      List<Offset> currPosList = finalPositionsByRound[r]!;
+
+      // In this tournament structure:
+      // Node J in Round R+1 comes from Node 2*J and Node 2*J+1 in Round R.
+
+      for (int j = 0; j < nextPosList.length; j++) {
+        Offset targetPos = nextPosList[j];
+        Offset targetLeft = Offset(targetPos.dx, targetPos.dy + cardHeight / 2);
+
+        // Parent 1 (2*j)
+        if (2 * j < currPosList.length) {
+          Offset sourcePos = currPosList[2 * j];
+          Offset sourceRight = Offset(
+            sourcePos.dx + cardWidth,
+            sourcePos.dy + cardHeight / 2,
+          );
+          drawBezierLine(canvas, paint, sourceRight, targetLeft);
+        }
+
+        // Parent 2 (2*j + 1)
+        if (2 * j + 1 < currPosList.length) {
+          Offset sourcePos = currPosList[2 * j + 1];
+          Offset sourceRight = Offset(
+            sourcePos.dx + cardWidth,
+            sourcePos.dy + cardHeight / 2,
+          );
+          drawBezierLine(canvas, paint, sourceRight, targetLeft);
         }
       }
-      positionsByRound[r] = currentPositions;
     }
   }
 
@@ -635,4 +526,171 @@ class TournamentLinesPainter extends CustomPainter {
   bool shouldRepaint(covariant TournamentLinesPainter oldDelegate) {
     return oldDelegate.focusRoundIndex != focusRoundIndex;
   }
+}
+
+// =============================================================================
+// Helper Functions for Layout Logic
+// =============================================================================
+
+// 計算並插值所有節點的位置，供 Delegate and Painter 使用。
+// 確保兩者的位置邏輯完全一致。
+Map<int, List<Offset>> calculateInterpolatedPositions({
+  required List<MatchNode> nodes,
+  required double focusRoundIndex,
+  required double cardWidth,
+  required double cardHeight,
+  required double horizontalGap,
+  required double verticalGap,
+  required Curve sizeCurve,
+}) {
+  int floorRound = focusRoundIndex.floor();
+  int ceilRound = focusRoundIndex.ceil();
+  // 為了效能，只計算可見範圍 (從 floorRound 開始)
+  int minVisibleRound = floorRound;
+
+  // 1. 計算 floorRound 為 Anchor 的佈局
+  var positionsFloor = _calculateBasePositions(
+    nodes: nodes,
+    anchorRound: floorRound,
+    cardWidth: cardWidth,
+    cardHeight: cardHeight,
+    horizontalGap: horizontalGap,
+    verticalGap: verticalGap,
+    minVisibleRound: minVisibleRound,
+  );
+
+  bool needInterpolation = floorRound != ceilRound;
+  Map<int, List<Offset>> positionsCeil = {};
+
+  // 2. 如果需要，計算 ceilRound 為 Anchor 的佈局
+  if (needInterpolation) {
+    positionsCeil = _calculateBasePositions(
+      nodes: nodes,
+      anchorRound: ceilRound,
+      cardWidth: cardWidth,
+      cardHeight: cardHeight,
+      horizontalGap: horizontalGap,
+      verticalGap: verticalGap,
+      minVisibleRound: minVisibleRound,
+    );
+  }
+
+  // 3. 計算插值係數 t
+  double rawT = focusRoundIndex - floorRound;
+  double t = sizeCurve.transform(rawT);
+
+  Map<int, List<Offset>> finalPositionsByRound = {};
+
+  // 4. 合併結果
+  Set<int> allRounds = {};
+  allRounds.addAll(positionsFloor.keys);
+
+  if (needInterpolation) {
+    allRounds.addAll(positionsCeil.keys);
+  }
+
+  for (int r in allRounds) {
+    List<Offset>? list1 = positionsFloor[r];
+    List<Offset>? list2 = positionsCeil[r];
+
+    List<Offset> resultList = [];
+    int length = list1?.length ?? list2?.length ?? 0;
+
+    for (int i = 0; i < length; i++) {
+      // 如果某一邊沒有數據 (不應該發生在相同節點集)，使用 Offset.zero 或 對方的數據
+      Offset p1 = (list1 != null && i < list1.length)
+          ? list1[i]
+          : (list2 != null && i < list2.length ? list2[i] : Offset.zero);
+      Offset p2 = (list2 != null && i < list2.length) ? list2[i] : p1;
+
+      // Lerp 插值
+      Offset interpolated = Offset.lerp(p1, p2, t)!;
+      resultList.add(interpolated);
+    }
+    finalPositionsByRound[r] = resultList;
+  }
+  return finalPositionsByRound;
+}
+
+// 根據指定的 Anchor Round 計算基本位置
+Map<int, List<Offset>> _calculateBasePositions({
+  required List<MatchNode> nodes,
+  required int anchorRound,
+  required double cardWidth,
+  required double cardHeight,
+  required double horizontalGap,
+  required double verticalGap,
+  required int minVisibleRound,
+}) {
+  Map<int, List<Offset>> positionsByRound = {};
+  int maxRound = 0;
+  for (var node in nodes) {
+    if (node.round > maxRound) {
+      maxRound = node.round;
+    }
+  }
+
+  // 步驟 1: 佈局 Anchor Round
+  List<MatchNode> anchorNodes = nodes
+      .where((n) => n.round == anchorRound)
+      .toList();
+  anchorNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
+  List<Offset> anchorPositions = [];
+  double startY = verticalGap;
+
+  for (int i = 0; i < anchorNodes.length; i++) {
+    double x = anchorRound * (cardWidth + horizontalGap) + 20;
+    double y = startY + i * (cardHeight + verticalGap);
+    anchorPositions.add(Offset(x, y));
+  }
+  positionsByRound[anchorRound] = anchorPositions;
+
+  // 步驟 2: 向前佈局 (Rounds > Anchor)
+  for (int r = anchorRound + 1; r <= maxRound; r++) {
+    List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
+    roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
+    List<Offset> currentPositions = [];
+    var prevPositions = positionsByRound[r - 1];
+
+    for (int i = 0; i < roundNodes.length; i++) {
+      double x = r * (cardWidth + horizontalGap) + 20;
+      double y = 0;
+      if (prevPositions != null && prevPositions.length > 2 * i + 1) {
+        double y1 = prevPositions[2 * i].dy;
+        double y2 = prevPositions[2 * i + 1].dy;
+        y = (y1 + y2) / 2;
+      }
+      currentPositions.add(Offset(x, y));
+    }
+    positionsByRound[r] = currentPositions;
+  }
+
+  // 步驟 3: 向後佈局 (Rounds < Anchor)
+  // 只計算 minVisibleRound 以後的
+  for (int r = anchorRound - 1; r >= minVisibleRound; r--) {
+    List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
+    roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
+    List<Offset> currentPositions = List.filled(roundNodes.length, Offset.zero);
+    var nextPositions = positionsByRound[r + 1];
+
+    if (nextPositions != null) {
+      for (int j = 0; j < nextPositions.length; j++) {
+        Offset childPos = nextPositions[j];
+        double x = r * (cardWidth + horizontalGap) + 20;
+
+        // Parent 1 (上方)
+        if (2 * j < roundNodes.length) {
+          double y1 = childPos.dy - (cardHeight + verticalGap) / 2;
+          currentPositions[2 * j] = Offset(x, y1);
+        }
+        // Parent 2 (下方)
+        if (2 * j + 1 < roundNodes.length) {
+          double y2 = childPos.dy + (cardHeight + verticalGap) / 2;
+          currentPositions[2 * j + 1] = Offset(x, y2);
+        }
+      }
+    }
+    positionsByRound[r] = currentPositions;
+  }
+  return positionsByRound;
 }

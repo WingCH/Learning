@@ -99,20 +99,28 @@ class _Level2CircleExampleState extends State<Level2CircleExample> {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.blue.shade100),
                   ),
-                  child: CustomMultiChildLayout(
-                    delegate: CircleLayoutDelegate(
-                      itemCount: _itemCount,
-                      radiusPercent: _radiusPercent,
-                      rotationOffset: _rotationOffset,
-                    ),
-                    children: [
-                      // 根據當前的數量動態產生子組件
-                      for (int i = 0; i < _itemCount; i++)
-                        LayoutId(
-                          id: i, // 使用索引作為 ID，方便 Delegate 使用迴圈存取
-                          child: CircleItem(index: i),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(end: _itemCount.toDouble()),
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOutBack, // 使用彈性曲線讓效果更生動
+                    builder: (context, effectiveCount, child) {
+                      return CustomMultiChildLayout(
+                        delegate: CircleLayoutDelegate(
+                          itemCount: _itemCount,
+                          effectiveItemCount: effectiveCount,
+                          radiusPercent: _radiusPercent,
+                          rotationOffset: _rotationOffset,
                         ),
-                    ],
+                        children: [
+                          // 根據當前的數量動態產生子組件
+                          for (int i = 0; i < _itemCount; i++)
+                            LayoutId(
+                              id: i, // 使用索引作為 ID，方便 Delegate 使用迴圈存取
+                              child: CircleItem(index: i),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               );
@@ -162,11 +170,13 @@ class CircleItem extends StatelessWidget {
 
 class CircleLayoutDelegate extends MultiChildLayoutDelegate {
   final int itemCount;
+  final double effectiveItemCount; // 用於動畫的有效數量
   final double radiusPercent;
   final double rotationOffset;
 
   CircleLayoutDelegate({
     required this.itemCount,
+    required this.effectiveItemCount,
     required this.radiusPercent,
     required this.rotationOffset,
   });
@@ -188,10 +198,12 @@ class CircleLayoutDelegate extends MultiChildLayoutDelegate {
 
         // --- 第二步：計算位置 ---
         // 角度 = (2 * pi / 數量) * 索引
+        // 這裡使用 effectiveItemCount 來計算每一步的角度，實現平滑過渡
+        final double angleStep = 2 * math.pi / effectiveItemCount;
+
         // 加入 -pi/2 是為了讓第一個項目從 "正上方" 開始，而不是右邊
         // 加入 rotationOffset 實現旋轉
-        final double angle =
-            (2 * math.pi / itemCount) * i - (math.pi / 2) + rotationOffset;
+        final double angle = angleStep * i - (math.pi / 2) + rotationOffset;
 
         // 圓參數式:
         // x = r * cos(theta)
@@ -215,6 +227,7 @@ class CircleLayoutDelegate extends MultiChildLayoutDelegate {
   bool shouldRelayout(covariant CircleLayoutDelegate oldDelegate) {
     // 當數量、半徑或旋轉角度改變時，我們需要重新佈局
     return oldDelegate.itemCount != itemCount ||
+        oldDelegate.effectiveItemCount != effectiveItemCount ||
         oldDelegate.radiusPercent != radiusPercent ||
         oldDelegate.rotationOffset != rotationOffset;
   }

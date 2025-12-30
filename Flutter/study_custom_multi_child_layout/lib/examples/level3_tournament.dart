@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart'; // ScrollSpringSimulation 需要此引用
 
 /// Level 3: 錦標賽對陣圖 (Tournament Bracket)
 ///
-/// 需求：
-/// 1. 僅限左右滑動 (Horizontal Scrolling)。
-/// 2. 生長方向：由左至右 (16強 -> 8強 -> ... -> 決賽)。
-/// 3. 卡片大小固定。
-/// 4. 高度隨層級縮小 (因為層級越高，節點越少)。
-/// 5. 連線使用 S 型貝茲曲線 (Bezier Curves)。
+/// 這個範例展示了如何使用 [CustomMultiChildLayout] 和 [CustomPainter] 實現一個高品質的錦標賽對陣圖。
+///
+/// 主要功能特色：
+/// 1. **精確佈局**: 使用自定義 Delegate 計算每個 "比賽卡片" (MatchNode) 的精確 (x, y) 坐標。
+/// 2. **動態視窗**: 隨著用戶向右滾動 (進入決賽圈)，容器的高度會自動收縮，因為後面的比賽較少，不需要那麼高的空間。
+/// 3. **平滑動畫**: 所有的位置變化和高度變化都基於滾動位置 (Scroll Position) 進行插值 (Interpolation)，確保視覺上的連續性。
+/// 4. **方括號連線**: 使用自定義 Painter 繪製帶有圓角的方括號連線，並且連線會隨著滾動自動調整與卡片的間距。
+/// 5. **吸附效果**: 實現了類似 PageView 的滾動吸附效果，讓用戶鬆手時總是停在某一輪的起始位置。
 
-// 定義一個簡單的比賽節點數據結構
+// =============================================================================
+// 數據模型 (Data Model)
+// =============================================================================
+
+/// 代表一場比賽的節點
 class MatchNode {
   final String id;
-  final int round; // 0: 16強, 1: 8強 ...
-  final int indexInRound;
+  final int round; // 輪次：0 (16強), 1 (8強), 2 (4強), 3 (準決賽), 4 (決賽)
+  final int indexInRound; // 該輪次中的索引 (從上到下)
   final String label;
 
   MatchNode({
@@ -24,6 +31,10 @@ class MatchNode {
   });
 }
 
+// =============================================================================
+// 主頁面 Widget (Main Widget)
+// =============================================================================
+
 class Level3TournamentExample extends StatefulWidget {
   const Level3TournamentExample({super.key});
 
@@ -33,26 +44,37 @@ class Level3TournamentExample extends StatefulWidget {
 }
 
 class _Level3TournamentExampleState extends State<Level3TournamentExample> {
-  // 模擬數據
+  // 比賽數據列表
   late List<MatchNode> _nodes;
-  final int _totalRounds = 5; // 16 -> 8 -> 4 -> 2 -> 1 (5 rounds)
+  // 總輪數 (例如 5 輪對應 16 隊單敗淘汰制) 16 -> 8 -> 4 -> 2 -> 1 (5 rounds)
+  final int _totalRounds = 5;
 
-  // Scroll Controller to track position
+  // 滾動控制器，用於監聽滾動位置
   final ScrollController _scrollController = ScrollController();
-  // Current "page" or "round" index based on scroll
+
+  // 當前滾動到的 "輪次索引" (可以是小數，例如 1.5 代表在第1輪和第2輪中間)
+  // 這個變量驅動了整個佈局的動畫狀態
   double _currentRoundIndex = 0.0;
 
-  // 配置參數
-  final double _cardWidth = 200;
-  final double _cardHeight = 60;
-  final double _horizontalGap = 20;
-  final double _verticalGap = 10; // 第一輪卡片之間的間距
+  // --- 佈局配置參數 ---
+  final double _cardHeight = 60; // 卡片高度
+  final double _horizontalGap = 20; // 卡片之間的水平間距
+  final double _verticalGap = 10; // 卡片之間的垂直間距
+  final double _paddingLeft = 8; // 容器左邊距
+  final double _paddingRight = 20; // 容器右邊距
+
+  // 動態計算卡片寬度
+  // (螢幕寬度 - 左邊距 - 右邊距 - 一個水平間隙) / 2
+  double get _cardWidth {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return (screenWidth - _paddingLeft - _paddingRight - _horizontalGap) / 2;
+  }
 
   @override
   void initState() {
     super.initState();
     _nodes = _generateNodes();
-    // Listen to scroll changes
+    // 監聽滾動事件，實時更新 _currentRoundIndex
     _scrollController.addListener(_onScroll);
   }
 
@@ -62,31 +84,32 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
     super.dispose();
   }
 
+  /// 滾動監聽回調
   void _onScroll() {
-    // 計算當前滾動位置對應的 "輪次索引" (Round Index)
-    // 這裡的 itemWidth 是 "卡片寬度 + 水平間距"，代表一列的完整寬度。
+    // 計算每一 "頁" (一輪比賽) 的總寬度 = 卡片寬度 + 間距
     final itemWidth = _cardWidth + _horizontalGap;
 
-    // offset / itemWidth 得到的是一個浮點數，例如 1.5 代表滾動到了 第1輪 和 第2輪 中間。
+    // 將像素偏移量轉換為輪次索引 (例如 滾動了 300px, itemWidth 是 150px, 則 index = 2.0)
     double newRoundIndex = _scrollController.offset / itemWidth;
 
-    // 限制範圍，確保索引不會小於 0 或大於 最大輪次。
+    // 限制範圍，防止越界
     newRoundIndex = newRoundIndex.clamp(0.0, (_totalRounds - 1).toDouble());
 
-    // 移除閾值檢查，確保狀態與滾動位置完全同步
-    // 這解決了在整數邊界附近 (例如 0.999 vs 1.001) 因閾值導致狀態不更新，
-    // 進而導致 floor() 計算錯誤，使得卡片可見性與實際滾動位置不符的問題。
+    // 更新狀態。
+    // 因為這是一個 Scroll-Driven Animation (滾動驅動動畫)，我們這裡使用 setState 來驅動每一幀的變化。
     setState(() {
       _currentRoundIndex = newRoundIndex;
     });
   }
 
+  /// 生成模擬數據
   List<MatchNode> _generateNodes() {
     List<MatchNode> nodes = [];
     int matchesInRound = 16;
     for (int r = 0; r < _totalRounds; r++) {
       for (int i = 0; i < matchesInRound; i++) {
         String roundName;
+        // 根據剩餘比賽數量命名
         if (matchesInRound == 16) {
           roundName = "16強";
         } else if (matchesInRound == 8) {
@@ -108,7 +131,7 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
           ),
         );
       }
-      matchesInRound ~/= 2;
+      matchesInRound ~/= 2; // 下一輪比賽數量減半
     }
     return nodes;
   }
@@ -116,23 +139,28 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      controller: _scrollController,
-      scrollDirection: Axis.horizontal,
-      physics: _SnappingScrollPhysics(itemWidth: _cardWidth + _horizontalGap),
+      scrollDirection: Axis.vertical, // 1. 垂直滾動：讓用戶可以上下滑動查看完整的樹狀圖 (當高度還很高時)
       child: SingleChildScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal, // 2. 水平滾動：查看不同輪次
+        // 使用自定義的物理效果來實現 "吸附" (Snapping)
+        physics: _SnappingScrollPhysics(itemWidth: _cardWidth + _horizontalGap),
         child: Container(
-          color: Colors.red,
+          // 給一個背景色方便調試或看清邊界，可改為 Colors.transparent 或移除
+          color: Colors.grey.shade50,
           child: CustomMultiChildLayout(
+            // Delegate 負責計算子元件的位置和尺寸
             delegate: TournamentLayoutDelegate(
               nodes: _nodes,
               cardWidth: _cardWidth,
               cardHeight: _cardHeight,
               horizontalGap: _horizontalGap,
               verticalGap: _verticalGap,
-              focusRoundIndex: _currentRoundIndex,
+              paddingLeft: _paddingLeft,
+              focusRoundIndex: _currentRoundIndex, // 傳入當前滾動進度
             ),
             children: [
-              // 繪製連線 (背景)
+              // 1. 繪製連線 (背景層) - 我們給它一個固定的 ID 'lines'
               LayoutId(
                 id: 'lines',
                 child: CustomPaint(
@@ -142,13 +170,15 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
                     cardHeight: _cardHeight,
                     horizontalGap: _horizontalGap,
                     verticalGap: _verticalGap,
+                    paddingLeft: _paddingLeft,
                     focusRoundIndex: _currentRoundIndex,
                   ),
                 ),
               ),
-              // 繪製卡片 (前景)
+              // 2. 繪製卡片 (前景層)
               for (var node in _nodes)
-                if (node.round >= _currentRoundIndex.floor()) // 優化：只構建可見的子節點
+                // 性能優化：只構建當前圓次及以後的節點。
+                if (node.round >= _currentRoundIndex.floor())
                   LayoutId(
                     id: node.id,
                     child: TournamentCard(
@@ -165,8 +195,14 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
   }
 }
 
+// =============================================================================
+// 滾動物理效果 (Scroll Physics)
+// =============================================================================
+
+/// 自定義滾動物理，實現 "翻頁吸附" 效果。
+/// 當用戶停止滾動時，會自動彈回到最近的一個 "列" (Round) 的起始位置。
 class _SnappingScrollPhysics extends ScrollPhysics {
-  final double itemWidth;
+  final double itemWidth; // 每一列的寬度 (卡片寬 + 間距)
 
   const _SnappingScrollPhysics({required this.itemWidth, super.parent});
 
@@ -178,12 +214,13 @@ class _SnappingScrollPhysics extends ScrollPhysics {
     );
   }
 
+  // 創建彈道模擬 (當用戶手指離開螢幕時觸發)
   @override
   Simulation? createBallisticSimulation(
     ScrollMetrics position,
     double velocity,
   ) {
-    // 如果滾動超出了邊界，使用默認的物理效果 (彈回)
+    // 如果已經滾動超出邊界，使用默認行為 (彈回)
     if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
         (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
       return super.createBallisticSimulation(position, velocity);
@@ -191,23 +228,22 @@ class _SnappingScrollPhysics extends ScrollPhysics {
 
     final Tolerance tolerance = toleranceFor(position);
 
-    // 計算目標滾動位置
-    // 我們希望滾動停止時，剛好停在某一列的起始位置 (Snap)
-
+    // 預測用戶原本會停下的位置
     double target = position.pixels;
     if (velocity.abs() > tolerance.velocity) {
-      // 如果用戶有甩動 (Fling) 的動作，我們預測一個更遠的目標點
+      // 如果有甩動速度，稍微預測遠一點
       target += velocity * 0.3;
     }
 
-    // 計算最近的 "頁面" (Page/Round) 索引
+    // 計算這是在第幾頁 (Round)
     double page = target / itemWidth;
+    // 四捨五入到最近的整數頁
     int index = page.round();
 
-    // 計算最終吸附的像素位置
+    // 最終吸附的目標像素位置
     double destination = index * itemWidth;
 
-    // 使用 ScrollSpringSimulation 來模擬彈簧吸附效果
+    // 使用彈簧模擬 (Spring) 讓它平滑地彈到目標位置
     return ScrollSpringSimulation(
       spring,
       position.pixels,
@@ -217,6 +253,10 @@ class _SnappingScrollPhysics extends ScrollPhysics {
     );
   }
 }
+
+// =============================================================================
+// UI 組件: 比賽卡片 (Tournament Card)
+// =============================================================================
 
 class TournamentCard extends StatelessWidget {
   final MatchNode node;
@@ -232,6 +272,7 @@ class TournamentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 一個簡單的卡片樣式
     return Container(
       width: width,
       height: height,
@@ -241,7 +282,7 @@ class TournamentCard extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -255,7 +296,7 @@ class TournamentCard extends StatelessWidget {
             node.label,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           const Text("vs", style: TextStyle(fontSize: 10, color: Colors.grey)),
         ],
       ),
@@ -263,15 +304,20 @@ class TournamentCard extends StatelessWidget {
   }
 }
 
+// =============================================================================
+// 佈局邏輯 Delegate (The Brain)
+// =============================================================================
+
 class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
   final List<MatchNode> nodes;
   final double cardWidth;
   final double cardHeight;
   final double horizontalGap;
   final double verticalGap;
-  final double focusRoundIndex;
-  // 增加 Curve 屬性，讓高度變化有動畫曲線感
-  // 雖然是 Scroll Driven，但在不同階段應用曲線會讓收縮感更自然
+  final double paddingLeft;
+  final double focusRoundIndex; // 核心參數：當前滾動進度
+
+  // 曲線屬性，用於讓高度變化的過渡更自然
   final Curve sizeCurve;
 
   TournamentLayoutDelegate({
@@ -280,45 +326,42 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
     required this.cardHeight,
     required this.horizontalGap,
     required this.verticalGap,
+    required this.paddingLeft,
     required this.focusRoundIndex,
-    this.sizeCurve = Curves.easeInOut, // 默認使用 EaseInOut
+    this.sizeCurve = Curves.easeInOut,
   });
 
+  /// 決定整個 Layout 的總尺寸
   @override
   Size getSize(BoxConstraints constraints) {
-    // Calculate Grid Dimensions
-    // Width is constant: All rounds + gaps
+    // 1. 計算總寬度
     int maxRound = 0;
     for (var node in nodes) {
       if (node.round > maxRound) maxRound = node.round;
     }
-    double totalWidth = (maxRound + 1) * _getStepWidth() + 40; // + padding
+    // 總寬度 = 所有輪次寬度 + 我們預留一點 padding
+    double totalWidth = (maxRound + 1) * (cardWidth + horizontalGap) + 40;
 
-    // 動態計算容器高度 (Dynamic Size)
-    // 這是實現無縫縮放的關鍵。
-    // 我們根據 focusRoundIndex (當前滾動位置) 來計算高度。
+    // 2. 動態計算總高度 (核心功能)
+    // 我們希望當用戶滾動到 "8強" 時，容器高度只適合 "8強" 的高度，而不是 "16強" 的高度。
+    // 這樣可以避免下方的空白。
 
-    // 例如：如果我們從 Round 0 (16強) 滾動到 Round 1 (8強)。
-    // 16強的高度較高，8強的高度較矮。
-    // 我們希望容器的高度能平滑地從 "16強高度" 過渡到 "8強高度"。
-
-    // 向下取整，找到當前區間的左邊輪次 (floorRound)
+    // 找出當前過渡的 "起點輪次" (Floor) 和 "終點輪次" (Ceil)
     int floorRound = focusRoundIndex.floor();
-    // 向上取整，找到當前區間的右邊輪次 (ceilRound)
     int ceilRound = focusRoundIndex.ceil();
-    // 計算插值進度 t (0.0 ~ 1.0)
-    double rawT = focusRoundIndex - floorRound;
-    // 應用曲線，讓變化非線性 (Animations!)
-    double t = sizeCurve.transform(rawT);
 
-    // 分別計算兩個輪次所需的理論高度
+    // 計算進度 t (0.0 ~ 1.0)
+    double rawT = focusRoundIndex - floorRound;
+    double t = sizeCurve.transform(rawT); // 應用曲線讓高度變化的過渡更自然
+
+    // 分別計算這兩個輪次如果作為 "基準" 時，容器需要的理想高度
     double h1 = _calculateHeightForRound(floorRound);
     double h2 = _calculateHeightForRound(ceilRound);
 
-    // 線性插值 (Lerp)：根據進度 t 在 h1 和 h2 之間過渡
+    // 插值計算當前高度
     double currentHeight = h1 + (h2 - h1) * t;
 
-    // 確保高度至少能顯示一張卡片
+    // 確保高度至少能顯示一張卡片，防止過小
     currentHeight = currentHeight < cardHeight
         ? cardHeight + verticalGap
         : currentHeight;
@@ -326,26 +369,26 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
     return Size(totalWidth, currentHeight);
   }
 
-  double _getStepWidth() => cardWidth + horizontalGap;
-
+  /// 計算某一輪的理論總高度
   double _calculateHeightForRound(int round) {
-    // Find how many nodes in this round
-    // Since nodes list is flat, we count.
-    // Or we can calculate theoretically if we know it's a perfect tournament.
-    // Let's count to be safe/generic.
+    // 找出該輪有多少比賽
     int count = nodes.where((n) => n.round == round).length;
-    if (count == 0) return 0; // Should not happen for valid rounds
+    if (count == 0) return 0;
+    // 高度 = 卡片總高 + 間距總高
     return count * cardHeight + (count + 1) * verticalGap;
   }
 
+  /// 執行佈局，放置每個子元件
   @override
   void performLayout(Size size) {
+    // 1. 佈局連線層 (它鋪滿整個容器)
     if (hasChild('lines')) {
       layoutChild('lines', BoxConstraints.tight(size));
       positionChild('lines', Offset.zero);
     }
 
-    // 使用共用的插值邏輯計算位置
+    // 2. 計算所有卡片的位置
+    // 這裡我們抽取出了一個共用函數，因為 Painter 也需要同樣的位置邏輯
     Map<int, List<Offset>> finalPositionsByRound =
         calculateInterpolatedPositions(
           nodes: nodes,
@@ -354,25 +397,28 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
           cardHeight: cardHeight,
           horizontalGap: horizontalGap,
           verticalGap: verticalGap,
+          paddingLeft: paddingLeft,
           sizeCurve: sizeCurve,
         );
 
     int minVisibleRound = focusRoundIndex.floor();
 
-    // Apply positions to children
+    // 3. 遍歷節點並設置位置
     for (var node in nodes) {
-      // 優化：如果該輪次小於最小可見輪次，則不進行佈局 (不顯示)
+      // 隱藏已經滾出畫面很遠的節點 (優化)
       if (node.round < minVisibleRound) continue;
 
       if (hasChild(node.id) && finalPositionsByRound[node.round] != null) {
-        // Use indexInRound to find safe position
         List<Offset> roundPos = finalPositionsByRound[node.round]!;
         if (node.indexInRound < roundPos.length) {
           Offset pos = roundPos[node.indexInRound];
+
+          // 設置子元件大小
           layoutChild(
             node.id,
             BoxConstraints.tight(Size(cardWidth, cardHeight)),
           );
+          // 設置子元件位置
           positionChild(node.id, pos);
         }
       }
@@ -381,10 +427,15 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
 
   @override
   bool shouldRelayout(covariant TournamentLayoutDelegate oldDelegate) {
+    // 當滾動或者節點改變時，重新佈局
     return oldDelegate.focusRoundIndex != focusRoundIndex ||
         oldDelegate.nodes != nodes;
   }
 }
+
+// =============================================================================
+// 繪圖邏輯 (Custom Painter)
+// =============================================================================
 
 class TournamentLinesPainter extends CustomPainter {
   final List<MatchNode> nodes;
@@ -392,6 +443,7 @@ class TournamentLinesPainter extends CustomPainter {
   final double cardHeight;
   final double horizontalGap;
   final double verticalGap;
+  final double paddingLeft;
   final double focusRoundIndex;
   final Curve sizeCurve;
 
@@ -401,6 +453,7 @@ class TournamentLinesPainter extends CustomPainter {
     required this.cardHeight,
     required this.horizontalGap,
     required this.verticalGap,
+    required this.paddingLeft,
     required this.focusRoundIndex,
     this.sizeCurve = Curves.easeInOut,
   });
@@ -412,10 +465,7 @@ class TournamentLinesPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    // Reuse Logic (Simplified copy of LayoutDelegate logic)
-    // In production, this logic should be shared.
-
-    // 使用共用的插值邏輯計算位置
+    // 重複使用相同的邏輯來獲取卡片位置
     Map<int, List<Offset>> finalPositionsByRound =
         calculateInterpolatedPositions(
           nodes: nodes,
@@ -424,93 +474,86 @@ class TournamentLinesPainter extends CustomPainter {
           cardHeight: cardHeight,
           horizontalGap: horizontalGap,
           verticalGap: verticalGap,
+          paddingLeft: paddingLeft,
           sizeCurve: sizeCurve,
         );
 
     int minVisibleRound = focusRoundIndex.floor();
-    // anchorRound is only used to iterate rounds.
-    // Actually we should iterate all keys in finalPositionsByRound.
 
-    int maxRound = 0;
-    for (var k in finalPositionsByRound.keys) {
-      if (k > maxRound) {
-        maxRound = k;
-      }
-    }
-
-    // Drawing lines:
-    // We iterate from maxRound-1 down to minVisibleRound (Backward / Fan-out style logic matches drawing order)
-    // Or iterate from minVisibleRound to maxRound.
-    // Logic: Connect Round R to Round R+1.
-    // Source: R. Target: R+1.
-
-    // Let's iterate R from minVisibleRound to maxRound - 1.
-    // For each node in R+1 (Target), find its parents in R (Source).
-
+    // 取得所有存在的輪次並排序
     List<int> sortedRounds = finalPositionsByRound.keys.toList()..sort();
+    int maxRound = sortedRounds.isEmpty ? 0 : sortedRounds.last;
 
+    // 遍歷每一輪，畫出它 "連接到下一輪" 的線
     for (int r in sortedRounds) {
-      if (r < minVisibleRound) {
-        continue;
-      }
-      if (r == maxRound) {
-        continue; // No lines from last round to nowhere? No, lines are usually between R and R+1.
-      }
+      // 優化：不需要畫看不見的輪次，但為了保險起見，畫 minVisibleRound 之前的連線可能需要小心
+      // 這裡我們畫出 minVisibleRound 及其之後的連線
+      if (r < minVisibleRound) continue;
 
-      // Current R is the "Source" side (Left). Next R+1 is "Target" side (Right).
-      // Wait, the original logic was:
-      // Round R nodes.
-      // Round R+1 positions.
-      // For each node in R+1, connect to parents in R.
+      // 最後一輪沒有 "下一輪"，所以不需要畫線
+      if (r == maxRound) continue;
 
-      // Let's look at R+1.
       int nextR = r + 1;
-      if (!finalPositionsByRound.containsKey(nextR)) {
-        continue;
-      }
+      if (!finalPositionsByRound.containsKey(nextR)) continue;
 
       List<Offset> nextPosList = finalPositionsByRound[nextR]!;
       List<Offset> currPosList = finalPositionsByRound[r]!;
 
-      // In this tournament structure:
-      // Node J in Round R+1 comes from Node 2*J and Node 2*J+1 in Round R.
-
-      // In this tournament structure:
-      // Node J in Round R+1 comes from Node 2*J and Node 2*J+1 in Round R.
-
+      // 邏輯：下一輪的卡片 J，是由 本輪的卡片 2*J 和 2*J+1 晉級而來的。
+      // 所以我們遍歷下一輪 (Target)，回頭找本輪的父母 (Source)。
       for (int j = 0; j < nextPosList.length; j++) {
         Offset targetPos = nextPosList[j];
-        // Add 8 padding (inset) to target connection point
+
+        // --- 動態間距動畫 ---
+        // 我們希望當用戶滾動過去時，舊的連線會慢慢與卡片分離，形成一種 "過去式" 的感覺，
+        // 或者至少是為了視覺上的整潔。
+        double animatedGap = 0.0;
+        if (r < focusRoundIndex) {
+          double t = focusRoundIndex - r;
+          if (t > 1.0) t = 1.0;
+          // 當完全滾過這一輪時，Gap 會變成 8.0
+          animatedGap = t * 8.0;
+        }
+
+        // 確保 Gap 不會大到讓線條交叉或看起來奇怪
+        double maxPadding = horizontalGap / 2 - 1.0;
+        if (maxPadding < 0) maxPadding = 0;
+        double linePadding = (animatedGap > maxPadding)
+            ? maxPadding
+            : animatedGap;
+
+        // 計算目標點 (右側卡片的左邊緣)
+        // 注意：targetPos 是卡片的左上角
         Offset targetLeft = Offset(
-          targetPos.dx + 8,
-          targetPos.dy + cardHeight / 2,
+          targetPos.dx - linePadding,
+          targetPos.dy + cardHeight / 2, // 垂直置中
         );
 
-        Offset? source1Right;
-        Offset? source2Right;
+        // 尋找來源 (左側卡片的右邊緣)
+        Offset? source1Right; // 上方的來源
+        Offset? source2Right; // 下方的來源
 
-        // Parent 1 (2*j)
+        // 來源 1 (Index: 2*j)
         if (2 * j < currPosList.length) {
           Offset sourcePos = currPosList[2 * j];
-          // Subtract 8 padding (inset) from source connection point
           source1Right = Offset(
-            sourcePos.dx + cardWidth - 8,
+            sourcePos.dx + cardWidth,
             sourcePos.dy + cardHeight / 2,
           );
         }
 
-        // Parent 2 (2*j + 1)
+        // 來源 2 (Index: 2*j + 1)
         if (2 * j + 1 < currPosList.length) {
           Offset sourcePos = currPosList[2 * j + 1];
-          // Subtract 8 padding (inset) from source connection point
           source2Right = Offset(
-            sourcePos.dx + cardWidth - 8,
+            sourcePos.dx + cardWidth,
             sourcePos.dy + cardHeight / 2,
           );
         }
 
+        // 繪製連線
         if (source1Right != null && source2Right != null) {
-          // Draw Bracket connecting both
+          // 兩個來源都有 -> 畫一個合併的方括號
           drawBracketConnection(
             canvas,
             paint,
@@ -519,16 +562,17 @@ class TournamentLinesPainter extends CustomPainter {
             targetLeft,
           );
         } else if (source1Right != null) {
-          // Single parent case
+          // 只有一個來源 -> 畫單條折線 (可能是輪空的情況)
           drawSingleConnection(canvas, paint, source1Right, targetLeft);
         } else if (source2Right != null) {
-          // Should not happen usually (skipping index 0?), but handle it
           drawSingleConnection(canvas, paint, source2Right, targetLeft);
         }
       }
     }
   }
 
+  /// 繪製方括號連線 (Squared Bracket)
+  /// 形狀像是一個橫向的 ']'，將兩個源頭匯聚到一個目標
   void drawBracketConnection(
     Canvas canvas,
     Paint paint,
@@ -537,49 +581,51 @@ class TournamentLinesPainter extends CustomPainter {
     Offset target,
   ) {
     final path = Path();
+    // 找出轉折點的 X 坐標 (兩點之間的中線)
     double midX = (src1.dx + target.dx) / 2;
-    // 動態計算圓角半徑：最大 10，但不能超過可用空間的一半 (避免重疊)
+
+    // 計算可用的圓角半徑空間，避免空間太小圓角錯亂
     double availableSpace = (midX - src1.dx).abs();
     double radius = (availableSpace < 10.0) ? availableSpace : 10.0;
 
-    // Ensure Src1 is above Src2 for simpler logic, though usually it is.
+    // 確保 src1 在上方，src2 在下方，方便邏輯處理
     if (src1.dy > src2.dy) {
       final temp = src1;
       src1 = src2;
       src2 = temp;
     }
 
-    // Upper path (src1 -> target)
+    // --- 上半部路徑 (src1 -> target) ---
     path.moveTo(src1.dx, src1.dy);
-    // Horizontal to midX - radius
+    // 1. 水平線向右
     if (availableSpace > radius) {
       path.lineTo(midX - radius, src1.dy);
     }
-    // Curve down
+    // 2. 向下彎的圓角
     path.quadraticBezierTo(midX, src1.dy, midX, src1.dy + radius);
-
-    // Vertical down to target Y
+    // 3. 垂直線向下延伸到 target 的高度
     path.lineTo(midX, target.dy);
 
-    // Lower path (src2 -> target)
+    // --- 下半部路徑 (src2 -> target) ---
     path.moveTo(src2.dx, src2.dy);
-    // Horizontal to midX - radius
+    // 1. 水平線向右
     if (availableSpace > radius) {
       path.lineTo(midX - radius, src2.dy);
     }
-    // Curve up
+    // 2. 向上彎的圓角
     path.quadraticBezierTo(midX, src2.dy, midX, src2.dy - radius);
-
-    // Vertical up to target Y (connects with the upper path's vertical line)
+    // 3. 垂直線向上延伸 (會與上半部路徑重合)
     path.lineTo(midX, target.dy);
 
-    // Connector to target
+    // --- 匯合後連向目標 ---
     path.moveTo(midX, target.dy);
     path.lineTo(target.dx, target.dy);
 
     canvas.drawPath(path, paint);
   }
 
+  /// 繪製單一連線 (Single Connection)
+  /// 用於只有一個來源節點的情況 (例如輪空)
   void drawSingleConnection(
     Canvas canvas,
     Paint paint,
@@ -588,67 +634,51 @@ class TournamentLinesPainter extends CustomPainter {
   ) {
     final path = Path();
     double midX = (src.dx + target.dx) / 2;
-
-    // Horizontal 1
-    double availableSpaceH = (midX - src.dx).abs();
-    double radius1 = (availableSpaceH < 10.0) ? availableSpaceH : 10.0;
+    double radius = 10.0;
 
     path.moveTo(src.dx, src.dy);
 
-    if (availableSpaceH > radius1) {
-      path.lineTo(midX - (src.dx < midX ? radius1 : -radius1), src.dy);
-    }
-    // Curve 1
-    path.quadraticBezierTo(
-      midX,
-      src.dy,
-      midX,
-      src.dy + (target.dy > src.dy ? radius1 : -radius1),
-    );
+    // 具體的路徑邏輯：畫一個簡單的 S 型折線 (Horizontal -> Corner -> Vertical -> Corner -> Horizontal)
 
-    // Vertical
-    double availableSpaceV = (target.dy - src.dy).abs();
-    // Use same radius logic but check vertical space too (usually plenty)
-    // Actually we only care about the corner at target side.
-    double radius2 =
-        10.0; // Keep 10 for target side if horizontal space allows?
-    // Target side corner essentially depends on horizontal space on the *other* side of midX?
-    // Wait, midX is midpoint. Space is symmetric if gap is symmetric.
-    double availableSpaceH2 = (target.dx - midX).abs();
-    if (availableSpaceH2 < radius2) radius2 = availableSpaceH2;
-
-    if (availableSpaceV > radius1 + radius2) {
-      // Need simpler logic
-      // Let's just draw to target corner
-      double directionY = target.dy > src.dy ? 1 : -1;
-      path.lineTo(midX, target.dy - radius2 * directionY);
-      path.quadraticBezierTo(midX, target.dy, midX + radius2, target.dy);
-    } else {
+    // 如果空間不足以畫圓角，則直接畫折線
+    if ((midX - src.dx).abs() < radius) {
+      path.lineTo(midX, src.dy);
       path.lineTo(midX, target.dy);
+      path.lineTo(target.dx, target.dy);
+    } else {
+      // 1. 水平延伸至中線前
+      path.lineTo(midX - radius, src.dy);
+
+      // 2. 第一個圓角 (轉向垂直)
+      // 判斷 target 在 src 的上方還是下方
+      double verticalDirection = (target.dy > src.dy) ? 1.0 : -1.0;
+      path.quadraticBezierTo(
+        midX,
+        src.dy,
+        midX,
+        src.dy + radius * verticalDirection,
+      );
+
+      // 3. 垂直延伸至 target 高度前 (如果有足夠垂直空間)
+      double verticalDist = (target.dy - src.dy).abs();
+      if (verticalDist > 2 * radius) {
+        path.lineTo(midX, target.dy - radius * verticalDirection);
+
+        // 4. 第二個圓角 (轉向水平)
+        path.quadraticBezierTo(
+          midX,
+          target.dy,
+          midX + radius, // 假設 target 在右測
+          target.dy,
+        );
+      } else {
+        // 垂直距離很短，直接連過去 (簡化)
+        path.lineTo(midX, target.dy);
+      }
+
+      // 5. 水平延伸至 target
+      path.lineTo(target.dx, target.dy);
     }
-
-    // Horizontal 2
-    path.lineTo(target.dx, target.dy);
-
-    canvas.drawPath(path, paint);
-  }
-
-  // 保留舊的 Bezier 方法備用或刪除
-  void drawBezierLine(Canvas canvas, Paint paint, Offset p1, Offset p2) {
-    final path = Path();
-    path.moveTo(p1.dx, p1.dy);
-
-    // 控制點：x 軸取中點，保持水平切線
-    double midX = (p1.dx + p2.dx) / 2;
-    // 使用兩個控制點的三次貝茲曲線 (Cubic Bezier) 會比二次 (Quadratic) 更平滑，形成 S 型
-    path.cubicTo(
-      midX,
-      p1.dy, // Control point 1: 水平延伸出 p1
-      midX,
-      p2.dy, // Control point 2: 水平延伸進 p2
-      p2.dx,
-      p2.dy,
-    );
 
     canvas.drawPath(path, paint);
   }
@@ -660,11 +690,11 @@ class TournamentLinesPainter extends CustomPainter {
 }
 
 // =============================================================================
-// Helper Functions for Layout Logic
+// 核心算法: 位置計算與插值 (Core Algorithm)
 // =============================================================================
 
-// 計算並插值所有節點的位置，供 Delegate and Painter 使用。
-// 確保兩者的位置邏輯完全一致。
+/// 計算所有節點在當前畫面時刻的精確位置。
+/// 這是實現 "平滑過渡" 的關鍵。
 Map<int, List<Offset>> calculateInterpolatedPositions({
   required List<MatchNode> nodes,
   required double focusRoundIndex,
@@ -672,14 +702,18 @@ Map<int, List<Offset>> calculateInterpolatedPositions({
   required double cardHeight,
   required double horizontalGap,
   required double verticalGap,
+  required double paddingLeft,
   required Curve sizeCurve,
 }) {
+  // 找出插值的兩個端點：Floor (前一整數輪) 和 Ceil (後一整數輪)
+  // 例如 focusRoundIndex = 1.5，則 Floor=1, Ceil=2
   int floorRound = focusRoundIndex.floor();
   int ceilRound = focusRoundIndex.ceil();
-  // 為了效能，只計算可見範圍 (從 floorRound 開始)
+
+  // 優化：只計算可見範圍
   int minVisibleRound = floorRound;
 
-  // 1. 計算 floorRound 為 Anchor 的佈局
+  // 1. 計算【狀態 A】：假設當前是 floorRound (例如 16強) 時，所有卡片的位置
   var positionsFloor = _calculateBasePositions(
     nodes: nodes,
     anchorRound: floorRound,
@@ -687,13 +721,15 @@ Map<int, List<Offset>> calculateInterpolatedPositions({
     cardHeight: cardHeight,
     horizontalGap: horizontalGap,
     verticalGap: verticalGap,
+    paddingLeft: paddingLeft,
     minVisibleRound: minVisibleRound,
   );
 
   bool needInterpolation = floorRound != ceilRound;
   Map<int, List<Offset>> positionsCeil = {};
 
-  // 2. 如果需要，計算 ceilRound 為 Anchor 的佈局
+  // 2. 計算【狀態 B】：假設當前是 ceilRound (例如 8強) 時，所有卡片的位置
+  // 在狀態 B 中，8強會變成 "基準" (Anchor)，排列會更緊湊。
   if (needInterpolation) {
     positionsCeil = _calculateBasePositions(
       nodes: nodes,
@@ -702,6 +738,7 @@ Map<int, List<Offset>> calculateInterpolatedPositions({
       cardHeight: cardHeight,
       horizontalGap: horizontalGap,
       verticalGap: verticalGap,
+      paddingLeft: paddingLeft,
       minVisibleRound: minVisibleRound,
     );
   }
@@ -712,10 +749,10 @@ Map<int, List<Offset>> calculateInterpolatedPositions({
 
   Map<int, List<Offset>> finalPositionsByRound = {};
 
-  // 4. 合併結果
+  // 4. 合併結果：對每一個節點的位置進行線性插值 (Lerp)
+  // Pos = PosA * (1-t) + PosB * t
   Set<int> allRounds = {};
   allRounds.addAll(positionsFloor.keys);
-
   if (needInterpolation) {
     allRounds.addAll(positionsCeil.keys);
   }
@@ -728,13 +765,13 @@ Map<int, List<Offset>> calculateInterpolatedPositions({
     int length = list1?.length ?? list2?.length ?? 0;
 
     for (int i = 0; i < length; i++) {
-      // 如果某一邊沒有數據 (不應該發生在相同節點集)，使用 Offset.zero 或 對方的數據
+      // 獲取起點和終點，如果某邊缺失則用對方位置或 Zero
       Offset p1 = (list1 != null && i < list1.length)
           ? list1[i]
           : (list2 != null && i < list2.length ? list2[i] : Offset.zero);
       Offset p2 = (list2 != null && i < list2.length) ? list2[i] : p1;
 
-      // Lerp 插值
+      // 執行插值
       Offset interpolated = Offset.lerp(p1, p2, t)!;
       resultList.add(interpolated);
     }
@@ -743,7 +780,13 @@ Map<int, List<Offset>> calculateInterpolatedPositions({
   return finalPositionsByRound;
 }
 
-// 根據指定的 Anchor Round 計算基本位置
+/// 基礎位置計算函數
+/// 根據給定的 [anchorRound] 作為基準，計算整個樹狀結構的位置。
+///
+/// 算法邏輯：
+/// 1. Anchor Round (基準輪): 從上到下緊密排列，作為定位的錨點。
+/// 2. Forward (向右): 下一輪的位置取決於上一輪對應節點的中點 (Vertical Center)。
+/// 3. Backward (向左): 上一輪的位置取決於下一輪對應節點的展開。
 Map<int, List<Offset>> _calculateBasePositions({
   required List<MatchNode> nodes,
   required int anchorRound,
@@ -751,32 +794,34 @@ Map<int, List<Offset>> _calculateBasePositions({
   required double cardHeight,
   required double horizontalGap,
   required double verticalGap,
+  required double paddingLeft,
   required int minVisibleRound,
 }) {
   Map<int, List<Offset>> positionsByRound = {};
   int maxRound = 0;
   for (var node in nodes) {
-    if (node.round > maxRound) {
-      maxRound = node.round;
-    }
+    if (node.round > maxRound) maxRound = node.round;
   }
 
-  // 步驟 1: 佈局 Anchor Round
+  // --- 步驟 1: 佈局 Anchor Round (基準輪) ---
+  // 這是最重要的一步。當我們說 "現在是 8強" 時，8強的卡片應該排列整齊，沒有多餘間隙。
   List<MatchNode> anchorNodes = nodes
       .where((n) => n.round == anchorRound)
       .toList();
   anchorNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
+
   List<Offset> anchorPositions = [];
   double startY = verticalGap;
 
   for (int i = 0; i < anchorNodes.length; i++) {
-    double x = anchorRound * (cardWidth + horizontalGap) + 8;
+    double x = anchorRound * (cardWidth + horizontalGap) + paddingLeft;
     double y = startY + i * (cardHeight + verticalGap);
     anchorPositions.add(Offset(x, y));
   }
   positionsByRound[anchorRound] = anchorPositions;
 
-  // 步驟 2: 向前佈局 (Rounds > Anchor)
+  // --- 步驟 2: 向右佈局 (Rounds > Anchor) ---
+  // 例如已經排好 16強，現在排 8強。8強某個卡片的位置，應該是它來源的兩個 16強卡片的垂直中心。
   for (int r = anchorRound + 1; r <= maxRound; r++) {
     List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
     roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
@@ -784,20 +829,22 @@ Map<int, List<Offset>> _calculateBasePositions({
     var prevPositions = positionsByRound[r - 1];
 
     for (int i = 0; i < roundNodes.length; i++) {
-      double x = r * (cardWidth + horizontalGap) + 8;
+      double x = r * (cardWidth + horizontalGap) + paddingLeft;
       double y = 0;
+      // 找到上一輪對應的兩個節點 (2*i 和 2*i+1)
       if (prevPositions != null && prevPositions.length > 2 * i + 1) {
         double y1 = prevPositions[2 * i].dy;
         double y2 = prevPositions[2 * i + 1].dy;
-        y = (y1 + y2) / 2;
+        y = (y1 + y2) / 2; // 取中點
       }
       currentPositions.add(Offset(x, y));
     }
     positionsByRound[r] = currentPositions;
   }
 
-  // 步驟 3: 向後佈局 (Rounds < Anchor)
-  // 只計算 minVisibleRound 以後的
+  // --- 步驟 3: 向左佈局 (Rounds < Anchor) ---
+  // 例如已經排好 8強 (Anchor)，現在要反推 16強的位置。
+  // 16強的位置會相對於 8強展開。
   for (int r = anchorRound - 1; r >= minVisibleRound; r--) {
     List<MatchNode> roundNodes = nodes.where((n) => n.round == r).toList();
     roundNodes.sort((a, b) => a.indexInRound.compareTo(b.indexInRound));
@@ -807,14 +854,17 @@ Map<int, List<Offset>> _calculateBasePositions({
     if (nextPositions != null) {
       for (int j = 0; j < nextPositions.length; j++) {
         Offset childPos = nextPositions[j];
-        double x = r * (cardWidth + horizontalGap) + 8;
+        double x = r * (cardWidth + horizontalGap) + paddingLeft;
 
-        // Parent 1 (上方)
+        // 我們知道 childPos 是 nextPositions[j]，它是由 currentPositions[2*j] 和 [2*j+1] 組成的。
+        // 所以我們把 childPos 上下展開來決定 currentPositions。
+
+        // Parent 1 (上方節點)
         if (2 * j < roundNodes.length) {
           double y1 = childPos.dy - (cardHeight + verticalGap) / 2;
           currentPositions[2 * j] = Offset(x, y1);
         }
-        // Parent 2 (下方)
+        // Parent 2 (下方節點)
         if (2 * j + 1 < roundNodes.length) {
           double y2 = childPos.dy + (cardHeight + verticalGap) / 2;
           currentPositions[2 * j + 1] = Offset(x, y2);

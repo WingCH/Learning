@@ -139,10 +139,10 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      scrollDirection: Axis.vertical, // 1. 垂直滾動：讓用戶可以上下滑動查看完整的樹狀圖 (當高度還很高時)
+      scrollDirection: Axis.vertical, // 垂直滾動：讓用戶可以上下滑動查看完整的樹狀圖 (當高度還很高時)
       child: SingleChildScrollView(
         controller: _scrollController,
-        scrollDirection: Axis.horizontal, // 2. 水平滾動：查看不同輪次
+        scrollDirection: Axis.horizontal, // 水平滾動：查看不同輪次
         // 使用自定義的物理效果來實現 "吸附" (Snapping)
         physics: _SnappingScrollPhysics(itemWidth: _cardWidth + _horizontalGap),
         child: Container(
@@ -157,7 +157,8 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
               horizontalGap: _horizontalGap,
               verticalGap: _verticalGap,
               paddingLeft: _paddingLeft,
-              focusRoundIndex: _currentRoundIndex, // 傳入當前滾動進度
+              focusRoundIndex: _currentRoundIndex,
+              screenWidth: MediaQuery.sizeOf(context).width,
             ),
             children: [
               // 1. 繪製連線 (背景層) - 我們給它一個固定的 ID 'lines'
@@ -317,6 +318,8 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
   final double paddingLeft;
   final double focusRoundIndex; // 核心參數：當前滾動進度
 
+  final double screenWidth;
+
   // 曲線屬性，用於讓高度變化的過渡更自然
   final Curve sizeCurve;
 
@@ -328,6 +331,7 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
     required this.verticalGap,
     required this.paddingLeft,
     required this.focusRoundIndex,
+    required this.screenWidth,
     this.sizeCurve = Curves.easeInOut,
   });
 
@@ -339,8 +343,19 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
     for (var node in nodes) {
       if (node.round > maxRound) maxRound = node.round;
     }
-    // 總寬度 = 所有輪次寬度 + 我們預留一點 padding
-    double totalWidth = (maxRound + 1) * (cardWidth + horizontalGap) + 40;
+
+    // 總寬度邏輯：
+    // 我們希望最後能停在 "準決賽 & 決賽" (Displaying the last two rounds together).
+    // 所以最後一個吸附點應該是 maxRound - 1 (倒數第二輪)。
+    // 這樣當我們吸附到這裡時，螢幕左邊是 "準決賽"，右邊是 "決賽"。
+    // TotalWidth = (maxRound - 1) * itemWidth + screenWidth;
+
+    double itemWidth = cardWidth + horizontalGap;
+    // 使用 max(0, ...) 避免只有一輪時出錯
+    double totalWidth =
+        (maxRound > 0 ? maxRound - 1 : 0) * itemWidth + screenWidth;
+
+    // 確保總寬度至少能容納內容 (雖然後面的公式應該cover了，但保險起見)
 
     // 2. 動態計算總高度 (核心功能)
     // 我們希望當用戶滾動到 "8強" 時，容器高度只適合 "8強" 的高度，而不是 "16強" 的高度。

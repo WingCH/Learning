@@ -22,6 +22,13 @@ class _Level2CircleExampleState extends State<Level2CircleExample> {
   // 控制圓形的半徑 (相對於可用寬度的一半的比例)
   double _radiusPercent = 0.7;
 
+  // 控制旋轉偏移量 (弧度)
+  double _rotationOffset = 0.0;
+  // 記錄手勢開始時的基礎偏移量
+  double _baseRotationOffset = 0.0;
+  // 記錄手勢開始時的手指角度
+  double _startGestureAngle = 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -52,27 +59,64 @@ class _Level2CircleExampleState extends State<Level2CircleExample> {
           ),
         ),
         Expanded(
-          child: Container(
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.blue.shade100),
-            ),
-            child: CustomMultiChildLayout(
-              delegate: CircleLayoutDelegate(
-                itemCount: _itemCount,
-                radiusPercent: _radiusPercent,
-              ),
-              children: [
-                // 根據當前的數量動態產生子組件
-                for (int i = 0; i < _itemCount; i++)
-                  LayoutId(
-                    id: i, // 使用索引作為 ID，方便 Delegate 使用迴圈存取
-                    child: CircleItem(index: i),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return GestureDetector(
+                // 監聽拖曳手勢來改變旋轉角度
+                onPanStart: (details) {
+                  // 計算圓心位置
+                  final center = Offset(
+                    constraints.maxWidth / 2,
+                    constraints.maxHeight / 2,
+                  );
+                  // 計算手指相對於圓心的角度 (atan2)
+                  final touchOffset = details.localPosition - center;
+                  _startGestureAngle = touchOffset.direction;
+                  // 記錄當前的旋轉偏移量
+                  _baseRotationOffset = _rotationOffset;
+                },
+                onPanUpdate: (details) {
+                  final center = Offset(
+                    constraints.maxWidth / 2,
+                    constraints.maxHeight / 2,
+                  );
+                  final touchOffset = details.localPosition - center;
+                  final currentAngle = touchOffset.direction;
+
+                  // 計算角度差值
+                  // 這裡不需要處理跨越 PI 的問題，因為 direction 是 -PI 到 PI，
+                  // 但相減後的差值在連續滑動中是正確的。
+                  final deltaAngle = currentAngle - _startGestureAngle;
+
+                  setState(() {
+                    _rotationOffset = _baseRotationOffset + deltaAngle;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.blue.shade100),
                   ),
-              ],
-            ),
+                  child: CustomMultiChildLayout(
+                    delegate: CircleLayoutDelegate(
+                      itemCount: _itemCount,
+                      radiusPercent: _radiusPercent,
+                      rotationOffset: _rotationOffset,
+                    ),
+                    children: [
+                      // 根據當前的數量動態產生子組件
+                      for (int i = 0; i < _itemCount; i++)
+                        LayoutId(
+                          id: i, // 使用索引作為 ID，方便 Delegate 使用迴圈存取
+                          child: CircleItem(index: i),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -119,8 +163,13 @@ class CircleItem extends StatelessWidget {
 class CircleLayoutDelegate extends MultiChildLayoutDelegate {
   final int itemCount;
   final double radiusPercent;
+  final double rotationOffset;
 
-  CircleLayoutDelegate({required this.itemCount, required this.radiusPercent});
+  CircleLayoutDelegate({
+    required this.itemCount,
+    required this.radiusPercent,
+    required this.rotationOffset,
+  });
 
   @override
   void performLayout(Size size) {
@@ -140,7 +189,9 @@ class CircleLayoutDelegate extends MultiChildLayoutDelegate {
         // --- 第二步：計算位置 ---
         // 角度 = (2 * pi / 數量) * 索引
         // 加入 -pi/2 是為了讓第一個項目從 "正上方" 開始，而不是右邊
-        final double angle = (2 * math.pi / itemCount) * i - (math.pi / 2);
+        // 加入 rotationOffset 實現旋轉
+        final double angle =
+            (2 * math.pi / itemCount) * i - (math.pi / 2) + rotationOffset;
 
         // 圓參數式:
         // x = r * cos(theta)
@@ -162,8 +213,9 @@ class CircleLayoutDelegate extends MultiChildLayoutDelegate {
 
   @override
   bool shouldRelayout(covariant CircleLayoutDelegate oldDelegate) {
-    // 當數量或半徑改變時，我們需要重新佈局
+    // 當數量、半徑或旋轉角度改變時，我們需要重新佈局
     return oldDelegate.itemCount != itemCount ||
-        oldDelegate.radiusPercent != radiusPercent;
+        oldDelegate.radiusPercent != radiusPercent ||
+        oldDelegate.rotationOffset != rotationOffset;
   }
 }

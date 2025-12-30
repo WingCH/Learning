@@ -43,10 +43,10 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
   double _currentRoundIndex = 0.0;
 
   // 配置參數
-  final double _cardWidth = 120;
+  final double _cardWidth = 200;
   final double _cardHeight = 60;
-  final double _horizontalGap = 60;
-  final double _verticalGap = 20; // 第一輪卡片之間的間距
+  final double _horizontalGap = 20;
+  final double _verticalGap = 10; // 第一輪卡片之間的間距
 
   @override
   void initState() {
@@ -121,7 +121,6 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
       physics: _SnappingScrollPhysics(itemWidth: _cardWidth + _horizontalGap),
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(20),
           color: Colors.red,
           child: CustomMultiChildLayout(
             delegate: TournamentLayoutDelegate(
@@ -476,33 +475,165 @@ class TournamentLinesPainter extends CustomPainter {
       // In this tournament structure:
       // Node J in Round R+1 comes from Node 2*J and Node 2*J+1 in Round R.
 
+      // In this tournament structure:
+      // Node J in Round R+1 comes from Node 2*J and Node 2*J+1 in Round R.
+
       for (int j = 0; j < nextPosList.length; j++) {
         Offset targetPos = nextPosList[j];
-        Offset targetLeft = Offset(targetPos.dx, targetPos.dy + cardHeight / 2);
+        // Add 8 padding (inset) to target connection point
+        Offset targetLeft = Offset(
+          targetPos.dx + 8,
+          targetPos.dy + cardHeight / 2,
+        );
+
+        Offset? source1Right;
+        Offset? source2Right;
 
         // Parent 1 (2*j)
         if (2 * j < currPosList.length) {
           Offset sourcePos = currPosList[2 * j];
-          Offset sourceRight = Offset(
-            sourcePos.dx + cardWidth,
+          // Subtract 8 padding (inset) from source connection point
+          source1Right = Offset(
+            sourcePos.dx + cardWidth - 8,
             sourcePos.dy + cardHeight / 2,
           );
-          drawBezierLine(canvas, paint, sourceRight, targetLeft);
         }
 
         // Parent 2 (2*j + 1)
         if (2 * j + 1 < currPosList.length) {
           Offset sourcePos = currPosList[2 * j + 1];
-          Offset sourceRight = Offset(
-            sourcePos.dx + cardWidth,
+          // Subtract 8 padding (inset) from source connection point
+          source2Right = Offset(
+            sourcePos.dx + cardWidth - 8,
             sourcePos.dy + cardHeight / 2,
           );
-          drawBezierLine(canvas, paint, sourceRight, targetLeft);
+        }
+
+        if (source1Right != null && source2Right != null) {
+          // Draw Bracket connecting both
+          drawBracketConnection(
+            canvas,
+            paint,
+            source1Right,
+            source2Right,
+            targetLeft,
+          );
+        } else if (source1Right != null) {
+          // Single parent case
+          drawSingleConnection(canvas, paint, source1Right, targetLeft);
+        } else if (source2Right != null) {
+          // Should not happen usually (skipping index 0?), but handle it
+          drawSingleConnection(canvas, paint, source2Right, targetLeft);
         }
       }
     }
   }
 
+  void drawBracketConnection(
+    Canvas canvas,
+    Paint paint,
+    Offset src1,
+    Offset src2,
+    Offset target,
+  ) {
+    final path = Path();
+    double midX = (src1.dx + target.dx) / 2;
+    // 動態計算圓角半徑：最大 10，但不能超過可用空間的一半 (避免重疊)
+    double availableSpace = (midX - src1.dx).abs();
+    double radius = (availableSpace < 10.0) ? availableSpace : 10.0;
+
+    // Ensure Src1 is above Src2 for simpler logic, though usually it is.
+    if (src1.dy > src2.dy) {
+      final temp = src1;
+      src1 = src2;
+      src2 = temp;
+    }
+
+    // Upper path (src1 -> target)
+    path.moveTo(src1.dx, src1.dy);
+    // Horizontal to midX - radius
+    if (availableSpace > radius) {
+      path.lineTo(midX - radius, src1.dy);
+    }
+    // Curve down
+    path.quadraticBezierTo(midX, src1.dy, midX, src1.dy + radius);
+
+    // Vertical down to target Y
+    path.lineTo(midX, target.dy);
+
+    // Lower path (src2 -> target)
+    path.moveTo(src2.dx, src2.dy);
+    // Horizontal to midX - radius
+    if (availableSpace > radius) {
+      path.lineTo(midX - radius, src2.dy);
+    }
+    // Curve up
+    path.quadraticBezierTo(midX, src2.dy, midX, src2.dy - radius);
+
+    // Vertical up to target Y (connects with the upper path's vertical line)
+    path.lineTo(midX, target.dy);
+
+    // Connector to target
+    path.moveTo(midX, target.dy);
+    path.lineTo(target.dx, target.dy);
+
+    canvas.drawPath(path, paint);
+  }
+
+  void drawSingleConnection(
+    Canvas canvas,
+    Paint paint,
+    Offset src,
+    Offset target,
+  ) {
+    final path = Path();
+    double midX = (src.dx + target.dx) / 2;
+
+    // Horizontal 1
+    double availableSpaceH = (midX - src.dx).abs();
+    double radius1 = (availableSpaceH < 10.0) ? availableSpaceH : 10.0;
+
+    path.moveTo(src.dx, src.dy);
+
+    if (availableSpaceH > radius1) {
+      path.lineTo(midX - (src.dx < midX ? radius1 : -radius1), src.dy);
+    }
+    // Curve 1
+    path.quadraticBezierTo(
+      midX,
+      src.dy,
+      midX,
+      src.dy + (target.dy > src.dy ? radius1 : -radius1),
+    );
+
+    // Vertical
+    double availableSpaceV = (target.dy - src.dy).abs();
+    // Use same radius logic but check vertical space too (usually plenty)
+    // Actually we only care about the corner at target side.
+    double radius2 =
+        10.0; // Keep 10 for target side if horizontal space allows?
+    // Target side corner essentially depends on horizontal space on the *other* side of midX?
+    // Wait, midX is midpoint. Space is symmetric if gap is symmetric.
+    double availableSpaceH2 = (target.dx - midX).abs();
+    if (availableSpaceH2 < radius2) radius2 = availableSpaceH2;
+
+    if (availableSpaceV > radius1 + radius2) {
+      // Need simpler logic
+      // Let's just draw to target corner
+      double directionY = target.dy > src.dy ? 1 : -1;
+      path.lineTo(midX, target.dy - radius2 * directionY);
+      path.quadraticBezierTo(midX, target.dy, midX + radius2, target.dy);
+    } else {
+      path.lineTo(midX, target.dy);
+    }
+
+    // Horizontal 2
+    path.lineTo(target.dx, target.dy);
+
+    canvas.drawPath(path, paint);
+  }
+
+  // 保留舊的 Bezier 方法備用或刪除
   void drawBezierLine(Canvas canvas, Paint paint, Offset p1, Offset p2) {
     final path = Path();
     path.moveTo(p1.dx, p1.dy);
@@ -639,7 +770,7 @@ Map<int, List<Offset>> _calculateBasePositions({
   double startY = verticalGap;
 
   for (int i = 0; i < anchorNodes.length; i++) {
-    double x = anchorRound * (cardWidth + horizontalGap) + 20;
+    double x = anchorRound * (cardWidth + horizontalGap) + 8;
     double y = startY + i * (cardHeight + verticalGap);
     anchorPositions.add(Offset(x, y));
   }
@@ -653,7 +784,7 @@ Map<int, List<Offset>> _calculateBasePositions({
     var prevPositions = positionsByRound[r - 1];
 
     for (int i = 0; i < roundNodes.length; i++) {
-      double x = r * (cardWidth + horizontalGap) + 20;
+      double x = r * (cardWidth + horizontalGap) + 8;
       double y = 0;
       if (prevPositions != null && prevPositions.length > 2 * i + 1) {
         double y1 = prevPositions[2 * i].dy;
@@ -676,7 +807,7 @@ Map<int, List<Offset>> _calculateBasePositions({
     if (nextPositions != null) {
       for (int j = 0; j < nextPositions.length; j++) {
         Offset childPos = nextPositions[j];
-        double x = r * (cardWidth + horizontalGap) + 20;
+        double x = r * (cardWidth + horizontalGap) + 8;
 
         // Parent 1 (上方)
         if (2 * j < roundNodes.length) {

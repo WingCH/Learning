@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'examples/level1_follower.dart';
 import 'examples/level2_circle.dart';
+import 'examples/level3_tournament.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,19 +30,25 @@ class ExamplesHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('CustomMultiChildLayout 教學'),
           bottom: const TabBar(
+            isScrollable: true,
             tabs: [
               Tab(text: 'Level 1: 跟隨者'),
               Tab(text: 'Level 2: 圓形佈局'),
+              Tab(text: 'Level 3: 錦標賽'),
             ],
           ),
         ),
         body: const TabBarView(
-          children: [Level1FollowerExample(), Level2CircleExample()],
+          children: [
+            Level1FollowerExample(),
+            Level2CircleExample(),
+            Level3TournamentExample(),
+          ],
         ),
       ),
     );

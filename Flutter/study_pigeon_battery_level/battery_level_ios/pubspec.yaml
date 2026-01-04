@@ -1,0 +1,26 @@
+name: battery_level_ios
+description: iOS implementation of the battery_level plugin.
+version: 1.0.0
+
+environment:
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
+
+flutter:
+  plugin:
+    implements: battery_level
+    platforms:
+      ios:
+        dartPluginClass: BatteryLevelIOS
+        pluginClass: BatteryLevelPlugin
+
+dependencies:
+  flutter:
+    sdk: flutter
+  battery_level_platform_interface:
+    path: ../battery_level_platform_interface
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  pigeon: ^22.7.0

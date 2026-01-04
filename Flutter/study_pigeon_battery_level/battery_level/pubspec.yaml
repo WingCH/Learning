@@ -1,0 +1,29 @@
+name: battery_level
+description: Flutter plugin for getting battery level from native platforms.
+version: 1.0.0
+
+environment:
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        default_package: battery_level_android
+      ios:
+        default_package: battery_level_ios
+
+dependencies:
+  flutter:
+    sdk: flutter
+  battery_level_android:
+    path: ../battery_level_android
+  battery_level_ios:
+    path: ../battery_level_ios
+  battery_level_platform_interface:
+    path: ../battery_level_platform_interface
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

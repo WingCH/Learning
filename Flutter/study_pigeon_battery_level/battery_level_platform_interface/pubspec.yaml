@@ -1,0 +1,16 @@
+name: battery_level_platform_interface
+description: A common platform interface for the battery_level plugin.
+version: 1.0.0
+
+environment:
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.1.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

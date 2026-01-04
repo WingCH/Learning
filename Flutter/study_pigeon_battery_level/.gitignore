@@ -1,0 +1,15 @@
+# Miscellaneous
+.DS_Store
+.idea/
+.vscode/
+
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Specific Ignore Rules
+battery_level/example/android/

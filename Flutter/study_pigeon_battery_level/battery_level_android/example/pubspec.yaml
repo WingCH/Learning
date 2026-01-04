@@ -1,0 +1,22 @@
+name: battery_level_android_example
+description: Demonstrates how to use the battery_level_android plugin.
+publish_to: none
+
+environment:
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  battery_level_android:
+    path: ../
+  battery_level_platform_interface:
+    path: ../../battery_level_platform_interface
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

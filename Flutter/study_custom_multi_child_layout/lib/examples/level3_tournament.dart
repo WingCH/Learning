@@ -43,7 +43,8 @@ class Level3TournamentExample extends StatefulWidget {
       _Level3TournamentExampleState();
 }
 
-class _Level3TournamentExampleState extends State<Level3TournamentExample> {
+class _Level3TournamentExampleState extends State<Level3TournamentExample>
+    with TickerProviderStateMixin {
   // 比賽數據列表
   late List<MatchNode> _nodes;
   // 總輪數 (例如 5 輪對應 16 隊單敗淘汰制) 16 -> 8 -> 4 -> 2 -> 1 (5 rounds)
@@ -63,6 +64,22 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
   final double _paddingLeft = 8; // 容器左邊距
   final double _paddingRight = 20; // 容器右邊距
 
+  // --- 展開/收起功能相關變數 ---
+  /// 目前「吸附後」所在的輪次頁面（用於偵測翻頁後 reset）
+  int _activeRoundPage = 0;
+
+  /// 收起時的固定高度（約顯示 4 張卡片）
+  /// 計算公式：4 * (cardHeight + verticalGap) + verticalGap
+  double get _collapsedHeight =>
+      4 * (_cardHeight + _verticalGap) + _verticalGap;
+
+  /// 按鈕區域高度
+  final double _buttonHeight = 60;
+
+  /// 展開/收起動畫控制器
+  late AnimationController _expandController;
+  late Animation<double> _expandAnimation;
+
   // 動態計算卡片寬度
   // (螢幕寬度 - 左邊距 - 右邊距 - 一個水平間隙) / 2
   double get _cardWidth {
@@ -76,15 +93,26 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
     _nodes = _generateNodes();
     // 監聽滾動事件，實時更新 _currentRoundIndex
     _scrollController.addListener(_onScroll);
+
+    // 展開/收起動畫
+    _expandController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _expandController,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _expandController.dispose();
     super.dispose();
   }
 
-  /// 滾動監聽回調
+  /// 滾動監聯回調
   void _onScroll() {
     // 計算每一 "頁" (一輪比賽) 的總寬度 = 卡片寬度 + 間距
     final itemWidth = _cardWidth + _horizontalGap;
@@ -94,6 +122,16 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
 
     // 限制範圍，防止越界
     newRoundIndex = newRoundIndex.clamp(0.0, (_totalRounds - 1).toDouble());
+
+    // 偵測頁面切換並重置展開狀態
+    int newPage = newRoundIndex.round();
+    if (newPage != _activeRoundPage) {
+      _activeRoundPage = newPage;
+      // 如果當前是展開狀態，自動收起
+      if (_expandController.value > 0) {
+        _expandController.reverse();
+      }
+    }
 
     // 更新狀態。
     // 因為這是一個 Scroll-Driven Animation (滾動驅動動畫)，我們這裡使用 setState 來驅動每一幀的變化。
@@ -136,36 +174,79 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
     return nodes;
   }
 
+  /// 構建展開/收起按鈕
+  Widget _buildExpandCollapseButton() {
+    return AnimatedBuilder(
+      animation: _expandAnimation,
+      builder: (context, _) {
+        bool isExpanded = _expandController.value > 0.5;
+        return Container(
+          color: Colors.grey.shade50,
+          child: Center(
+            child: TextButton.icon(
+              onPressed: () {
+                if (_expandController.isCompleted) {
+                  _expandController.reverse();
+                } else {
+                  _expandController.forward();
+                }
+              },
+              icon: Icon(
+                isExpanded
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
+                size: 20,
+              ),
+              label: Text(isExpanded ? '收起' : '更多'),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.blue.shade700,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(color: Colors.grey.shade300),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 計算當前 round 的完整高度
+    final double fullHeight = calculateInterpolatedHeight(
+      nodes: _nodes,
+      focusRoundIndex: _currentRoundIndex,
+      cardHeight: _cardHeight,
+      verticalGap: _verticalGap,
+    );
+
+    // 判斷是否需要顯示展開按鈕（使用 epsilon 避免浮點誤差）
+    final bool canExpand = fullHeight > _collapsedHeight + 0.5;
+
     return SingleChildScrollView(
-      scrollDirection: Axis.vertical, // 垂直滾動：讓用戶可以上下滑動查看完整的樹狀圖 (當高度還很高時)
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal, // 水平滾動：查看不同輪次
-        // 使用自定義的物理效果來實現 "吸附" (Snapping)
-        physics: _SnappingScrollPhysics(itemWidth: _cardWidth + _horizontalGap),
-        child: Container(
-          // 給一個背景色方便調試或看清邊界，可改為 Colors.transparent 或移除
-          color: Colors.grey.shade50,
-          child: CustomMultiChildLayout(
-            // Delegate 負責計算子元件的位置和尺寸
-            delegate: TournamentLayoutDelegate(
-              nodes: _nodes,
-              cardWidth: _cardWidth,
-              cardHeight: _cardHeight,
-              horizontalGap: _horizontalGap,
-              verticalGap: _verticalGap,
-              paddingLeft: _paddingLeft,
-              focusRoundIndex: _currentRoundIndex,
-              screenWidth: MediaQuery.sizeOf(context).width,
+      scrollDirection: Axis.vertical,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 主要內容：水平滾動的錦標賽佈局
+          SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            physics: _SnappingScrollPhysics(
+              itemWidth: _cardWidth + _horizontalGap,
             ),
-            children: [
-              // 1. 繪製連線 (背景層) - 我們給它一個固定的 ID 'lines'
-              LayoutId(
-                id: 'lines',
-                child: CustomPaint(
-                  painter: TournamentLinesPainter(
+            child: ClipRect(
+              child: Container(
+                color: Colors.grey.shade50,
+                child: CustomMultiChildLayout(
+                  delegate: TournamentLayoutDelegate(
                     nodes: _nodes,
                     cardWidth: _cardWidth,
                     cardHeight: _cardHeight,
@@ -173,24 +254,48 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample> {
                     verticalGap: _verticalGap,
                     paddingLeft: _paddingLeft,
                     focusRoundIndex: _currentRoundIndex,
+                    screenWidth: MediaQuery.sizeOf(context).width,
+                    // 展開/收起功能參數
+                    expandAnimation: _expandAnimation,
+                    collapsedHeight: _collapsedHeight,
+                    canExpand: canExpand,
+                    buttonHeight: _buttonHeight,
                   ),
+                  children: [
+                    // 1. 繪製連線 (背景層)
+                    LayoutId(
+                      id: 'lines',
+                      child: CustomPaint(
+                        painter: TournamentLinesPainter(
+                          nodes: _nodes,
+                          cardWidth: _cardWidth,
+                          cardHeight: _cardHeight,
+                          horizontalGap: _horizontalGap,
+                          verticalGap: _verticalGap,
+                          paddingLeft: _paddingLeft,
+                          focusRoundIndex: _currentRoundIndex,
+                        ),
+                      ),
+                    ),
+                    // 2. 繪製卡片 (前景層)
+                    for (var node in _nodes)
+                      if (node.round >= _currentRoundIndex.floor())
+                        LayoutId(
+                          id: node.id,
+                          child: TournamentCard(
+                            node: node,
+                            width: _cardWidth,
+                            height: _cardHeight,
+                          ),
+                        ),
+                  ],
                 ),
               ),
-              // 2. 繪製卡片 (前景層)
-              for (var node in _nodes)
-                // 性能優化：只構建當前圓次及以後的節點。
-                if (node.round >= _currentRoundIndex.floor())
-                  LayoutId(
-                    id: node.id,
-                    child: TournamentCard(
-                      node: node,
-                      width: _cardWidth,
-                      height: _cardHeight,
-                    ),
-                  ),
-            ],
+            ),
           ),
-        ),
+          // 展開/收起按鈕：在卡片區域下方，不遮擋內容
+          if (canExpand) _buildExpandCollapseButton(),
+        ],
       ),
     );
   }
@@ -323,6 +428,12 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
   // 曲線屬性，用於讓高度變化的過渡更自然
   final Curve sizeCurve;
 
+  // --- 展開/收起功能參數 ---
+  final Animation<double> expandAnimation;
+  final double collapsedHeight;
+  final bool canExpand;
+  final double buttonHeight;
+
   TournamentLayoutDelegate({
     required this.nodes,
     required this.cardWidth,
@@ -332,8 +443,12 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
     required this.paddingLeft,
     required this.focusRoundIndex,
     required this.screenWidth,
+    required this.expandAnimation,
+    required this.collapsedHeight,
+    required this.canExpand,
+    this.buttonHeight = 60,
     this.sizeCurve = Curves.easeInOut,
-  });
+  }) : super(relayout: expandAnimation); // 關鍵！綁定動畫驅動 relayout
 
   /// 決定整個 Layout 的總尺寸
   @override
@@ -357,40 +472,28 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
 
     // 確保總寬度至少能容納內容 (雖然後面的公式應該cover了，但保險起見)
 
-    // 2. 動態計算總高度 (核心功能)
-    // 我們希望當用戶滾動到 "8強" 時，容器高度只適合 "8強" 的高度，而不是 "16強" 的高度。
-    // 這樣可以避免下方的空白。
+    // 2. 計算完整高度
+    double fullHeight = calculateInterpolatedHeight(
+      nodes: nodes,
+      focusRoundIndex: focusRoundIndex,
+      cardHeight: cardHeight,
+      verticalGap: verticalGap,
+      sizeCurve: sizeCurve,
+    );
 
-    // 找出當前過渡的 "起點輪次" (Floor) 和 "終點輪次" (Ceil)
-    int floorRound = focusRoundIndex.floor();
-    int ceilRound = focusRoundIndex.ceil();
-
-    // 計算進度 t (0.0 ~ 1.0)
-    double rawT = focusRoundIndex - floorRound;
-    double t = sizeCurve.transform(rawT); // 應用曲線讓高度變化的過渡更自然
-
-    // 分別計算這兩個輪次如果作為 "基準" 時，容器需要的理想高度
-    double h1 = _calculateHeightForRound(floorRound);
-    double h2 = _calculateHeightForRound(ceilRound);
-
-    // 插值計算當前高度
-    double currentHeight = h1 + (h2 - h1) * t;
-
-    // 確保高度至少能顯示一張卡片，防止過小
-    currentHeight = currentHeight < cardHeight
-        ? cardHeight + verticalGap
-        : currentHeight;
+    // 3. 根據展開狀態計算實際高度
+    double currentHeight;
+    if (!canExpand) {
+      // 不需要展開功能，使用完整高度
+      currentHeight = fullHeight;
+    } else {
+      // 使用動畫值插值計算高度
+      currentHeight =
+          collapsedHeight +
+          (fullHeight - collapsedHeight) * expandAnimation.value;
+    }
 
     return Size(totalWidth, currentHeight);
-  }
-
-  /// 計算某一輪的理論總高度
-  double _calculateHeightForRound(int round) {
-    // 找出該輪有多少比賽
-    int count = nodes.where((n) => n.round == round).length;
-    if (count == 0) return 0;
-    // 高度 = 卡片總高 + 間距總高
-    return count * cardHeight + (count + 1) * verticalGap;
   }
 
   /// 執行佈局，放置每個子元件
@@ -443,8 +546,11 @@ class TournamentLayoutDelegate extends MultiChildLayoutDelegate {
   @override
   bool shouldRelayout(covariant TournamentLayoutDelegate oldDelegate) {
     // 當滾動或者節點改變時，重新佈局
+    // 注意：expandAnimation 透過 super(relayout:) 自動處理
     return oldDelegate.focusRoundIndex != focusRoundIndex ||
-        oldDelegate.nodes != nodes;
+        oldDelegate.nodes != nodes ||
+        oldDelegate.canExpand != canExpand ||
+        oldDelegate.collapsedHeight != collapsedHeight;
   }
 }
 
@@ -889,4 +995,57 @@ Map<int, List<Offset>> _calculateBasePositions({
     positionsByRound[r] = currentPositions;
   }
   return positionsByRound;
+}
+
+// =============================================================================
+// 共用高度計算函數 (Shared Height Calculation)
+// =============================================================================
+
+/// 計算某一輪的理論總高度
+double calculateHeightForRound({
+  required List<MatchNode> nodes,
+  required int round,
+  required double cardHeight,
+  required double verticalGap,
+}) {
+  int count = nodes.where((n) => n.round == round).length;
+  if (count == 0) return 0;
+  return count * cardHeight + (count + 1) * verticalGap;
+}
+
+/// 計算當前滾動位置的插值高度（與 delegate 完全一致）
+double calculateInterpolatedHeight({
+  required List<MatchNode> nodes,
+  required double focusRoundIndex,
+  required double cardHeight,
+  required double verticalGap,
+  Curve sizeCurve = Curves.easeInOut,
+}) {
+  int floorRound = focusRoundIndex.floor();
+  int ceilRound = focusRoundIndex.ceil();
+
+  double rawT = focusRoundIndex - floorRound;
+  double t = sizeCurve.transform(rawT);
+
+  double h1 = calculateHeightForRound(
+    nodes: nodes,
+    round: floorRound,
+    cardHeight: cardHeight,
+    verticalGap: verticalGap,
+  );
+  double h2 = calculateHeightForRound(
+    nodes: nodes,
+    round: ceilRound,
+    cardHeight: cardHeight,
+    verticalGap: verticalGap,
+  );
+
+  double currentHeight = h1 + (h2 - h1) * t;
+
+  // 最小高度防呆
+  if (currentHeight < cardHeight) {
+    currentHeight = cardHeight + verticalGap;
+  }
+
+  return currentHeight;
 }

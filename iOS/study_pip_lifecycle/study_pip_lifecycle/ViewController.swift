@@ -72,6 +72,19 @@ class ViewController: UIViewController {
         return button
     }()
     
+    /// Case 4 按鈕：先播放本地 dummy 快速啟動 PiP
+    private lazy var case4Button: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Case 4: 先 dummy 再播放有效m3u8", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        button.backgroundColor = .systemPurple
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(case4ButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     /// 狀態標籤
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
@@ -114,12 +127,13 @@ class ViewController: UIViewController {
         view.addSubview(case1Button)
         view.addSubview(case2Button)
         view.addSubview(case3Button)
+        view.addSubview(case4Button)
         view.addSubview(statusLabel)
         
         NSLayoutConstraint.activate([
             // Case 1 按鈕
             case1Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -80),
+            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -120),
             case1Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case1Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case1Button.heightAnchor.constraint(equalToConstant: 50),
@@ -138,8 +152,15 @@ class ViewController: UIViewController {
             case3Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case3Button.heightAnchor.constraint(equalToConstant: 50),
             
+            // Case 4 按鈕
+            case4Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            case4Button.topAnchor.constraint(equalTo: case3Button.bottomAnchor, constant: 16),
+            case4Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            case4Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            case4Button.heightAnchor.constraint(equalToConstant: 50),
+            
             // 狀態標籤
-            statusLabel.topAnchor.constraint(equalTo: case3Button.bottomAnchor, constant: 20),
+            statusLabel.topAnchor.constraint(equalTo: case4Button.bottomAnchor, constant: 20),
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -154,6 +175,7 @@ class ViewController: UIViewController {
             case1Button.isEnabled = false
             case2Button.isEnabled = false
             case3Button.isEnabled = false
+            case4Button.isEnabled = false
         }
     }
     
@@ -191,7 +213,10 @@ class ViewController: UIViewController {
         if #available(iOS 14.2, *) {
             pipController?.canStartPictureInPictureAutomaticallyFromInline = true
         }
-        logger.log(.controller, "AVPictureInPictureController created")
+        
+        // 設定為直播模式（隱藏進度條）
+        pipController?.requiresLinearPlayback = true
+        logger.log(.controller, "AVPictureInPictureController created (linear playback mode)")
         
         statusLabel.text = "準備就緒，點擊按鈕開始"
     }
@@ -382,6 +407,32 @@ class ViewController: UIViewController {
         let anotherURL = URL(string: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8")!
         loadVideo(url: anotherURL)
     }
+    
+    /// Case 4: 先播放本地 dummy 快速啟動 PiP，再切換到真實 m3u8
+    @objc private func case4ButtonTapped() {
+        logger.log(.action, "=== Case 4: Dummy first, then m3u8 ===")
+        
+        // 本地 dummy 視頻
+        guard let dummyURL = Bundle.main.url(forResource: "dummy", withExtension: "mp4") else {
+            logger.log(.player, "ERROR: dummy.mp4 not found in bundle")
+            statusLabel.text = "找不到 dummy.mp4"
+            return
+        }
+        
+        // 真實的 m3u8 URL
+        let realURL = URL(string: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8")!
+        
+        logger.log(.player, "Step 1: Loading dummy video for instant PiP")
+        loadVideo(url: dummyURL)
+        
+        // 當 PiP 啟動後，延遲切換到真實 m3u8
+        // 這裡用簡單的延遲，實際項目可以用 delegate 回調
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self = self else { return }
+            self.logger.log(.player, "Step 2: Switching to real m3u8")
+            self.loadVideo(url: realURL)
+        }
+    }
 }
 
 // MARK: - AVPictureInPictureControllerDelegate
@@ -528,4 +579,38 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [WILL_START] PiP will start
  [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
  [PiP] [DID_START] PiP did start
+ 
+ 
+ === Case 4:先 dummy 再有效m3u8
+ [PiP] [ACTION] === Case 4: Dummy first, then m3u8 ===
+ [PiP] [PLAYER] Step 1: Loading dummy video for instant PiP
+ [PiP] [PLAYER] Loading video: file:///Users/wingchan/Library/Developer/CoreSimulator/Devices/D19D48DD-0189-414F-9634-B90EEBF29B4B/data/Containers/Bundle/Application/9D60FFB1-8764-4100-A990-8769065F9823/study_pip_lifecycle.app/dummy.mp4
+ [PiP] [CONTROLLER] PiP active: false
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
+ [PiP] [ACTION] Starting PiP
+ [PiP] [WILL_START] PiP will start
+ [PiP] [DID_START] PiP did start
+ [PiP] [PLAYER] Step 2: Switching to real m3u8
+ [PiP] [PLAYER] Loading video: https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
+ [PiP] [CONTROLLER] PiP active: true
+ [PiP] [PLAYER] Removed observers for player item
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=true, playerStatus=readyToPlay
+ [PiP] [ACTION] PiP already active, video updated
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
  */

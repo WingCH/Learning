@@ -24,16 +24,32 @@ class ViewController: UIViewController {
     /// 畫中畫控制器
     private var pipController: AVPictureInPictureController?
     
-    /// 開始 PiP 的按鈕
-    private lazy var startPiPButton: UIButton = {
+    /// Player item 狀態監聽器
+    private var playerItemStatusObserver: NSKeyValueObservation?
+    
+    /// Case 1 按鈕：播放有效連結
+    private lazy var case1Button: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("開始畫中畫", for: .normal)
+        button.setTitle("Case 1: 播放有效的 m3u8", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 12
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(startPiPButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(case1ButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    /// Case 2 按鈕：播放無效連結
+    private lazy var case2Button: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Case 2: 播放無效的 m3u8", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        button.backgroundColor = .systemOrange
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(case2ButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -44,6 +60,7 @@ class ViewController: UIViewController {
         label.textAlignment = .center
         label.textColor = .secondaryLabel
         label.font = UIFont.systemFont(ofSize: 14)
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -56,6 +73,7 @@ class ViewController: UIViewController {
         
         logger.log(.setup, "viewDidLoad started")
         setupUI()
+        setupAudioSession()
         setupPlayer()
         logger.log(.setup, "viewDidLoad completed")
     }
@@ -69,33 +87,45 @@ class ViewController: UIViewController {
     
     /// 設定 UI 元件
     private func setupUI() {
-        view.addSubview(startPiPButton)
+        view.addSubview(case1Button)
+        view.addSubview(case2Button)
         view.addSubview(statusLabel)
         
         NSLayoutConstraint.activate([
-            startPiPButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            startPiPButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            startPiPButton.widthAnchor.constraint(equalToConstant: 160),
-            startPiPButton.heightAnchor.constraint(equalToConstant: 50),
-            statusLabel.topAnchor.constraint(equalTo: startPiPButton.bottomAnchor, constant: 20),
+            // Case 1 按鈕
+            case1Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
+            case1Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            case1Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            case1Button.heightAnchor.constraint(equalToConstant: 50),
+            
+            // Case 2 按鈕
+            case2Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            case2Button.topAnchor.constraint(equalTo: case1Button.bottomAnchor, constant: 16),
+            case2Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            case2Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            case2Button.heightAnchor.constraint(equalToConstant: 50),
+            
+            // 狀態標籤
+            statusLabel.topAnchor.constraint(equalTo: case2Button.bottomAnchor, constant: 20),
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
-    }
-    
-    /// 設定視頻播放器和 PiP 控制器
-    private func setupPlayer() {
+        
+        // 檢查 PiP 支援
         let isPiPSupported = AVPictureInPictureController.isPictureInPictureSupported()
         logger.log(.setup, "PiP supported: \(isPiPSupported)")
         
-        guard isPiPSupported else {
+        if !isPiPSupported {
             statusLabel.text = "此設備不支援畫中畫"
-            startPiPButton.isEnabled = false
-            return
+            case1Button.isEnabled = false
+            case2Button.isEnabled = false
         }
-        
-        // 設定音頻 session（允許背景播放）
+    }
+    
+    /// 設定音頻 session（只需設定一次）
+    private func setupAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
             try AVAudioSession.sharedInstance().setActive(true)
@@ -103,13 +133,19 @@ class ViewController: UIViewController {
         } catch {
             logger.error(.audioSession, error)
         }
+    }
+    
+    /// 設定 Player 和 PiP Controller（前置工作，不載入視頻）
+    private func setupPlayer() {
+        guard AVPictureInPictureController.isPictureInPictureSupported() else {
+            return
+        }
         
-        // 創建播放器
-        let videoURL = URL(string: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8")!
-        player = AVPlayer(url: videoURL)
-        logger.log(.player, "AVPlayer created with URL")
+        // 創建空的播放器
+        player = AVPlayer()
+        logger.log(.player, "AVPlayer created (empty)")
         
-        // 創建播放器圖層（PiP 需要一個 layer 來參考）
+        // 創建播放器圖層
         let layer = AVPlayerLayer(player: player)
         layer.frame = CGRect(x: 0, y: 0, width: 1, height: 1)
         view.layer.addSublayer(layer)
@@ -127,12 +163,73 @@ class ViewController: UIViewController {
         statusLabel.text = "準備就緒，點擊按鈕開始"
     }
     
-    // MARK: - Actions
-    
-    /// 點擊開始 PiP 按鈕
-    @objc private func startPiPButtonTapped() {
-        logger.log(.action, "Button tapped")
+    /// 載入視頻並啟動 PiP
+    /// - Parameter url: 視頻 URL
+    private func loadVideoAndStartPiP(url: URL) {
+        logger.log(.player, "Loading video: \(url.absoluteString)")
         
+        // 停止現有播放
+        player?.pause()
+        
+        // 如果 PiP 正在運行，先停止
+        if let pip = pipController, pip.isPictureInPictureActive {
+            pip.stopPictureInPicture()
+        }
+        
+        // 移除舊的監聽器
+        playerItemStatusObserver?.invalidate()
+        playerItemStatusObserver = nil
+        
+        // 替換播放內容
+        let playerItem = AVPlayerItem(url: url)
+        player?.replaceCurrentItem(with: playerItem)
+        logger.log(.player, "Player item replaced")
+        
+        // 監聽 player item 狀態變化
+        playerItemStatusObserver = playerItem.observe(\.status, options: [.new, .initial]) { [weak self] item, _ in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                self.handlePlayerItemStatusChange(status: item.status)
+            }
+        }
+        
+        // 開始播放
+        player?.play()
+        logger.log(.player, "Player started")
+        
+        statusLabel.text = "載入視頻中..."
+    }
+    
+    /// 處理 player item 狀態變化
+    private func handlePlayerItemStatusChange(status: AVPlayerItem.Status) {
+        logger.log(.player, "Player item status changed: \(status.description)")
+        
+        switch status {
+        case .readyToPlay:
+            logger.log(.player, "Video ready to play")
+            startPiP()
+            
+        case .failed:
+            if let error = player?.currentItem?.error {
+                logger.error(.player, error)
+                statusLabel.text = "視頻載入失敗: \(error.localizedDescription)"
+            } else {
+                logger.log(.player, "Video failed to load (unknown error)")
+                statusLabel.text = "視頻載入失敗"
+            }
+            
+        case .unknown:
+            // 還在載入中
+            break
+            
+        @unknown default:
+            break
+        }
+    }
+    
+    /// 啟動 PiP
+    private func startPiP() {
         guard let pipController = pipController else {
             logger.log(.controller, "PiP controller is nil")
             statusLabel.text = "PiP 控制器未初始化"
@@ -145,27 +242,32 @@ class ViewController: UIViewController {
             playerStatus: player?.currentItem?.status.description
         )
         
-        guard pipController.isPictureInPicturePossible else {
-            logger.log(.state, "PiP not possible yet, waiting for video to load")
-            statusLabel.text = "正在載入視頻..."
-            player?.play()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                self?.startPiPButtonTapped()
-            }
-            return
-        }
-        
-        player?.play()
-        
-        if pipController.isPictureInPictureActive {
-            logger.log(.action, "Stopping PiP")
-            pipController.stopPictureInPicture()
-            statusLabel.text = "PiP 已停止"
-        } else {
+        if pipController.isPictureInPicturePossible {
             logger.log(.action, "Starting PiP")
             pipController.startPictureInPicture()
             statusLabel.text = "PiP 啟動中..."
+        } else {
+            logger.log(.state, "PiP not possible yet")
+            statusLabel.text = "PiP 等待視頻載入..."
         }
+    }
+    
+    // MARK: - Actions
+    
+    /// Case 1: 播放有效連結
+    @objc private func case1ButtonTapped() {
+        logger.log(.action, "=== Case 1: Valid URL ===")
+        
+        let validURL = URL(string: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8")!
+        loadVideoAndStartPiP(url: validURL)
+    }
+    
+    /// Case 2: 播放無效連結
+    @objc private func case2ButtonTapped() {
+        logger.log(.action, "=== Case 2: Invalid URL ===")
+        
+        let invalidURL = URL(string: "https://invalid-url.example.com/invalid.m3u8")!
+        loadVideoAndStartPiP(url: invalidURL)
     }
 }
 
@@ -183,7 +285,6 @@ extension ViewController: AVPictureInPictureControllerDelegate {
     func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         logger.log(.didStart, "PiP did start")
         statusLabel.text = "PiP 播放中"
-        startPiPButton.setTitle("停止畫中畫", for: .normal)
     }
     
     /// PiP 開始失敗
@@ -207,7 +308,6 @@ extension ViewController: AVPictureInPictureControllerDelegate {
         logger.log(.player, "Player paused")
         
         statusLabel.text = "PiP 已停止"
-        startPiPButton.setTitle("開始畫中畫", for: .normal)
     }
     
     /// 使用者要求恢復播放介面
@@ -234,8 +334,14 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
 
 /*
  Case 1:
- 正常播放一條有效的連結
- [PiP] [ACTION] Button tapped
+ 播放一條有效的連結
+ [PiP] [ACTION] === Case 1: Valid URL ===
+ [PiP] [PLAYER] Loading video: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
  [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
  [PiP] [ACTION] Starting PiP
  [PiP] [WILL_START] PiP will start
@@ -251,4 +357,15 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [WILL_STOP] PiP will stop
  [PiP] [DID_STOP] PiP did stop
  [PiP] [PLAYER] Player paused
+ 
+-----
+ Case 2:
+ 播放一條無效的連結
+ [PiP] [ACTION] === Case 2: Invalid URL ===
+ [PiP] [PLAYER] Loading video: https://invalid-url.example.com/invalid.m3u8
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] Player item status changed: failed
+ [PiP] [PLAYER] ERROR: A TLS error caused the secure connection to fail.
  */

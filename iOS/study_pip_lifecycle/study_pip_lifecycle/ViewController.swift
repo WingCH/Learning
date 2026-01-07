@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     /// 日誌記錄器
     private let logger = PiPLogger.shared
     
-    /// 視頻播放器
+    /// 主視頻播放器（用於 PiP）
     private var player: AVPlayer?
     
     /// 播放器圖層
@@ -24,14 +24,29 @@ class ViewController: UIViewController {
     /// 畫中畫控制器
     private var pipController: AVPictureInPictureController?
     
+    /// 預驗證播放器（隱藏，用於測試 URL 是否可播放）
+    private var preloadPlayer: AVPlayer?
+    
+    /// 預驗證成功後的回調
+    private var preloadSuccessHandler: ((AVPlayerItem) -> Void)?
+    
+    /// 預驗證失敗後的回調
+    private var preloadFailureHandler: (() -> Void)?
+    
     /// KVO context - status
     private static var playerItemStatusContext = 0
     
     /// KVO context - playbackLikelyToKeepUp
     private static var playbackLikelyToKeepUpContext = 0
     
+    /// KVO context - preload status
+    private static var preloadStatusContext = 0
+    
     /// 當前正在監聽的 player item
     private weak var observedPlayerItem: AVPlayerItem?
+    
+    /// 當前正在預驗證的 player item
+    private weak var preloadObservedItem: AVPlayerItem?
     
     /// Case 1 按鈕：播放有效連結
     private lazy var case1Button: UIButton = {
@@ -98,6 +113,32 @@ class ViewController: UIViewController {
         return button
     }()
     
+    /// Case 6 按鈕：預驗證後再切換
+    private lazy var case6Button: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Case 6: 預驗證無效URL", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        button.backgroundColor = .systemTeal
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(case6ButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    /// Case 7 按鈕：預驗證失敗後自動重試
+    private lazy var case7Button: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Case 7: 預驗證失敗後重試", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        button.backgroundColor = .systemIndigo
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(case7ButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     /// 狀態標籤
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
@@ -126,6 +167,7 @@ class ViewController: UIViewController {
     deinit {
         // 確保移除 KVO observer
         removePlayerItemObserver()
+        cancelPreload()
     }
     
     override func viewDidLayoutSubviews() {
@@ -142,46 +184,62 @@ class ViewController: UIViewController {
         view.addSubview(case3Button)
         view.addSubview(case4Button)
         view.addSubview(case5Button)
+        view.addSubview(case6Button)
+        view.addSubview(case7Button)
         view.addSubview(statusLabel)
         
         NSLayoutConstraint.activate([
             // Case 1 按鈕
             case1Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -160),
+            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -240),
             case1Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case1Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case1Button.heightAnchor.constraint(equalToConstant: 50),
             
             // Case 2 按鈕
             case2Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case2Button.topAnchor.constraint(equalTo: case1Button.bottomAnchor, constant: 16),
+            case2Button.topAnchor.constraint(equalTo: case1Button.bottomAnchor, constant: 12),
             case2Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case2Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case2Button.heightAnchor.constraint(equalToConstant: 50),
             
             // Case 3 按鈕
             case3Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case3Button.topAnchor.constraint(equalTo: case2Button.bottomAnchor, constant: 16),
+            case3Button.topAnchor.constraint(equalTo: case2Button.bottomAnchor, constant: 12),
             case3Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case3Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case3Button.heightAnchor.constraint(equalToConstant: 50),
             
             // Case 4 按鈕
             case4Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case4Button.topAnchor.constraint(equalTo: case3Button.bottomAnchor, constant: 16),
+            case4Button.topAnchor.constraint(equalTo: case3Button.bottomAnchor, constant: 12),
             case4Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case4Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case4Button.heightAnchor.constraint(equalToConstant: 50),
             
             // Case 5 按鈕
             case5Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case5Button.topAnchor.constraint(equalTo: case4Button.bottomAnchor, constant: 16),
+            case5Button.topAnchor.constraint(equalTo: case4Button.bottomAnchor, constant: 12),
             case5Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case5Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case5Button.heightAnchor.constraint(equalToConstant: 50),
             
+            // Case 6 按鈕
+            case6Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            case6Button.topAnchor.constraint(equalTo: case5Button.bottomAnchor, constant: 12),
+            case6Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            case6Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            case6Button.heightAnchor.constraint(equalToConstant: 50),
+            
+            // Case 7 按鈕
+            case7Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            case7Button.topAnchor.constraint(equalTo: case6Button.bottomAnchor, constant: 12),
+            case7Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            case7Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            case7Button.heightAnchor.constraint(equalToConstant: 50),
+            
             // 狀態標籤
-            statusLabel.topAnchor.constraint(equalTo: case5Button.bottomAnchor, constant: 20),
+            statusLabel.topAnchor.constraint(equalTo: case7Button.bottomAnchor, constant: 16),
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -198,6 +256,8 @@ class ViewController: UIViewController {
             case3Button.isEnabled = false
             case4Button.isEnabled = false
             case5Button.isEnabled = false
+            case6Button.isEnabled = false
+            case7Button.isEnabled = false
         }
     }
     
@@ -320,7 +380,7 @@ class ViewController: UIViewController {
             return
         }
         
-        // 處理 status 變化
+        // 處理主 player 的 status 變化
         if context == &ViewController.playerItemStatusContext {
             DispatchQueue.main.async { [weak self] in
                 self?.handlePlayerItemStatusChange(status: playerItem.status)
@@ -332,6 +392,14 @@ class ViewController: UIViewController {
         if context == &ViewController.playbackLikelyToKeepUpContext {
             DispatchQueue.main.async { [weak self] in
                 self?.handlePlaybackLikelyToKeepUpChange(isLikelyToKeepUp: playerItem.isPlaybackLikelyToKeepUp)
+            }
+            return
+        }
+        
+        // 處理預驗證 player 的 status 變化
+        if context == &ViewController.preloadStatusContext {
+            DispatchQueue.main.async { [weak self] in
+                self?.handlePreloadStatusChange(status: playerItem.status, playerItem: playerItem)
             }
             return
         }
@@ -365,6 +433,124 @@ class ViewController: UIViewController {
             
         case .unknown:
             // 還在載入中
+            break
+            
+        @unknown default:
+            break
+        }
+    }
+    
+    // MARK: - 預驗證邏輯
+    
+    /// 預驗證 URL 是否可播放，成功後才切換到主 player
+    /// - Parameters:
+    ///   - url: 要驗證的 URL
+    ///   - onSuccess: 驗證成功的回調
+    ///   - onFailure: 驗證失敗的回調（可選）
+    private func preloadAndValidate(url: URL, onSuccess: @escaping (AVPlayerItem) -> Void, onFailure: (() -> Void)? = nil) {
+        logger.log(.player, "[Preload] Starting preload for: \(url.absoluteString)")
+        
+        // 清除之前的預驗證
+        cancelPreload()
+        
+        // 保存回調
+        preloadSuccessHandler = onSuccess
+        preloadFailureHandler = onFailure
+        
+        // 創建預驗證 player（如果還沒有）
+        if preloadPlayer == nil {
+            preloadPlayer = AVPlayer()
+            logger.log(.player, "[Preload] Created preload player")
+        }
+        
+        // 創建 player item 並開始預驗證
+        let playerItem = AVPlayerItem(url: url)
+        preloadPlayer?.replaceCurrentItem(with: playerItem)
+        
+        // 添加 KVO 監聽
+        preloadObservedItem = playerItem
+        playerItem.addObserver(
+            self,
+            forKeyPath: #keyPath(AVPlayerItem.status),
+            options: [.new],
+            context: &ViewController.preloadStatusContext
+        )
+        
+        logger.log(.player, "[Preload] Waiting for status...")
+    }
+    
+    /// 取消預驗證
+    private func cancelPreload() {
+        if let item = preloadObservedItem {
+            item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &ViewController.preloadStatusContext)
+            preloadObservedItem = nil
+        }
+        preloadSuccessHandler = nil
+        preloadFailureHandler = nil
+        preloadPlayer?.replaceCurrentItem(with: nil)
+        logger.log(.player, "[Preload] Cancelled")
+    }
+    
+    /// 處理預驗證結果
+    private func handlePreloadStatusChange(status: AVPlayerItem.Status, playerItem: AVPlayerItem) {
+        logger.log(.player, "[Preload] Status changed: \(status.description)")
+        
+        switch status {
+        case .readyToPlay:
+            logger.log(.player, "[Preload] ✅ URL is valid, switching to main player")
+            
+            // 移除預驗證的 KVO
+            if let item = preloadObservedItem {
+                item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &ViewController.preloadStatusContext)
+                preloadObservedItem = nil
+            }
+            
+            // 先取出 handler 並清空，防止 callback 內部啟動新流程時被覆蓋
+            let successHandler = preloadSuccessHandler
+            preloadSuccessHandler = nil
+            preloadFailureHandler = nil
+            
+            // 調用成功回調
+            if let handler = successHandler {
+                // 嘗試從 asset 獲取 URL
+                if let urlAsset = playerItem.asset as? AVURLAsset {
+                    logger.log(.player, "[Preload] Creating new item from URL: \(urlAsset.url)")
+                    let newItem = AVPlayerItem(url: urlAsset.url)
+                    handler(newItem)
+                } else {
+                    // HLS 可能不是 AVURLAsset，直接用 preloadPlayer 的 currentItem 來獲取 URL
+                    logger.log(.player, "[Preload] Asset is not AVURLAsset, using preloadPlayer's currentItem")
+                    // 無法獲取 URL，直接用 playerItem（雖然可能有問題）
+                    handler(playerItem)
+                }
+            }
+            
+        case .failed:
+            if let error = playerItem.error {
+                logger.log(.player, "[Preload] ❌ URL failed: \(error.localizedDescription)")
+            } else {
+                logger.log(.player, "[Preload] ❌ URL failed (unknown error)")
+            }
+            
+            // 移除預驗證的 KVO
+            if let item = preloadObservedItem {
+                item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &ViewController.preloadStatusContext)
+                preloadObservedItem = nil
+            }
+            
+            // 先取出 handler 並清空，防止 callback 內部啟動新流程時被覆蓋
+            let failureHandler = preloadFailureHandler
+            preloadSuccessHandler = nil
+            preloadFailureHandler = nil
+            
+            // 調用失敗回調（如果有設定）
+            if let handler = failureHandler {
+                handler()
+            } else {
+                statusLabel.text = "視頻無法播放"
+            }
+            
+        case .unknown:
             break
             
         @unknown default:
@@ -479,6 +665,130 @@ class ViewController: UIViewController {
             self.logger.log(.player, "Step 2: Switching to invalid m3u8")
             self.loadVideo(url: invalidURL)
         }
+    }
+    
+    /// Case 6: 先用隱藏 player 預驗證，成功才切換
+    @objc private func case6ButtonTapped() {
+        logger.log(.action, "=== Case 6: Preload and validate before switch ===")
+        
+        // 本地 dummy 視頻（先啟動 PiP）
+        guard let dummyURL = Bundle.main.url(forResource: "dummy", withExtension: "mp4") else {
+            logger.log(.player, "ERROR: dummy.mp4 not found in bundle")
+            statusLabel.text = "找不到 dummy.mp4"
+            return
+        }
+        
+        // 無效的 m3u8 URL（用於測試預驗證）
+        let invalidURL = URL(string: "https://invalid-url.example.com/invalid.m3u8")!
+        
+        logger.log(.player, "Step 1: Loading dummy video for instant PiP")
+        loadVideo(url: dummyURL)
+        
+        // 當 PiP 啟動後，用預驗證方式切換
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self = self else { return }
+            
+            self.logger.log(.player, "Step 2: Preloading invalid URL...")
+            self.statusLabel.text = "預驗證中..."
+            
+            // 預驗證 URL，只有成功才切換到主 player
+            self.preloadAndValidate(url: invalidURL) { [weak self] validatedItem in
+                guard let self = self else { return }
+                
+                self.logger.log(.player, "Step 3: URL validated, switching to main player")
+                
+                // 移除舊的監聽器
+                self.removePlayerItemObserver()
+                
+                // 替換為已驗證的 player item
+                self.player?.replaceCurrentItem(with: validatedItem)
+                
+                // 添加新的監聯器
+                self.addPlayerItemObserver(validatedItem)
+                
+                // 繼續播放
+                self.player?.play()
+                
+                self.statusLabel.text = "視頻已更新"
+            }
+        }
+    }
+    
+    /// Case 7: 先 dummy，預驗證無效 URL 失敗後自動重試有效 URL
+    @objc private func case7ButtonTapped() {
+        logger.log(.action, "=== Case 7: Preload with retry on failure ===")
+        
+        // 本地 dummy 視頻（先啟動 PiP）
+        guard let dummyURL = Bundle.main.url(forResource: "dummy", withExtension: "mp4") else {
+            logger.log(.player, "ERROR: dummy.mp4 not found in bundle")
+            statusLabel.text = "找不到 dummy.mp4"
+            return
+        }
+        
+        // 無效的 m3u8 URL（第一次嘗試）
+        let invalidURL = URL(string: "https://invalid-url.example.com/invalid.m3u8")!
+        
+        // 有效的 m3u8 URL（備用）
+        let validURL = URL(string: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8")!
+        
+        logger.log(.player, "Step 1: Loading dummy video for instant PiP")
+        loadVideo(url: dummyURL)
+        
+        // 當 PiP 啟動後，用預驗證方式嘗試無效 URL
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self = self else { return }
+            
+            self.logger.log(.player, "Step 2: Trying invalid URL first...")
+            self.statusLabel.text = "嘗試主要 URL..."
+            
+            // 預驗證無效 URL，失敗時自動重試有效 URL
+            self.preloadAndValidate(
+                url: invalidURL,
+                onSuccess: { [weak self] validatedItem in
+                    guard let self = self else { return }
+                    self.logger.log(.player, "Step 3a: Invalid URL unexpectedly succeeded!")
+                    self.switchToValidatedItem(validatedItem)
+                },
+                onFailure: { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.logger.log(.player, "Step 3b: Invalid URL failed, trying backup URL...")
+                    self.statusLabel.text = "主要 URL 失敗，嘗試備用..."
+                    
+                    // 重試有效 URL
+                    self.preloadAndValidate(
+                        url: validURL,
+                        onSuccess: { [weak self] validatedItem in
+                            guard let self = self else { return }
+                            self.logger.log(.player, "Step 4: Backup URL succeeded!")
+                            self.switchToValidatedItem(validatedItem)
+                        },
+                        onFailure: { [weak self] in
+                            self?.logger.log(.player, "Step 4: Backup URL also failed!")
+                            self?.statusLabel.text = "所有 URL 都失敗"
+                        }
+                    )
+                }
+            )
+        }
+    }
+    
+    /// 切換到已驗證的 player item
+    private func switchToValidatedItem(_ item: AVPlayerItem) {
+        // 移除舊的監聽器
+        removePlayerItemObserver()
+        
+        // 替換為已驗證的 player item
+        player?.replaceCurrentItem(with: item)
+        
+        // 添加新的監聽器
+        addPlayerItemObserver(item)
+        
+        // 繼續播放
+        player?.play()
+        
+        statusLabel.text = "視頻已更新 ✅"
+        logger.log(.player, "Switched to validated item successfully")
     }
 }
 
@@ -696,4 +1006,75 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [RESTORE_UI] User requested to restore UI
  [PiP] [DID_STOP] PiP did stop
  [PiP] [PLAYER] Player paused
+ 
+ === Case 6:預驗證無效URL
+ [PiP] [ACTION] === Case 6: Preload and validate before switch ===
+ [PiP] [PLAYER] Step 1: Loading dummy video for instant PiP
+ [PiP] [PLAYER] Loading video: file:///Users/wingchan/Library/Developer/CoreSimulator/Devices/D19D48DD-0189-414F-9634-B90EEBF29B4B/data/Containers/Bundle/Application/FB059874-0600-4E3E-ADE2-5237AAABB543/study_pip_lifecycle.app/dummy.mp4
+ [PiP] [CONTROLLER] PiP active: false
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
+ [PiP] [ACTION] Starting PiP
+ [PiP] [WILL_START] PiP will start
+ [PiP] [DID_START] PiP did start
+ [PiP] [PLAYER] Step 2: Preloading invalid URL...
+ [PiP] [PLAYER] [Preload] Starting preload for: https://invalid-url.example.com/invalid.m3u8
+ [PiP] [PLAYER] [Preload] Cancelled
+ [PiP] [PLAYER] [Preload] Created preload player
+ [PiP] [PLAYER] [Preload] Waiting for status...
+ [PiP] [PLAYER] [Preload] Status changed: failed
+ [PiP] [PLAYER] [Preload] ❌ URL failed: A TLS error caused the secure connection to fail.
+ 
+ 
+ === Case 7:預驗證失敗後重試
+ [PiP] [ACTION] === Case 7: Preload with retry on failure ===
+ [PiP] [PLAYER] Step 1: Loading dummy video for instant PiP
+ [PiP] [PLAYER] Loading video: file:///Users/wingchan/Library/Developer/CoreSimulator/Devices/D19D48DD-0189-414F-9634-B90EEBF29B4B/data/Containers/Bundle/Application/DD55DBA4-2577-422C-9CF4-78FE93598EE7/study_pip_lifecycle.app/dummy.mp4
+ [PiP] [CONTROLLER] PiP active: false
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
+ [PiP] [ACTION] Starting PiP
+ [PiP] [WILL_START] PiP will start
+ [PiP] [DID_START] PiP did start
+ [PiP] [PLAYER] Step 2: Trying invalid URL first...
+ [PiP] [PLAYER] [Preload] Starting preload for: https://invalid-url.example.com/invalid.m3u8
+ [PiP] [PLAYER] [Preload] Cancelled
+ [PiP] [PLAYER] [Preload] Created preload player
+ [PiP] [PLAYER] [Preload] Waiting for status...
+ [PiP] [PLAYER] [Preload] Status changed: failed
+ [PiP] [PLAYER] [Preload] ❌ URL failed: A TLS error caused the secure connection to fail.
+ [PiP] [PLAYER] Step 3b: Invalid URL failed, trying backup URL...
+ [PiP] [PLAYER] [Preload] Starting preload for: https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
+ [PiP] [PLAYER] [Preload] Cancelled
+ [PiP] [PLAYER] [Preload] Waiting for status...
+ [PiP] [PLAYER] [Preload] Status changed: readyToPlay
+ [PiP] [PLAYER] [Preload] ✅ URL is valid, switching to main player
+ [PiP] [PLAYER] [Preload] Creating new item from URL: https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
+ [PiP] [PLAYER] Step 4: Backup URL succeeded!
+ [PiP] [PLAYER] Removed observers for player item
+ [PiP] [PLAYER] Added observers for player item
+ [PiP] [PLAYER] Switched to validated item successfully
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=true, playerStatus=readyToPlay
+ [PiP] [ACTION] PiP already active, video updated
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
  */

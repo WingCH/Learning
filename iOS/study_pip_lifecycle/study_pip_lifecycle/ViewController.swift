@@ -24,8 +24,14 @@ class ViewController: UIViewController {
     /// 畫中畫控制器
     private var pipController: AVPictureInPictureController?
     
-    /// Player item 狀態監聽器
-    private var playerItemStatusObserver: NSKeyValueObservation?
+    /// KVO context - status
+    private static var playerItemStatusContext = 0
+    
+    /// KVO context - playbackLikelyToKeepUp
+    private static var playbackLikelyToKeepUpContext = 0
+    
+    /// 當前正在監聽的 player item
+    private weak var observedPlayerItem: AVPlayerItem?
     
     /// Case 1 按鈕：播放有效連結
     private lazy var case1Button: UIButton = {
@@ -89,6 +95,11 @@ class ViewController: UIViewController {
         setupAudioSession()
         setupPlayer()
         logger.log(.setup, "viewDidLoad completed")
+    }
+    
+    deinit {
+        // 確保移除 KVO observer
+        removePlayerItemObserver()
     }
     
     override func viewDidLayoutSubviews() {
@@ -199,29 +210,92 @@ class ViewController: UIViewController {
             player?.pause()
         }
         
-        // 移除舊的監聯器
-        playerItemStatusObserver?.invalidate()
-        playerItemStatusObserver = nil
+        // 移除舊的監聽器
+        removePlayerItemObserver()
         
         // 替換播放內容
         let playerItem = AVPlayerItem(url: url)
         player?.replaceCurrentItem(with: playerItem)
         logger.log(.player, "Player item replaced")
         
-        // 監聽 player item 狀態變化
-        playerItemStatusObserver = playerItem.observe(\.status, options: [.new, .initial]) { [weak self] item, _ in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                self.handlePlayerItemStatusChange(status: item.status)
-            }
-        }
+        // 添加新的監聽器
+        addPlayerItemObserver(playerItem)
         
         // 開始播放
         player?.play()
         logger.log(.player, "Player started")
         
         statusLabel.text = "載入視頻中..."
+    }
+    
+    /// 添加 player item 狀態監聽器
+    private func addPlayerItemObserver(_ playerItem: AVPlayerItem) {
+        observedPlayerItem = playerItem
+        
+        // 監聽 status
+        playerItem.addObserver(
+            self,
+            forKeyPath: #keyPath(AVPlayerItem.status),
+            options: [.new, .initial],
+            context: &ViewController.playerItemStatusContext
+        )
+        
+        // 監聽 isPlaybackLikelyToKeepUp
+        playerItem.addObserver(
+            self,
+            forKeyPath: #keyPath(AVPlayerItem.isPlaybackLikelyToKeepUp),
+            options: [.new, .initial],
+            context: &ViewController.playbackLikelyToKeepUpContext
+        )
+        
+        logger.log(.player, "Added observers for player item")
+    }
+    
+    /// 移除 player item 狀態監聽器
+    private func removePlayerItemObserver() {
+        if let item = observedPlayerItem {
+            item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &ViewController.playerItemStatusContext)
+            item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.isPlaybackLikelyToKeepUp), context: &ViewController.playbackLikelyToKeepUpContext)
+            observedPlayerItem = nil
+            logger.log(.player, "Removed observers for player item")
+        }
+    }
+    
+    /// KVO 回調
+    override func observeValue(
+        forKeyPath keyPath: String?,
+        of object: Any?,
+        change: [NSKeyValueChangeKey : Any]?,
+        context: UnsafeMutableRawPointer?
+    ) {
+        guard let playerItem = object as? AVPlayerItem else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+        
+        // 處理 status 變化
+        if context == &ViewController.playerItemStatusContext {
+            DispatchQueue.main.async { [weak self] in
+                self?.handlePlayerItemStatusChange(status: playerItem.status)
+            }
+            return
+        }
+        
+        // 處理 isPlaybackLikelyToKeepUp 變化
+        if context == &ViewController.playbackLikelyToKeepUpContext {
+            DispatchQueue.main.async { [weak self] in
+                self?.handlePlaybackLikelyToKeepUpChange(isLikelyToKeepUp: playerItem.isPlaybackLikelyToKeepUp)
+            }
+            return
+        }
+        
+        // 不是我們的 context，交給 super
+        super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+    }
+    
+    /// 處理 isPlaybackLikelyToKeepUp 變化
+    private func handlePlaybackLikelyToKeepUpChange(isLikelyToKeepUp: Bool) {
+        logger.log(.player, "isPlaybackLikelyToKeepUp: \(isLikelyToKeepUp)")
     }
     
     /// 處理 player item 狀態變化
@@ -378,13 +452,16 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [PLAYER] Loading video: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
  [PiP] [CONTROLLER] PiP active: false
  [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
  [PiP] [PLAYER] Player started
  [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
  [PiP] [PLAYER] Player item status changed: readyToPlay
  [PiP] [PLAYER] Video ready to play
  [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
  [PiP] [ACTION] Starting PiP
  [PiP] [WILL_START] PiP will start
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
  [PiP] [DID_START] PiP did start
  
  if 用户點擊左上角close button
@@ -403,11 +480,16 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  播放一條無效的連結
  [PiP] [ACTION] === Case 2: Invalid URL ===
  [PiP] [PLAYER] Loading video: https://invalid-url.example.com/invalid.m3u8
+ [PiP] [CONTROLLER] PiP active: false
+ [PiP] [PLAYER] Removed observers for player item
  [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
  [PiP] [PLAYER] Player started
  [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
  [PiP] [PLAYER] Player item status changed: failed
  [PiP] [PLAYER] ERROR: A TLS error caused the secure connection to fail.
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
  
  =======
  Case 3: 播放另一條 URL
@@ -415,25 +497,35 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [ACTION] === Case 3: Switch URL ===
  [PiP] [PLAYER] Loading video: https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
  [PiP] [CONTROLLER] PiP active: true
+ [PiP] [PLAYER] Removed observers for player item
  [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
  [PiP] [PLAYER] Player started
  [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
  [PiP] [PLAYER] Player item status changed: readyToPlay
  [PiP] [PLAYER] Video ready to play
  [PiP] [STATE] isPossible=true, isActive=true, playerStatus=readyToPlay
  [PiP] [ACTION] PiP already active, video updated
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
  
  if 直接運行Case 3 (和上面一樣)
  [PiP] [ACTION] === Case 3: Switch URL ===
  [PiP] [PLAYER] Loading video: https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
  [PiP] [CONTROLLER] PiP active: false
+ [PiP] [PLAYER] Removed observers for player item
  [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
  [PiP] [PLAYER] Player started
  [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
  [PiP] [PLAYER] Player item status changed: readyToPlay
  [PiP] [PLAYER] Video ready to play
  [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
  [PiP] [ACTION] Starting PiP
  [PiP] [WILL_START] PiP will start
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
  [PiP] [DID_START] PiP did start
  */

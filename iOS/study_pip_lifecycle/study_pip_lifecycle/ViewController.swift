@@ -53,6 +53,19 @@ class ViewController: UIViewController {
         return button
     }()
     
+    /// Case 3 按鈕：PiP 運行中切換另一條 URL
+    private lazy var case3Button: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Case 3: 播放另一條 URL", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        button.backgroundColor = .systemGreen
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(case3ButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     /// 狀態標籤
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
@@ -89,12 +102,13 @@ class ViewController: UIViewController {
     private func setupUI() {
         view.addSubview(case1Button)
         view.addSubview(case2Button)
+        view.addSubview(case3Button)
         view.addSubview(statusLabel)
         
         NSLayoutConstraint.activate([
             // Case 1 按鈕
             case1Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -40),
+            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -80),
             case1Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case1Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case1Button.heightAnchor.constraint(equalToConstant: 50),
@@ -106,8 +120,15 @@ class ViewController: UIViewController {
             case2Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case2Button.heightAnchor.constraint(equalToConstant: 50),
             
+            // Case 3 按鈕
+            case3Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            case3Button.topAnchor.constraint(equalTo: case2Button.bottomAnchor, constant: 16),
+            case3Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            case3Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            case3Button.heightAnchor.constraint(equalToConstant: 50),
+            
             // 狀態標籤
-            statusLabel.topAnchor.constraint(equalTo: case2Button.bottomAnchor, constant: 20),
+            statusLabel.topAnchor.constraint(equalTo: case3Button.bottomAnchor, constant: 20),
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -121,6 +142,7 @@ class ViewController: UIViewController {
             statusLabel.text = "此設備不支援畫中畫"
             case1Button.isEnabled = false
             case2Button.isEnabled = false
+            case3Button.isEnabled = false
         }
     }
     
@@ -163,20 +185,21 @@ class ViewController: UIViewController {
         statusLabel.text = "準備就緒，點擊按鈕開始"
     }
     
-    /// 載入視頻並啟動 PiP
+    /// 載入視頻
     /// - Parameter url: 視頻 URL
-    private func loadVideoAndStartPiP(url: URL) {
+    /// - Note: 如果 PiP 正在運行，會保持 PiP 並切換視頻；否則會在載入完成後啟動 PiP
+    private func loadVideo(url: URL) {
+        let isPiPActive = pipController?.isPictureInPictureActive ?? false
+        
         logger.log(.player, "Loading video: \(url.absoluteString)")
+        logger.log(.controller, "PiP active: \(isPiPActive)")
         
-        // 停止現有播放
-        player?.pause()
-        
-        // 如果 PiP 正在運行，先停止
-        if let pip = pipController, pip.isPictureInPictureActive {
-            pip.stopPictureInPicture()
+        // 如果 PiP 沒有運行，停止現有播放
+        if !isPiPActive {
+            player?.pause()
         }
         
-        // 移除舊的監聽器
+        // 移除舊的監聯器
         playerItemStatusObserver?.invalidate()
         playerItemStatusObserver = nil
         
@@ -242,6 +265,13 @@ class ViewController: UIViewController {
             playerStatus: player?.currentItem?.status.description
         )
         
+        // 如果 PiP 已經在運行，只需更新狀態
+        if pipController.isPictureInPictureActive {
+            logger.log(.action, "PiP already active, video updated")
+            statusLabel.text = "PiP 播放中（視頻已更新）"
+            return
+        }
+        
         if pipController.isPictureInPicturePossible {
             logger.log(.action, "Starting PiP")
             pipController.startPictureInPicture()
@@ -259,7 +289,7 @@ class ViewController: UIViewController {
         logger.log(.action, "=== Case 1: Valid URL ===")
         
         let validURL = URL(string: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8")!
-        loadVideoAndStartPiP(url: validURL)
+        loadVideo(url: validURL)
     }
     
     /// Case 2: 播放無效連結
@@ -267,7 +297,16 @@ class ViewController: UIViewController {
         logger.log(.action, "=== Case 2: Invalid URL ===")
         
         let invalidURL = URL(string: "https://invalid-url.example.com/invalid.m3u8")!
-        loadVideoAndStartPiP(url: invalidURL)
+        loadVideo(url: invalidURL)
+    }
+    
+    /// Case 3: PiP 運行中切換另一條 URL
+    @objc private func case3ButtonTapped() {
+        logger.log(.action, "=== Case 3: Switch URL ===")
+        
+        // 另一條有效的測試 URL
+        let anotherURL = URL(string: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8")!
+        loadVideo(url: anotherURL)
     }
 }
 
@@ -337,6 +376,7 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  播放一條有效的連結
  [PiP] [ACTION] === Case 1: Valid URL ===
  [PiP] [PLAYER] Loading video: https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
+ [PiP] [CONTROLLER] PiP active: false
  [PiP] [PLAYER] Player item replaced
  [PiP] [PLAYER] Player started
  [PiP] [PLAYER] Player item status changed: unknown
@@ -358,7 +398,7 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [DID_STOP] PiP did stop
  [PiP] [PLAYER] Player paused
  
------
+ =======
  Case 2:
  播放一條無效的連結
  [PiP] [ACTION] === Case 2: Invalid URL ===
@@ -368,4 +408,32 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [PLAYER] Player item status changed: unknown
  [PiP] [PLAYER] Player item status changed: failed
  [PiP] [PLAYER] ERROR: A TLS error caused the secure connection to fail.
+ 
+ =======
+ Case 3: 播放另一條 URL
+ if 先完成 Case 1
+ [PiP] [ACTION] === Case 3: Switch URL ===
+ [PiP] [PLAYER] Loading video: https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
+ [PiP] [CONTROLLER] PiP active: true
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=true, playerStatus=readyToPlay
+ [PiP] [ACTION] PiP already active, video updated
+ 
+ if 直接運行Case 3 (和上面一樣)
+ [PiP] [ACTION] === Case 3: Switch URL ===
+ [PiP] [PLAYER] Loading video: https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
+ [PiP] [CONTROLLER] PiP active: false
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
+ [PiP] [ACTION] Starting PiP
+ [PiP] [WILL_START] PiP will start
+ [PiP] [DID_START] PiP did start
  */

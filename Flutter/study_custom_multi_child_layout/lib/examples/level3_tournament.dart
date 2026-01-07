@@ -124,14 +124,14 @@ class _Level3TournamentExampleState extends State<Level3TournamentExample>
     newRoundIndex = newRoundIndex.clamp(0.0, (_totalRounds - 1).toDouble());
 
     // 偵測頁面切換並重置展開狀態
-    int newPage = newRoundIndex.round();
-    if (newPage != _activeRoundPage) {
-      _activeRoundPage = newPage;
-      // 如果當前是展開狀態，自動收起
-      if (_expandController.value > 0) {
-        _expandController.reverse();
-      }
-    }
+    // int newPage = newRoundIndex.round();
+    // if (newPage != _activeRoundPage) {
+    //   _activeRoundPage = newPage;
+    //   // 如果當前是展開狀態，自動收起
+    //   if (_expandController.value > 0) {
+    //     _expandController.reverse();
+    //   }
+    // }
 
     // 更新狀態。
     // 因為這是一個 Scroll-Driven Animation (滾動驅動動畫)，我們這裡使用 setState 來驅動每一幀的變化。

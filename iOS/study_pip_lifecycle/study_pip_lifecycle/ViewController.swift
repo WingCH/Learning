@@ -85,6 +85,19 @@ class ViewController: UIViewController {
         return button
     }()
     
+    /// Case 5 按鈕：先 dummy 再播放無效 m3u8
+    private lazy var case5Button: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Case 5: 先 dummy 再播放無效m3u8", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        button.backgroundColor = .systemRed
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(case5ButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     /// 狀態標籤
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
@@ -128,12 +141,13 @@ class ViewController: UIViewController {
         view.addSubview(case2Button)
         view.addSubview(case3Button)
         view.addSubview(case4Button)
+        view.addSubview(case5Button)
         view.addSubview(statusLabel)
         
         NSLayoutConstraint.activate([
             // Case 1 按鈕
             case1Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -120),
+            case1Button.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -160),
             case1Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             case1Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case1Button.heightAnchor.constraint(equalToConstant: 50),
@@ -159,8 +173,15 @@ class ViewController: UIViewController {
             case4Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             case4Button.heightAnchor.constraint(equalToConstant: 50),
             
+            // Case 5 按鈕
+            case5Button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            case5Button.topAnchor.constraint(equalTo: case4Button.bottomAnchor, constant: 16),
+            case5Button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            case5Button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            case5Button.heightAnchor.constraint(equalToConstant: 50),
+            
             // 狀態標籤
-            statusLabel.topAnchor.constraint(equalTo: case4Button.bottomAnchor, constant: 20),
+            statusLabel.topAnchor.constraint(equalTo: case5Button.bottomAnchor, constant: 20),
             statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -176,6 +197,7 @@ class ViewController: UIViewController {
             case2Button.isEnabled = false
             case3Button.isEnabled = false
             case4Button.isEnabled = false
+            case5Button.isEnabled = false
         }
     }
     
@@ -433,6 +455,31 @@ class ViewController: UIViewController {
             self.loadVideo(url: realURL)
         }
     }
+    
+    /// Case 5: 先播放本地 dummy 快速啟動 PiP，再切換到無效 m3u8
+    @objc private func case5ButtonTapped() {
+        logger.log(.action, "=== Case 5: Dummy first, then invalid m3u8 ===")
+        
+        // 本地 dummy 視頻
+        guard let dummyURL = Bundle.main.url(forResource: "dummy", withExtension: "mp4") else {
+            logger.log(.player, "ERROR: dummy.mp4 not found in bundle")
+            statusLabel.text = "找不到 dummy.mp4"
+            return
+        }
+        
+        // 無效的 m3u8 URL
+        let invalidURL = URL(string: "https://invalid-url.example.com/invalid.m3u8")!
+        
+        logger.log(.player, "Step 1: Loading dummy video for instant PiP")
+        loadVideo(url: dummyURL)
+        
+        // 當 PiP 啟動後，延遲切換到無效 m3u8
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self = self else { return }
+            self.logger.log(.player, "Step 2: Switching to invalid m3u8")
+            self.loadVideo(url: invalidURL)
+        }
+    }
 }
 
 // MARK: - AVPictureInPictureControllerDelegate
@@ -613,4 +660,40 @@ extension AVPlayerItem.Status: @retroactive CustomStringConvertible {
  [PiP] [STATE] isPossible=true, isActive=true, playerStatus=readyToPlay
  [PiP] [ACTION] PiP already active, video updated
  [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ 
+ === Case 5:先 dummy 再無效m3u8
+ [PiP] [ACTION] === Case 5: Dummy first, then invalid m3u8 ===
+ [PiP] [PLAYER] Step 1: Loading dummy video for instant PiP
+ [PiP] [PLAYER] Loading video: file:///Users/wingchan/Library/Developer/CoreSimulator/Devices/D19D48DD-0189-414F-9634-B90EEBF29B4B/data/Containers/Bundle/Application/DCA33FD9-CBA7-4E5C-B044-07D98BB2BF59/study_pip_lifecycle.app/dummy.mp4
+ [PiP] [CONTROLLER] PiP active: false
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: true
+ [PiP] [PLAYER] Player item status changed: readyToPlay
+ [PiP] [PLAYER] Video ready to play
+ [PiP] [STATE] isPossible=true, isActive=false, playerStatus=readyToPlay
+ [PiP] [ACTION] Starting PiP
+ [PiP] [WILL_START] PiP will start
+ [PiP] [DID_START] PiP did start
+ [PiP] [PLAYER] Step 2: Switching to invalid m3u8
+ [PiP] [PLAYER] Loading video: https://invalid-url.example.com/invalid.m3u8
+ [PiP] [CONTROLLER] PiP active: true
+ [PiP] [PLAYER] Removed observers for player item
+ [PiP] [PLAYER] Player item replaced
+ [PiP] [PLAYER] Added observers for player item
+ [PiP] [PLAYER] Player started
+ [PiP] [PLAYER] Player item status changed: unknown
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [WILL_STOP] PiP will stop
+ [PiP] [PLAYER] Player item status changed: failed
+ [PiP] [PLAYER] ERROR: A TLS error caused the secure connection to fail.
+ [PiP] [PLAYER] isPlaybackLikelyToKeepUp: false
+ [PiP] [RESTORE_UI] User requested to restore UI
+ [PiP] [DID_STOP] PiP did stop
+ [PiP] [PLAYER] Player paused
  */

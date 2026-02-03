@@ -24,14 +24,8 @@ class ViewController: UIViewController {
     /// 畫中畫控制器
     private var pipController: AVPictureInPictureController?
     
-    /// 預驗證播放器（隱藏，用於測試 URL 是否可播放）
-    private var preloadPlayer: AVPlayer?
-    
-    /// 預驗證成功後的回調
-    private var preloadSuccessHandler: ((AVPlayerItem) -> Void)?
-    
-    /// 預驗證失敗後的回調
-    private var preloadFailureHandler: (() -> Void)?
+    /// 視頻預驗證器
+    private let videoPreloader = VideoPreloader()
     
     /// KVO context - status
     private static var playerItemStatusContext = 0
@@ -39,14 +33,8 @@ class ViewController: UIViewController {
     /// KVO context - playbackLikelyToKeepUp
     private static var playbackLikelyToKeepUpContext = 0
     
-    /// KVO context - preload status
-    private static var preloadStatusContext = 0
-    
-    /// 當前正在監聽的 player item
+    /// 當前正在監聯的 player item
     private weak var observedPlayerItem: AVPlayerItem?
-    
-    /// 當前正在預驗證的 player item
-    private weak var preloadObservedItem: AVPlayerItem?
     
     /// Case 1 按鈕：播放有效連結
     private lazy var case1Button: UIButton = {
@@ -167,7 +155,7 @@ class ViewController: UIViewController {
     deinit {
         // 確保移除 KVO observer
         removePlayerItemObserver()
-        cancelPreload()
+        videoPreloader.cancel()
     }
     
     override func viewDidLayoutSubviews() {
@@ -396,14 +384,6 @@ class ViewController: UIViewController {
             return
         }
         
-        // 處理預驗證 player 的 status 變化
-        if context == &ViewController.preloadStatusContext {
-            DispatchQueue.main.async { [weak self] in
-                self?.handlePreloadStatusChange(status: playerItem.status, playerItem: playerItem)
-            }
-            return
-        }
-        
         // 不是我們的 context，交給 super
         super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
     }
@@ -433,124 +413,6 @@ class ViewController: UIViewController {
             
         case .unknown:
             // 還在載入中
-            break
-            
-        @unknown default:
-            break
-        }
-    }
-    
-    // MARK: - 預驗證邏輯
-    
-    /// 預驗證 URL 是否可播放，成功後才切換到主 player
-    /// - Parameters:
-    ///   - url: 要驗證的 URL
-    ///   - onSuccess: 驗證成功的回調
-    ///   - onFailure: 驗證失敗的回調（可選）
-    private func preloadAndValidate(url: URL, onSuccess: @escaping (AVPlayerItem) -> Void, onFailure: (() -> Void)? = nil) {
-        logger.log(.player, "[Preload] Starting preload for: \(url.absoluteString)")
-        
-        // 清除之前的預驗證
-        cancelPreload()
-        
-        // 保存回調
-        preloadSuccessHandler = onSuccess
-        preloadFailureHandler = onFailure
-        
-        // 創建預驗證 player（如果還沒有）
-        if preloadPlayer == nil {
-            preloadPlayer = AVPlayer()
-            logger.log(.player, "[Preload] Created preload player")
-        }
-        
-        // 創建 player item 並開始預驗證
-        let playerItem = AVPlayerItem(url: url)
-        preloadPlayer?.replaceCurrentItem(with: playerItem)
-        
-        // 添加 KVO 監聽
-        preloadObservedItem = playerItem
-        playerItem.addObserver(
-            self,
-            forKeyPath: #keyPath(AVPlayerItem.status),
-            options: [.new],
-            context: &ViewController.preloadStatusContext
-        )
-        
-        logger.log(.player, "[Preload] Waiting for status...")
-    }
-    
-    /// 取消預驗證
-    private func cancelPreload() {
-        if let item = preloadObservedItem {
-            item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &ViewController.preloadStatusContext)
-            preloadObservedItem = nil
-        }
-        preloadSuccessHandler = nil
-        preloadFailureHandler = nil
-        preloadPlayer?.replaceCurrentItem(with: nil)
-        logger.log(.player, "[Preload] Cancelled")
-    }
-    
-    /// 處理預驗證結果
-    private func handlePreloadStatusChange(status: AVPlayerItem.Status, playerItem: AVPlayerItem) {
-        logger.log(.player, "[Preload] Status changed: \(status.description)")
-        
-        switch status {
-        case .readyToPlay:
-            logger.log(.player, "[Preload] ✅ URL is valid, switching to main player")
-            
-            // 移除預驗證的 KVO
-            if let item = preloadObservedItem {
-                item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &ViewController.preloadStatusContext)
-                preloadObservedItem = nil
-            }
-            
-            // 先取出 handler 並清空，防止 callback 內部啟動新流程時被覆蓋
-            let successHandler = preloadSuccessHandler
-            preloadSuccessHandler = nil
-            preloadFailureHandler = nil
-            
-            // 調用成功回調
-            if let handler = successHandler {
-                // 嘗試從 asset 獲取 URL
-                if let urlAsset = playerItem.asset as? AVURLAsset {
-                    logger.log(.player, "[Preload] Creating new item from URL: \(urlAsset.url)")
-                    let newItem = AVPlayerItem(url: urlAsset.url)
-                    handler(newItem)
-                } else {
-                    // HLS 可能不是 AVURLAsset，直接用 preloadPlayer 的 currentItem 來獲取 URL
-                    logger.log(.player, "[Preload] Asset is not AVURLAsset, using preloadPlayer's currentItem")
-                    // 無法獲取 URL，直接用 playerItem（雖然可能有問題）
-                    handler(playerItem)
-                }
-            }
-            
-        case .failed:
-            if let error = playerItem.error {
-                logger.log(.player, "[Preload] ❌ URL failed: \(error.localizedDescription)")
-            } else {
-                logger.log(.player, "[Preload] ❌ URL failed (unknown error)")
-            }
-            
-            // 移除預驗證的 KVO
-            if let item = preloadObservedItem {
-                item.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &ViewController.preloadStatusContext)
-                preloadObservedItem = nil
-            }
-            
-            // 先取出 handler 並清空，防止 callback 內部啟動新流程時被覆蓋
-            let failureHandler = preloadFailureHandler
-            preloadSuccessHandler = nil
-            preloadFailureHandler = nil
-            
-            // 調用失敗回調（如果有設定）
-            if let handler = failureHandler {
-                handler()
-            } else {
-                statusLabel.text = "視頻無法播放"
-            }
-            
-        case .unknown:
             break
             
         @unknown default:
@@ -692,7 +554,7 @@ class ViewController: UIViewController {
             self.statusLabel.text = "預驗證中..."
             
             // 預驗證 URL，只有成功才切換到主 player
-            self.preloadAndValidate(url: invalidURL) { [weak self] validatedItem in
+            self.videoPreloader.preloadAndValidate(url: invalidURL, onSuccess: { [weak self] validatedItem in
                 guard let self = self else { return }
                 
                 self.logger.log(.player, "Step 3: URL validated, switching to main player")
@@ -710,7 +572,7 @@ class ViewController: UIViewController {
                 self.player?.play()
                 
                 self.statusLabel.text = "視頻已更新"
-            }
+            }, onFailure: nil)
         }
     }
     
@@ -742,7 +604,7 @@ class ViewController: UIViewController {
             self.statusLabel.text = "嘗試主要 URL..."
             
             // 預驗證無效 URL，失敗時自動重試有效 URL
-            self.preloadAndValidate(
+            self.videoPreloader.preloadAndValidate(
                 url: invalidURL,
                 onSuccess: { [weak self] validatedItem in
                     guard let self = self else { return }
@@ -756,7 +618,7 @@ class ViewController: UIViewController {
                     self.statusLabel.text = "主要 URL 失敗，嘗試備用..."
                     
                     // 重試有效 URL
-                    self.preloadAndValidate(
+                    self.videoPreloader.preloadAndValidate(
                         url: validURL,
                         onSuccess: { [weak self] validatedItem in
                             guard let self = self else { return }

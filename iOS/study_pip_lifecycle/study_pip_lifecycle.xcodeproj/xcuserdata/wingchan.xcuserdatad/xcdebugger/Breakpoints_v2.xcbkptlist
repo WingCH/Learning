@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Bucket
-   uuid = "0A5A40AD-6038-40F1-9D6F-FC621206CE1F"
+   uuid = "88DF377F-5AC4-4EA9-8303-395B91703C5A"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2A9BF3E2-10CF-41EF-933B-A1DFE6483FDC"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "study_pip_lifecycle/VideoPreloader.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
+            landmarkName = "cancel()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "2A9BF3E2-10CF-41EF-933B-A1DFE6483FDC - 79235002319fffcd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "study_pip_lifecycle.VideoPreloader.cancel() -&gt; ()"
+                  moduleName = "study_pip_lifecycle.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/wingchan/Project/Learning/iOS/study_pip_lifecycle/study_pip_lifecycle/VideoPreloader.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "74"
+                  endingLineNumber = "74">
+               </Location>
+               <Location
+                  uuid = "2A9BF3E2-10CF-41EF-933B-A1DFE6483FDC - 79235002319fffcd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "study_pip_lifecycle.VideoPreloader.cancel() -&gt; ()"
+                  moduleName = "study_pip_lifecycle.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/wingchan/Project/Learning/iOS/study_pip_lifecycle/study_pip_lifecycle/VideoPreloader.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "74"
+                  endingLineNumber = "74">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

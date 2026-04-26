@@ -1,0 +1,16 @@
+{
+  "active": false,
+  "mode": "ralplan",
+  "current_phase": "completed",
+  "started_at": "2026-04-22T09:05:28.000Z",
+  "updated_at": "2026-04-22T09:05:28.000Z",
+  "completed_at": "2026-04-22T09:05:28.000Z",
+  "session_id": "019db459-381c-7c32-8340-0c6d4198c488",
+  "task_description": "Consensus planning for Android tnum debug project",
+  "state": {
+    "spec_path": ".omx/specs/deep-interview-android-tnum-debug-project.md",
+    "prd_path": ".omx/plans/prd-android-tnum-debug-project-20260422T090528Z.md",
+    "test_spec_path": ".omx/plans/test-spec-android-tnum-debug-project-20260422T090528Z.md",
+    "status": "approved-for-execution"
+  }
+}

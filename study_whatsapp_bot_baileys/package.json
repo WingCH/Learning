@@ -1,0 +1,30 @@
+{
+  "name": "study-whatsapp-bot-baileys",
+  "version": "0.1.0",
+  "private": true,
+  "description": "使用 Baileys 建立的可擴充個人 WhatsApp 自動回覆 bot",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start:dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test",
+    "check": "npm run typecheck && npm test"
+  },
+  "dependencies": {
+    "@cacheable/node-cache": "^3.1.1",
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "7.0.0-rc14",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

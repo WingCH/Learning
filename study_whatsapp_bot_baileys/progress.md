@@ -1,0 +1,65 @@
+# 執行進度
+
+## 2026-08-23
+
+- 已確認目前工作目錄為空白專案目錄。
+- 已確認上層 Git repository 的無關未提交變更，後續會保持不動。
+- 已讀取並套用 `planning-with-files` skill。
+- 已建立 `task_plan.md`、`findings.md`、`progress.md`。
+- 下一步：查閱 Baileys 官方文件與 Context7 文件。
+- 使用者補充專案需具備長期可擴充性；已更新設計目標及架構決策。
+- 已透過 Context7 查核連線 lifecycle、認證保存、`messages.upsert` 與 quoted reply API。
+- 已核對 Baileys 官方 Installation 與 Quickstart，確認 Node.js 20、stable package、QR render、訊息過濾及 session 安全要求。
+- 已核對 Session management 與 Events；決定使用 `ev.process`、cacheable Signal key store，並用 auth provider 邊界隔離 development file auth 與未來 production database auth。
+- 已核對 Socket config 與 v8 migration；確認採用 stable v7-style API，並加入 message retry cache、message store、JID filter、`markOnlineOnConnect: false`、`syncFullHistory: false`。
+- 階段 2 完成；下一步開始建立模組化 TypeScript 專案。
+- 已確認本機 Node.js／npm 與 npm package metadata；環境符合最低版本需求。
+- 已建立 TypeScript／ESM 專案設定、dependency 定義、build／test scripts 及 `.gitignore`。
+- 已實作可替換的 auth provider、bounded message store、訊息 parser、handler router、repeat handler、Baileys message consumer、socket lifecycle、QR render 及 exponential backoff reconnect。
+- 已加入 config、graceful shutdown、structured logging 及三組非網絡單元測試。
+- 已撰寫繁體中文 README，包含首次連線、安全、設定、架構及 production 演進說明。
+- 下一步：安裝 dependencies，依據實際 Baileys 7 typings 修正整合問題並執行驗證。
+- `npm install` 完成：新增 90 packages，audit 91 packages，0 vulnerabilities。
+- 初次 `npm run typecheck` 發現 1 個 Baileys typing 正規化問題；準備修正。
+- 初次 `npm test` 通過已執行的 3 個 tests，但 nested application tests 未被 test glob 收集，尚不能視為完整通過。
+- 已修正 `isJidGroup` typing，第二次 `npm run typecheck` 通過。
+- 已確認 `tsx --test` 可自動遞迴發現全部測試，8 個 tests 全部通過；已更新 npm test script。
+- `npm run check` 完整通過：TypeScript typecheck 及 8/8 tests 成功。
+- `npm run build` 通過，已成功輸出 ESM JavaScript／declarations 至 gitignored `dist/`。
+- 已檢查專案檔案清單；沒有建立 `.data` 或 auth directory，驗證過程沒有讀寫真實 WhatsApp session。
+- 階段 3 完成；階段 4 進行最終 dependency 與 repository scope 檢查。
+- `npm prune`／`npm audit` 完成，92 packages、0 vulnerabilities；sharp 的 optional WebAssembly packages 仍由 npm 保留並標示為 `extraneous`，已確認來源。
+- 已補上 Baileys message parser 與 bounded message store 的單元測試，涵蓋自己訊息過濾、群組辨識、非文字過濾及容量淘汰。
+- 新測試的首次 typecheck 發現 test helper 接受 optional message type；已收窄為 `proto.IMessage`。
+- 第二次完整驗證通過：TypeScript typecheck、16/16 tests 及 production build 全部成功。
+- 已令 shutdown signal 明確傳入 `SIGINT`／`SIGTERM`，避免依賴 EventEmitter callback argument。
+- 最終非互動式驗證再次通過：typecheck、16/16 tests、production build。
+- 階段 4 完成；準備啟動 development process 供使用者掃描 QR code。
+- Live smoke test 成功連到 WhatsApp Web endpoint 並持續產生 QR code；尚未掃描，因此沒有完成帳號連結。
+- Live test 發現 Baileys internal logger 輸出過多 handshake 細節；已停止 process，並改成官方 production 範例使用的 `silent` internal logger。
+- logger 修正後再次通過 typecheck、16/16 tests 及 production build。
+- 已重新啟動 development process，確認 terminal 現在只輸出 application lifecycle 與 QR，不再輸出 Baileys handshake payload。
+- bot 目前正在等待使用者掃描最新 QR；尚未進行真實 `hi` → `hi hi` round-trip。
+- 使用者指出 ASCII QR 在 Codex terminal 被裁切，要求 raw payload。
+- 已停止舊 development process，避免繼續輸出不可用的 ASCII QR。
+- 已新增階段 6–8，準備實作 raw QR presenter、安全暫存檔與 lifecycle cleanup。
+- 已透過 Context7 再次確認 raw payload 直接來自 `connection.update.qr`，並確認 open／close／stop cleanup 時機。
+- 已新增可替換的 `QrCodePresenter` 與 `RawQrCodePresenter`，terminal 會輸出 raw block，並把最新 payload 以 `0600` 權限保存。
+- 已在 open／close／stop lifecycle 清除暫存 QR，並移除大型 ASCII QR renderer 與相關 dependencies。
+- 已更新 config、`.env.example`、README 及 raw presenter tests。
+- `npm install` 已移除 `qrcode-terminal` 及其 typings；audit 90 packages，0 vulnerabilities。
+- Raw QR 修改後 `npm run check` 通過，18/18 tests 成功；`npm run build` 亦通過。
+- 已確認 source、lockfile 與 dependencies 不再引用 `qrcode-terminal`。
+- 階段 6–7 完成；下一步做 live raw payload、檔案內容／權限及 stop cleanup 驗證。
+- Live process 已成功輸出清楚的 `WHATSAPP QR RAW BEGIN/END` 單行 payload，不再 render ASCII QR。
+- 已驗證 `.data/latest-whatsapp-qr.txt` 為 1 行、mode `0600`、非空且受 `.gitignore` 保護。
+- process 現正運行並持續更新最新 raw payload；階段 8 完成。
+- Live process 收到 Baileys restart-required 後成功重連，log 已確認 WhatsApp 帳號連結成功。
+- 發現 raw file trailing newline 可能影響外部 generator；已停止 process並將檔案改為只保存 payload bytes，準備重新驗證及以既有 session 重啟。
+- 檢查已保存 auth state 發現預設 permissions 過寬；已依 Node.js 官方 API 加入 umask `0077`、既有 directory `0700`／file `0600` hardening 及 symlink 防護測試。
+- 最終 `npm run check` 通過，19/19 tests；production build 通過。
+- 已用保存的 session 重新啟動，live log 確認 `WhatsApp 已連線，自動回覆已啟動`，沒有再要求 QR。
+- Permission read-back 確認 auth directory `0700`、826 個 auth files 全部 `0600`；連線後 raw QR 暫存檔已自動清除。
+- Bot process 現正運行，等待真實 `hi` → `hi hi` 訊息 round-trip。
+- 使用者確認真實 `hi` → `hi hi` round-trip 成功。
+- 按使用者要求取消 quoted reply；repeat handler 改為直接送出普通文字訊息，並同步更新測試及 README。

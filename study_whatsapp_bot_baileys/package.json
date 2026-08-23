@@ -20,6 +20,7 @@
     "@cacheable/node-cache": "^3.1.1",
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "7.0.0-rc14",
+    "dotenv": "^17.4.2",
     "pino": "^10.3.1"
   },
   "devDependencies": {

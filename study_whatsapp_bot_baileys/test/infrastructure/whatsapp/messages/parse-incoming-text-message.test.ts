@@ -14,8 +14,32 @@ test("解析一般 conversation 文字", () => {
     id: "message-1",
     chatJid: "85212345678@s.whatsapp.net",
     text: "hi",
+    quotedText: null,
     isGroup: false,
   });
+});
+
+test("正規化被引用的 ephemeral text", () => {
+  const parsedMessage = parseIncomingTextMessage(
+    createMessage({
+      extendedTextMessage: {
+        text: "而家呢？",
+        contextInfo: {
+          quotedMessage: {
+            ephemeralMessage: {
+              message: {
+                extendedTextMessage: {
+                  text: "會消失的原文",
+                },
+              },
+            },
+          },
+        },
+      },
+    }),
+  );
+
+  assert.equal(parsedMessage?.quotedText, "會消失的原文");
 });
 
 test("解析回覆或帶格式的 extendedTextMessage 文字", () => {
@@ -28,6 +52,29 @@ test("解析回覆或帶格式的 extendedTextMessage 文字", () => {
   );
 
   assert.equal(parsedMessage?.text, "hello world");
+});
+
+test("解析 WhatsApp reply 所引用的文字內容", () => {
+  const parsedMessage = parseIncomingTextMessage(
+    createMessage({
+      extendedTextMessage: {
+        text: "咁即係點？",
+        contextInfo: {
+          quotedMessage: {
+            conversation: "原本嗰句",
+          },
+        },
+      },
+    }),
+  );
+
+  assert.deepEqual(parsedMessage, {
+    id: "message-1",
+    chatJid: "85212345678@s.whatsapp.net",
+    text: "咁即係點？",
+    quotedText: "原本嗰句",
+    isGroup: false,
+  });
 });
 
 test("忽略自己發出的訊息", () => {

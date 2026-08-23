@@ -155,7 +155,7 @@ export class WhatsAppClient {
     if (update.connection === "open") {
       await this.clearQrCode();
       this.reconnectAttempts = 0;
-      this.logger.info("WhatsApp 已連線，自動回覆已啟動。");
+      this.logger.info("WhatsApp 已連線，AI 自動訊息已啟動。");
       return;
     }
 

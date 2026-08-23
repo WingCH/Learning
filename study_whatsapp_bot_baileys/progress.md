@@ -63,3 +63,39 @@
 - Bot process 現正運行，等待真實 `hi` → `hi hi` 訊息 round-trip。
 - 使用者確認真實 `hi` → `hi hi` round-trip 成功。
 - 按使用者要求取消 quoted reply；repeat handler 改為直接送出普通文字訊息，並同步更新測試及 README。
+- 已建立第一階段 baseline commit：`35e554aa feat(main): 建立可擴充的 WhatsApp 自動訊息 Bot`。
+- 已透過 Context7 與 OpenRouter 官方文件查核 preset reference、Chat Completions request／response 及 error contract。
+- 已新增 OpenRouter 第二階段 9–12 計劃。
+- 已確認目前沒有可用 OpenRouter API key；決定加入 dotenv 自動載入，但不建立或保存使用者 secret。
+- 階段 9 完成；已確認 dependency 版本及現有 handler seam，準備實作 OpenRouter adapter。
+- 已建立 `TextCompletionClient` port、`AiTextMessageHandler` 與 raw-fetch OpenRouter Chat Completions adapter。
+- 已加入 required API key、preset／endpoint／timeout／attribution config 及 dotenv startup loading。
+- 已移除 repeat handler，composition root 改用 `@preset/whatsapp-auto-reply`；同步新增 mock API、timeout、error、empty response 與 handler tests。
+- 已更新 README 的 setup、設定、架構及第三方 AI 私隱／費用說明。
+- 初次驗證：26/26 runtime tests 及 source build 通過；test typecheck 發現 1 個 async capture narrowing 問題，已改用 typed array 修正。
+- 修正後 `npm run check` 完整通過：typecheck 及 26/26 tests 成功；production build 再次通過。
+- Dependency audit 為 91 packages、0 vulnerabilities；階段 10–11 完成。
+- Static review 修正 README dotenv 說明、OpenRouter test coverage 與舊的 repeat/reply runtime wording。
+- 最終非網絡驗證通過：typecheck、27/27 tests、production build、secret scan。
+- 已停止舊 repeat bot；WhatsApp auth session 保留。
+- 已驗證新版本缺少 key 時會清楚退出；階段 12 等待使用者在 `.env` 設定 `OPENROUTER_API_KEY`，不應在對話中貼出 secret。
+- 已確認 `.env` 存在、API key 非空、mode `0600`，且未輸出 key。
+- 已完成 OpenRouter `@preset/whatsapp-auto-reply` 最小 live probe：request 成功並取得非空 assistant completion。
+- 已使用既有 WhatsApp credentials 重啟 bot；live log 確認 `WhatsApp 已連線，AI 自動訊息已啟動`。
+- 階段 12 完成；bot process 現正運行，等待真實 WhatsApp → OpenRouter → WhatsApp round-trip。
+- 使用者回報 WhatsApp quoted reply 的被引用內容沒有傳給 AI；已啟動 `diagnosing-bugs` 流程。
+- 已確認 production process 保持連線並持續正常處理訊息；沒有為診斷而停止。
+- 已新增 quoted reply bug 階段 13–16，並選定 parser fixture 作為 red-capable feedback loop。
+- 已新增並連續兩次執行 quoted reply regression test；兩次都以相同缺失 `quotedText` 的結果失敗，階段 13 完成。
+- 已查核 Baileys quotedMessage／normalization contract並確認 ranked hypotheses #1–#4。
+- 使用者新增查問完整對話記憶；已從 current request builder、message store 與 socket config 確認為獨立的既有 limitation，未擴大今次 quote fix scope。
+- 使用者其後明確授權停止 production 並修正；已正常停止 process，保留 WhatsApp auth state。
+- 已查核 Baileys HistorySync primitives 及限制，決定同時加入 bounded per-chat sliding history 與 keyed serialization；階段 14 完成。
+- 已完成 quoted parser、AI history request、send-success commit、bounded in-memory store 與 per-chat serial queue 實作。
+- 原始 quoted regression 及全部 35 個 runtime tests 已通過；首次 test typecheck 只剩 queue resolver 的 control-flow narrowing，已修正。
+- 已更新 README／env config，明確記錄 sliding history bounds、serialization、privacy 及 restart 後清空的邊界；另補 queue failure recovery 與 chat LRU tests。
+- 最終 `npm run check` 通過：typecheck 及 37/37 tests；production build 與 secret／debug-marker scan 通過。
+- 已完成兩次無敏感真實 OpenRouter probes，分別驗證 multi-turn history 及 quoted context；兩者均成功。
+- 階段 15 完成，準備立即重新啟動 production。
+- Production 啟動 command 的 tool stream 被中斷，但 process 沒有停止；read-only audit 確認單一 parent／worker pair 正在運行並已建立 WhatsApp TLS connection。
+- `git diff --check`、secret scan、debug-marker cleanup 均通過；階段 16 完成，沒有再停止或重啟 server。

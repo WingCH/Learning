@@ -87,6 +87,46 @@
 - 檢查既有 session 發現 auth directory 為 `0755`、826 個 files 為 `0644`；已新增啟動時 permission hardening，並以 `lstat` 避免跟隨 auth directory 內的 symlink。
 - Hardening 後 live read-back：auth directory 為 `0700`、826 個 files 全部為 `0600`；raw QR 暫存檔在連線成功後不存在，符合 lifecycle cleanup 設計。
 
+## OpenRouter 第二階段
+
+- 官方 preset 文件確認可在標準 `POST https://openrouter.ai/api/v1/chat/completions` request 中直接使用 `model: "@preset/whatsapp-auto-reply"`。
+- 必要 headers 是 `Authorization: Bearer <OPENROUTER_API_KEY>` 與 `Content-Type: application/json`；`HTTP-Referer` 及 `X-OpenRouter-Title` 是 optional attribution headers。
+- 非 streaming 成功回應遵循 OpenAI-compatible schema：`choices[0].message.content` 是主要 assistant text，response 同時可能提供 model 與 usage。
+- 官方列出的 HTTP errors 包括 400、401、402、403、404、408、413、422、429、500、502、503。
+- Provider 亦可能在 choice 中回傳 `finish_reason: "error"` 與 embedded `error`，即使已有 partial content；第一版會視為失敗，不把 partial output 傳到 WhatsApp。
+- Preset 的價值是把 model、provider routing、system prompt 與 generation parameters 留在 OpenRouter 管理，application 只傳 preset ID 與 user message。
+- 本機目前沒有 `OPENROUTER_API_KEY` shell variable，亦沒有 `.env`；live probe 需在實作完成後由使用者提供 key。
+- Dotenv 官方 ESM 用法可在 application startup 載入 `.env`；`quiet: true` 避免額外 console noise，`override: false` 保留 deployment environment 的優先權。
+- npm 最新 dotenv 是 17.4.2，支援 Node.js >=12，與本專案 Node.js >=20 相容。
+- 既有 `MessageHandler`／`MessageRouter` seam 可直接容納 AI handler；OpenRouter client 會以 application port 注入，不需更改 WhatsApp consumer。
+- 新 application 在沒有 key 時會以明確的 `缺少必要設定：OPENROUTER_API_KEY` 立即退出，不會連接 WhatsApp 或默默退回舊 repeat 行為。
+- 使用者已在 gitignored `.env` 設定 key；檔案 read-back 為 mode `0600`，preset ID 符合 `@preset/whatsapp-auto-reply`，未輸出 secret。
+- 固定無敏感 prompt 的最小 live probe 成功，preset 回傳 3 個字元的非空 completion，證明 authentication、preset routing 與 response parsing 正常。
+
+## Quoted reply bug
+
+- Production process 仍在運行且持續成功完成 OpenRouter requests；診斷期間沒有停止服務。
+- Repository 沒有額外 `CONTEXT.md` 或 ADR 可供查核。
+- 現有 parser 只輸出目前訊息 text，application input 亦只有 `userMessage`；quoted reply context 尚無任何 domain field 或 transport mapping。
+- 正確 feedback seam 是 `parseIncomingTextMessage` fixture：建立帶 `extendedTextMessage.contextInfo.quotedMessage` 的真實形狀，斷言 parser 必須輸出 quoted text；此 test 可 deterministic 重現使用者描述的缺失。
+- Targeted command `npx tsx --test test/infrastructure/whatsapp/messages/parse-incoming-text-message.test.ts` 已連續兩次得到相同 5 pass／1 fail；唯一 diff 是 expected `quotedText` 在 actual 缺失，符合 red-capable、deterministic、fast、agent-runnable 條件。
+- 最小 fixture 只保留 current extended text、`contextInfo.quotedMessage.conversation` 與必要 message key；移除 quotedMessage 後便不再屬於此 bug，因此 remaining elements 均為 load-bearing。
+- Baileys contract 確認 `IContextInfo.quotedMessage` 是完整 `proto.IMessage`；`normalizeMessageContent` 是 public export，可移除 ephemeral／view-once／edited 等 wrapper 後再解析文字或 caption。
+- Hypotheses #1–#3 已由 source inspection 證實：parser 不讀 quote、domain 無 quoted field、OpenRouter port 只收單一 string。Hypothesis #4 以官方 `normalizeMessageContent` 處理 wrapper，不自行重建 Baileys normalization。
+
+## Conversation history limitation
+
+- 已確認目前 OpenRouter request 永遠只有一個 current `user` message；project 沒有 per-chat role history 或 conversation memory。
+- `InMemoryMessageContentStore` 只為 Baileys `getMessage` retry 保存 raw content，沒有傳入 handler／OpenRouter，不能當作 AI memory。
+- Socket 明確設定 `syncFullHistory: false`；即使開啟 history sync，也仍需 application 自行建立 store、role mapping、window／token policy，AI 才會看到歷史。
+- 因此「AI 不知道再上面多條訊息」是現有 application feature gap，不是 quoted reply bug，亦不是 Baileys 強制只提供上一條訊息。
+- Baileys 提供 `messaging-history.set`／HistorySync 等 primitives，但 application 必須自行保存及映射 `WAMessage`；existing linked session 不保證每次 restart 都重新交付完整歷史。
+- 為避免未經界定地同步及保存整個 personal WhatsApp 歷史，今次採用有上限的 in-memory per-chat history；重啟前未保存的舊訊息不納入。
+- Production logs 顯示同一 chat 可有多個 OpenRouter completion 同時進行，因此 history store 之外亦需要 keyed serial queue，否則 rapid messages 會看到相同 snapshot。
+- 實作後真實 preset probe 已確認兩條 paths：multi-turn `messages[]` 能取回較早 turn 的固定 codeword；formatted quoted context 能取回被引用內容的另一固定 codeword。
+- Conversation turn 在 WhatsApp send 成功前不會加入 store；同一 message ID 去重，queue failure 不會阻塞後續 task。
+- Production 啟動工具被中斷後，read-only process audit 確認只有一個 `tsx src/index.ts` parent／worker pair；worker 有一條 port 443 established connection，沒有啟動第二個 WhatsApp instance。
+
 ## 新增需求
 
 - 專案需要可長期擴充，不能只做單檔 demo。

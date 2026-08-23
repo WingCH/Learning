@@ -9,15 +9,21 @@ const incomingMessage: IncomingTextMessage = {
   id: "message-1",
   chatJid: "85212345678@s.whatsapp.net",
   text: "hi",
+  quotedText: null,
   isGroup: false,
 };
 
 test("使用第一個能夠處理訊息的 handler", async () => {
+  const onSent = async (): Promise<void> => {};
   const skippedHandler: MessageHandler = {
     handle: async () => null,
   };
   const selectedHandler: MessageHandler = {
-    handle: async () => ({ text: "selected", quoteOriginal: false }),
+    handle: async () => ({
+      text: "selected",
+      quoteOriginal: false,
+      onSent,
+    }),
   };
   const unreachableHandler: MessageHandler = {
     handle: async () => {
@@ -35,6 +41,7 @@ test("使用第一個能夠處理訊息的 handler", async () => {
   assert.deepEqual(response, {
     text: "selected",
     quoteOriginal: false,
+    onSent,
   });
 });
 

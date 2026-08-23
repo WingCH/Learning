@@ -1,10 +1,10 @@
-# 可擴充的個人 WhatsApp 自動回覆 Bot
+# 可擴充的個人 WhatsApp AI 自動訊息 Bot
 
-這是一個使用 [Baileys](https://baileys.wiki/) 及 TypeScript 建立的個人 WhatsApp bot。第一階段功能是收到私人文字訊息後，把內容重複兩次回覆：
+這是一個使用 [Baileys](https://baileys.wiki/)、OpenRouter 及 TypeScript 建立的個人 WhatsApp bot。收到私人文字訊息後，bot 會把內容傳給 OpenRouter preset，再把 model response 作為普通 WhatsApp 訊息直接送出。
 
 ```text
-收到：hi
-回覆：hi hi
+收到：Hello! How are you today?
+送出：<@preset/whatsapp-auto-reply 的 response>
 ```
 
 專案採用分層結構，WhatsApp 連線、認證保存、訊息解析、訊息路由及回覆規則彼此分開，方便日後加入 command、AI 回覆、database、queue 或其他整合。
@@ -22,6 +22,9 @@
 
 ```bash
 npm install
+cp .env.example .env
+chmod 600 .env
+# 編輯 .env，填入 OPENROUTER_API_KEY
 npm run start:dev
 ```
 
@@ -32,7 +35,7 @@ Terminal 顯示 `WHATSAPP QR RAW BEGIN/END` raw payload 後：
 3. 複製 BEGIN／END 之間的單行 raw payload，使用你選擇的 QR generator 生成 QR code。
 4. 亦可直接從 `.data/latest-whatsapp-qr.txt` 讀取目前最新 payload；macOS 可執行 `pbcopy < .data/latest-whatsapp-qr.txt`。
 5. 使用手機掃描你生成的 QR code。
-6. Terminal 顯示「WhatsApp 已連線」後，請另一個帳號傳送 `hi` 給你測試。
+6. Terminal 顯示「WhatsApp 已連線」後，請另一個帳號傳送文字訊息測試 OpenRouter response。
 
 認證資料會儲存在 `.data/whatsapp-auth/`。這個目錄已加入 `.gitignore`，不可提交、分享或備份到不受信任的位置；當中的 Signal private keys 應視為與 SSH private key 同等敏感。
 
@@ -60,23 +63,36 @@ npm start
 
 ## 目前訊息規則
 
-- 只回覆實時收到的 `notify` 訊息，不會回覆 history backfill。
+- 只處理實時收到的 `notify` 訊息，不會處理 history backfill。
 - 忽略由自己帳號發出的訊息，避免無限回覆循環。
-- 只回覆 `conversation` 及 `extendedTextMessage` 形式的文字。
+- 處理一般文字、extended text，以及 image／video caption。
 - 預設只回覆私人對話；群組訊息不會觸發 bot。
 - 忽略 broadcast、status 及 newsletter。
-- 自動訊息會作為普通文字直接送出，不會引用原訊息或顯示 quoted reply。
+- 每個 chat 會保留有上限的 user／assistant sliding history，再連同目前訊息傳給 `@preset/whatsapp-auto-reply`。
+- 使用 WhatsApp Reply 時，`contextInfo.quotedMessage` 的文字會明確加入目前 user context；支援 ephemeral／view-once normalization。
+- 同一 chat 的 requests 會依序處理，快速連續訊息不會讀到相同的舊 history snapshot。
+- History 只會在 WhatsApp 訊息成功送出後加入，失敗的 response 不會污染下一輪 context。
+- Model response 會作為普通文字直接送出，不會引用原訊息或顯示 quoted reply。
+- OpenRouter 失敗、逾時或回傳空白內容時不會把內部錯誤傳給聯絡人。
 - 使用 bounded in-memory message store 支援 Baileys retry，不會無限佔用記憶體。
 
 ## 設定
 
-設定值由 environment variables 讀取。可參考 `.env.example`；專案沒有自動載入 `.env`，執行時需要由 shell、process manager 或 deployment platform 注入。
+設定值由 environment variables 讀取。Application 啟動時會自動載入 project root 的 gitignored `.env`，但不會覆蓋 shell、process manager 或 deployment platform 已注入的值。
 
 | 變數 | 預設值 | 用途 |
 |---|---|---|
 | `BOT_NAME` | `Personal WhatsApp Bot` | 顯示於 Linked Devices 及 log 的名稱 |
 | `WHATSAPP_AUTH_DIR` | `.data/whatsapp-auth` | development file auth 路徑 |
 | `WHATSAPP_QR_OUTPUT_PATH` | `.data/latest-whatsapp-qr.txt` | 最新 raw QR payload 暫存路徑 |
+| `OPENROUTER_API_KEY` | 必填 | OpenRouter Bearer token；只放在 `.env` 或 deployment secret |
+| `OPENROUTER_MODEL` | `@preset/whatsapp-auto-reply` | OpenRouter preset／model ID |
+| `OPENROUTER_ENDPOINT` | `https://openrouter.ai/api/v1/chat/completions` | Chat Completions endpoint，必須為 HTTPS |
+| `OPENROUTER_REQUEST_TIMEOUT_MS` | `30000` | 每次 OpenRouter request timeout |
+| `OPENROUTER_HTTP_REFERER` | 空白 | 選填的 OpenRouter attribution URL |
+| `CONVERSATION_HISTORY_MAX_CHATS` | `100` | 記憶體內最多保留的 active chats |
+| `CONVERSATION_HISTORY_MAX_TURNS_PER_CHAT` | `20` | 每個 chat 最多保留的 user／assistant turns |
+| `CONVERSATION_HISTORY_MAX_CHARACTERS_PER_CHAT` | `12000` | 每個 chat history 的總字元上限 |
 | `LOG_LEVEL` | `info` | Pino log level |
 | `REPLY_TO_GROUPS` | `false` | 是否回覆群組文字訊息 |
 | `MAX_RECONNECT_ATTEMPTS` | `8` | 可恢復斷線的最大重連次數 |
@@ -94,16 +110,25 @@ REPLY_TO_GROUPS=true npm run start:dev
 
 ```text
 src/
+├── application/ai/                  # AI completion port
 ├── application/messages/            # 與 Baileys 無關的訊息規則及 router
 ├── config/                           # environment 設定與驗證
 ├── infrastructure/logging/           # structured logger
+├── infrastructure/conversation/      # bounded in-memory conversation history
+├── infrastructure/openrouter/        # OpenRouter fetch adapter
 ├── infrastructure/whatsapp/auth/     # 可替換的 auth provider
 ├── infrastructure/whatsapp/messages/ # Baileys 訊息 adapter 及 store
 ├── infrastructure/whatsapp/          # socket lifecycle 及重連
 └── index.ts                          # composition root
 ```
 
-新增較高優先次序的規則時，實作 `MessageHandler`，再於 `src/index.ts` 把它放在 `RepeatTextMessageHandler` 前面。Router 會採用第一個回傳結果的 handler，repeat handler 因此可作為 fallback。
+`AiTextMessageHandler` 只依賴 `TextCompletionClient` interface；OpenRouter transport、API schema 與 timeout 都留在 infrastructure adapter。日後若更換 AI provider，只需新增另一個 `TextCompletionClient` 實作。
+
+## 私隱與費用
+
+每則符合規則的 WhatsApp inbound text 都會傳送至 OpenRouter，並可能再由 OpenRouter 傳給 preset 所選的 model provider。使用 personal account 前，請確認訊息內容適合交由第三方 AI provider 處理，並留意 preset 所用 model 的 token 費用。API key、WhatsApp auth state 及 raw QR 均不可提交或分享。
+
+Conversation history 目前只保存在 process memory，受 chat／turn／character 三重上限限制，不會寫入磁碟。Process restart 後 history 會清空；application 啟動前的舊 WhatsApp 訊息亦不會自動補入。Baileys history sync 只提供 raw history events，若需要跨 restart 的長期記憶，應另行設計經過加密、retention policy 及刪除流程的 database-backed store。
 
 ## 從本機走向 production
 

@@ -1,0 +1,424 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6E6E1A528C36EEC4AC743040 /* AirPlayRoutePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208824F0EB385074147F9512 /* AirPlayRoutePickerTests.swift */; };
+		AA337F61D6634E6944CB1BB5 /* MediaPlaybackConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55BF429CFADE1590AA4E0FDA /* MediaPlaybackConfigurationTests.swift */; };
+		B3F39CD1DB9DA81C2C83B2CB /* AirPlayRoutePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1FCE98B034A54D51571CCF /* AirPlayRoutePicker.swift */; };
+		C1CDB565DC8EFECF319ACC93 /* PlaybackConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7050E8B1644ABF1D8ECCE9AF /* PlaybackConfigurationTests.swift */; };
+		C89785191E7332DE4FE1584E /* NativeAirPlayLabApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685959036AFD36B0A8D136F4 /* NativeAirPlayLabApp.swift */; };
+		C9AB6D041E786B2555F7DC67 /* AirPlayRoutePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE1FCE98B034A54D51571CCF /* AirPlayRoutePicker.swift */; };
+		CCD42DF04132A077DE6CD5A6 /* PlaybackConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858BAA8F79EE424B966A4969 /* PlaybackConfiguration.swift */; };
+		D28617272279437361771F98 /* MediaPlaybackConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80FAFCB65FA100CC1EC921DF /* MediaPlaybackConfiguration.swift */; };
+		D8A58FE2EC10599720295F3C /* NativeVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58AD87468F8C87EBB5AB8607 /* NativeVideoPlayer.swift */; };
+		E031CF2ADE782525F8C81C8D /* MediaPlaybackConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80FAFCB65FA100CC1EC921DF /* MediaPlaybackConfiguration.swift */; };
+		E4944AE76CED0783438D724F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60AB6746167343A4BF1A5E4D /* ContentView.swift */; };
+		FE383D2145AD69FD448E9BB4 /* PlaybackConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858BAA8F79EE424B966A4969 /* PlaybackConfiguration.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		208824F0EB385074147F9512 /* AirPlayRoutePickerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirPlayRoutePickerTests.swift; sourceTree = "<group>"; };
+		55BF429CFADE1590AA4E0FDA /* MediaPlaybackConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlaybackConfigurationTests.swift; sourceTree = "<group>"; };
+		58AD87468F8C87EBB5AB8607 /* NativeVideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeVideoPlayer.swift; sourceTree = "<group>"; };
+		60AB6746167343A4BF1A5E4D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		685959036AFD36B0A8D136F4 /* NativeAirPlayLabApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAirPlayLabApp.swift; sourceTree = "<group>"; };
+		7050E8B1644ABF1D8ECCE9AF /* PlaybackConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackConfigurationTests.swift; sourceTree = "<group>"; };
+		7A83E22CF4192AEFC2E53B3E /* NativeAirPlayLabTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NativeAirPlayLabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		80FAFCB65FA100CC1EC921DF /* MediaPlaybackConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlaybackConfiguration.swift; sourceTree = "<group>"; };
+		858BAA8F79EE424B966A4969 /* PlaybackConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackConfiguration.swift; sourceTree = "<group>"; };
+		A375580D7D7995E0156E34EB /* NativeAirPlayLab.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NativeAirPlayLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EE1FCE98B034A54D51571CCF /* AirPlayRoutePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirPlayRoutePicker.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1BD0E9B55BC81132126A0207 /* NativeAirPlayLab */ = {
+			isa = PBXGroup;
+			children = (
+				EE1FCE98B034A54D51571CCF /* AirPlayRoutePicker.swift */,
+				60AB6746167343A4BF1A5E4D /* ContentView.swift */,
+				80FAFCB65FA100CC1EC921DF /* MediaPlaybackConfiguration.swift */,
+				685959036AFD36B0A8D136F4 /* NativeAirPlayLabApp.swift */,
+				58AD87468F8C87EBB5AB8607 /* NativeVideoPlayer.swift */,
+				858BAA8F79EE424B966A4969 /* PlaybackConfiguration.swift */,
+			);
+			path = NativeAirPlayLab;
+			sourceTree = "<group>";
+		};
+		68E486238A2C1D2B441A83C0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A375580D7D7995E0156E34EB /* NativeAirPlayLab.app */,
+				7A83E22CF4192AEFC2E53B3E /* NativeAirPlayLabTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7827239F3800C109C4B8C046 = {
+			isa = PBXGroup;
+			children = (
+				1BD0E9B55BC81132126A0207 /* NativeAirPlayLab */,
+				A4CA07463EC0E4033364879F /* NativeAirPlayLabTests */,
+				68E486238A2C1D2B441A83C0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A4CA07463EC0E4033364879F /* NativeAirPlayLabTests */ = {
+			isa = PBXGroup;
+			children = (
+				208824F0EB385074147F9512 /* AirPlayRoutePickerTests.swift */,
+				55BF429CFADE1590AA4E0FDA /* MediaPlaybackConfigurationTests.swift */,
+				7050E8B1644ABF1D8ECCE9AF /* PlaybackConfigurationTests.swift */,
+			);
+			path = NativeAirPlayLabTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		047011434A03DAFF98029943 /* NativeAirPlayLabTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2DCC6F96925973E1CCD8C4B2 /* Build configuration list for PBXNativeTarget "NativeAirPlayLabTests" */;
+			buildPhases = (
+				1A8E5AF5C04A0AF4EFCDFEF6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NativeAirPlayLabTests;
+			packageProductDependencies = (
+			);
+			productName = NativeAirPlayLabTests;
+			productReference = 7A83E22CF4192AEFC2E53B3E /* NativeAirPlayLabTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FD6E12D3DFB0AB67F1CAD123 /* NativeAirPlayLab */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D8EB74BD6462EF9623EC50CA /* Build configuration list for PBXNativeTarget "NativeAirPlayLab" */;
+			buildPhases = (
+				3EF7FAA4C1E18AE02AAA0774 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NativeAirPlayLab;
+			packageProductDependencies = (
+			);
+			productName = NativeAirPlayLab;
+			productReference = A375580D7D7995E0156E34EB /* NativeAirPlayLab.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5BD092E9233C2F43B2E6F0CC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					047011434A03DAFF98029943 = {
+						DevelopmentTeam = AL869FRMV6;
+						ProvisioningStyle = Automatic;
+					};
+					FD6E12D3DFB0AB67F1CAD123 = {
+						DevelopmentTeam = AL869FRMV6;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 328563DFEDE6057615AA62B8 /* Build configuration list for PBXProject "NativeAirPlayLab" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7827239F3800C109C4B8C046;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 68E486238A2C1D2B441A83C0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FD6E12D3DFB0AB67F1CAD123 /* NativeAirPlayLab */,
+				047011434A03DAFF98029943 /* NativeAirPlayLabTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1A8E5AF5C04A0AF4EFCDFEF6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9AB6D041E786B2555F7DC67 /* AirPlayRoutePicker.swift in Sources */,
+				6E6E1A528C36EEC4AC743040 /* AirPlayRoutePickerTests.swift in Sources */,
+				E031CF2ADE782525F8C81C8D /* MediaPlaybackConfiguration.swift in Sources */,
+				AA337F61D6634E6944CB1BB5 /* MediaPlaybackConfigurationTests.swift in Sources */,
+				FE383D2145AD69FD448E9BB4 /* PlaybackConfiguration.swift in Sources */,
+				C1CDB565DC8EFECF319ACC93 /* PlaybackConfigurationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3EF7FAA4C1E18AE02AAA0774 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B3F39CD1DB9DA81C2C83B2CB /* AirPlayRoutePicker.swift in Sources */,
+				E4944AE76CED0783438D724F /* ContentView.swift in Sources */,
+				D28617272279437361771F98 /* MediaPlaybackConfiguration.swift in Sources */,
+				C89785191E7332DE4FE1584E /* NativeAirPlayLabApp.swift in Sources */,
+				D8A58FE2EC10599720295F3C /* NativeVideoPlayer.swift in Sources */,
+				CCD42DF04132A077DE6CD5A6 /* PlaybackConfiguration.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		02EDB760BF8ABB102F330654 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wingchan.NativeAirPlayLabTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
+		2C41460A49C5C8E30D26B122 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wingchan.NativeAirPlayLabTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		3FF2ED48790DE8A7706EFEB1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = AL869FRMV6;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		5B1142190CC283B08A2B80FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = AL869FRMV6;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A1435E5985B340423609E5EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = NativeAirPlayLab/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wingchan.NativeAirPlayLab;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C7B43074211605FE527FAD86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = NativeAirPlayLab/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wingchan.NativeAirPlayLab;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2DCC6F96925973E1CCD8C4B2 /* Build configuration list for PBXNativeTarget "NativeAirPlayLabTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C41460A49C5C8E30D26B122 /* Debug */,
+				02EDB760BF8ABB102F330654 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		328563DFEDE6057615AA62B8 /* Build configuration list for PBXProject "NativeAirPlayLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B1142190CC283B08A2B80FA /* Debug */,
+				3FF2ED48790DE8A7706EFEB1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D8EB74BD6462EF9623EC50CA /* Build configuration list for PBXNativeTarget "NativeAirPlayLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7B43074211605FE527FAD86 /* Debug */,
+				A1435E5985B340423609E5EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5BD092E9233C2F43B2E6F0CC /* Project object */;
+}

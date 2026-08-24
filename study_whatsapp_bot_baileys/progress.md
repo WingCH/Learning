@@ -99,3 +99,39 @@
 - 階段 15 完成，準備立即重新啟動 production。
 - Production 啟動 command 的 tool stream 被中斷，但 process 沒有停止；read-only audit 確認單一 parent／worker pair 正在運行並已建立 WhatsApp TLS connection。
 - `git diff --check`、secret scan、debug-marker cleanup 均通過；階段 16 完成，沒有再停止或重啟 server。
+- 使用者要求 persistent temp-file memory、threshold-based AI compaction、restart record preservation 與完成後才 restart。
+- 已說明現有容量：100 chats × 每 chat 20 turns／12,000 characters；另有 1,000-entry Baileys retry store。
+- 已啟動 `planning-with-files` 與 `codebase-design`，新增階段 17–21；production parent／worker 仍正常運行，inspector 尚未開啟。
+- 已完成不停止 production 的 inspector migration snapshot，安全保存 2 chats／6 turns 至 mode `0600` legacy file，沒有輸出 JID／content。
+- 已驗證 snapshot schema、bytes、permissions，並確認 inspector 關閉、production worker 繼續運行；階段 17 完成。
+- 已完成 persistent memory 深層 module 設計：versioned schema、atomic persistence、legacy migration、AI compaction、failure retry、hard limits 與 restart recovery；階段 18 完成。
+- 已實作 file-backed conversation memory、OpenRouter summarizer adapter、V0→V1 migration、atomic durability、compaction／retry／hard-limit policy 與 production composition；targeted 6 tests、typecheck、build 已通過。
+- 已更新 README／env config，記錄全部 thresholds、容量、明文私隱與 restart persistence 行為。
+- 全套 `npm run check` 通過：typecheck 與 45/45 tests；production build、secret／debug-marker scan 通過。
+- 已用隔離 temp directory 完成真實 OpenRouter summary／atomic persistence／reopen probe，沒有接觸 production memory；階段 19–20 完成。
+- Cutover 前 final snapshot 捕捉最新 2 chats／12 turns；只有 snapshot 成功後才 graceful stop 舊 worker。
+- 新 production process 已自動 V0→V1 migration 相同 2 chats／12 turns並成功連接 WhatsApp；file mode `0600`、schema valid、legacy／temp files removed。
+- 已刪除一次性 inspector migration script，確認 inspector 關閉且沒有雙開 process；階段 21 完成。
+- 使用者要求系統化 slash commands（例如 `/help`、`/reset`）；production process 保持運行。
+- 已新增階段 22–24，設計 command registry seam 與 send-success reset semantics。
+- 已實作 command registry、dynamic `/help`、scoped `/reset`、unknown-command handling，以及 in-memory／file store `clear`。
+- 已新增 command parsing、duplicate validation、send-success reset、chat isolation 與 reopen persistence tests；README 已加入 Commands 說明。
+- Command change 後 typecheck、54/54 tests、build、whitespace／secret／debug-marker scan 全部通過；階段 22–23 完成。
+- 已完成一次受控 restart 部署 commands；restart 前後 memory 均為 2 chats／14 turns／0 summaries，mode `0600`。
+- WhatsApp 已重新連線，production 只有一個 parent／worker；階段 24 完成，不再停止 server。
+- 使用者澄清目前優先問題是所有 inbound messages 缺少藍剔，而非 commands；commands 保留。
+- 已查核 Baileys `readMessages(keys)` contract，新增階段 25–27；production 保持運行。
+- 已新增並連續兩次執行 read-receipt regression test，兩次均以 actual empty batch 重現藍剔缺失；階段 25 完成。
+- 已在 parser／group filter 前加入 best-effort batch `readMessages(keys)`；targeted test 3/3 及全套 57/57 tests 轉綠。
+- Typecheck、build、whitespace／secret／debug-marker scan 通過；階段 26 完成，準備受控 restart。
+- 已受控 restart 部署 read receipts；WhatsApp 重新連線，memory 2 chats／14 turns／0 summaries、mode `0600`，production 單一 instance 運行中。
+- 階段 27 只剩使用者由外部帳號確認藍剔 visibility；server 不再停止。
+- 使用者確認 read receipts 運作完美，階段 27 的外部藍剔驗證完成。
+- 使用者要求 AI 等候期間顯示 WhatsApp typing indicator；已查核約 10 秒 expiry，新增階段 28–30，production 保持運行。
+- 已實作 serialized typing indicator：composing、8 秒 refresh、finally paused，presence failure 不阻塞主要 operation；README 已更新。
+- Targeted typing／consumer tests 7/7，全套 typecheck、61/61 tests、build、whitespace／secret／debug-marker scan 通過；階段 28–29 完成。
+- 已受控 restart 部署 typing indicator；WhatsApp 重新連線，memory 2 chats／15 turns／0 summaries、mode `0600`，production 單一 instance 運行中；階段 30 完成。
+- 使用者要求 API 快速時亦延遲至隨機 minimum response time；已選定 configurable 2–5 秒範圍及 deadline-based 設計，新增階段 31–33，production 保持運行。
+- 已實作 randomized response delay policy、env config 及 AI-handler integration；commands 維持即時，typing indicator 會覆蓋 delay 等候時間。
+- Targeted delay／handler／command tests 14/14，全套 typecheck、67/67 tests、build、whitespace／secret／debug-marker scan 通過；階段 31–32 完成。
+- 已受控 restart 部署 randomized response delay；WhatsApp 重新連線，memory 2 chats／15 turns／0 summaries、mode `0600`，production 單一 instance 運行中；階段 33 完成。

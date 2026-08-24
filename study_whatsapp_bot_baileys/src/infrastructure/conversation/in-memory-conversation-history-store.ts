@@ -76,6 +76,10 @@ export class InMemoryConversationHistoryStore
     }
   }
 
+  public async clear(chatJid: string): Promise<void> {
+    this.turnsByChat.delete(chatJid);
+  }
+
   private touch(chatJid: string, turns: ConversationTurn[]): void {
     this.turnsByChat.delete(chatJid);
     this.turnsByChat.set(chatJid, turns);

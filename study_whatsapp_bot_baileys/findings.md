@@ -127,6 +127,64 @@
 - Conversation turn 在 WhatsApp send 成功前不會加入 store；同一 message ID 去重，queue failure 不會阻塞後續 task。
 - Production 啟動工具被中斷後，read-only process audit 確認只有一個 `tsx src/index.ts` parent／worker pair；worker 有一條 port 443 established connection，沒有啟動第二個 WhatsApp instance。
 
+## Persistent compressed memory
+
+- 目前 bounds 是每 chat 20 turns（約 40 user／assistant messages）與 12,000 characters 先到先截，最多 100 chats；理論上約 4,000 messages／120 萬 characters，純字串約數 MB，加 object overhead 仍屬可控。
+- Baileys retry store 另有 1,000 raw message entries，與 AI conversation memory 分開，沒有保存下載後 media buffers。
+- 使用者要求 restart 保留 records，因此 OS temp directory 不合適；選用 project-private gitignored `.data/conversation-memory.json`，因為 `/tmp` 可被系統清理且共享風險較高。
+- Current production worker 仍運行舊的 in-memory adapter；records 只存在該 process heap。需在 restart 前以不回傳內容的本機 inspector migration snapshot 保存。
+- 深層 module interface 維持 `getContext`／`appendTurn` 類型的少量操作；OpenRouter summarizer 是 true-external internal seam，以 mock adapter 測試、production adapter 呼叫現有 Chat Completions client。
+- Inspector migration 最終以 heap Map shape 定位 active store，首次成功 snapshot 捕捉 2 chats／6 turns／2,048 bytes；file mode `0600`、schema valid，Inspector 已關閉。
+- Production 在 snapshot 全程保持運行；final cutover 前需重新執行 snapshot，避免漏掉這段期間新增的 turns。
+- Node.js file persistence 採 same-directory temp file → `FileHandle.sync()` → close → `rename()` → chmod 的 atomic replacement pattern；`writeFile` 本身不是 atomic。
+- V1 schema 保存 ordered chats：`chatJid`、optional summary、recent turns；array order同時代表 LRU，restart 可恢復 eviction order。
+- Compaction 先 persist 未壓縮的新 turn，再呼叫 summarizer；成功後 persist summary + recent turns。Summary failure 保留原資料並於後續 turn 重試，只有超過 40 turns／24,000 characters hard cap 才移除最舊 turns。
+- `ConversationHistoryStore` 兩方法 interface 保持不變；file adapter 取代 production in-memory adapter。`ConversationSummarizer` 是 internal true-external seam，OpenRouter adapter 與 test fake 形成兩個 adapters。
+- Summary 在 completion context 中以 `system` role 明確標示為 earlier context；recent user／assistant turns 隨後串接，最後才是 current message。
+- 真實 summary probe 成功：3 turns 觸發壓縮，V1 file 只留 1 recent turn，context 是 summary + 1 user／assistant pair；reopen context 完全相同、file mode `0600`。
+- 全套 gates：45/45 tests、typecheck、build、diff whitespace、secret scan、debug-marker scan 全部通過。
+- Final cutover snapshot 捕捉 2 chats／12 turns／3,945 bytes；新 process log 回讀並 migration 相同 2 chats／12 turns，證實 restart preservation。
+- Production V1 read-back：mode `0600`、schema valid、2 chats、12 recent turns、0 summaries（尚未達 threshold）；legacy／temp files 已移除，inspector 已關閉。
+
+## Slash commands
+
+- Baileys command text 經既有 conversation／extendedText parser 會保留 `/` prefix，可在 `MessageRouter` 的 AI handler 前加入 command handler。
+- Command registry 是 application-level 深層 module：負責 parse、case normalization、duplicate validation、unknown-command response 及 dynamic help；個別 command adapter 只實作 description 與 execute。
+- `/reset` 採 send-success callback：確認訊息成功傳送後才呼叫 `ConversationHistoryStore.clear(chatJid)`，避免 send failure 時使用者以為已清除。
+- Registry tests 證明普通文字會落入下一個 handler、`/help` 動態列出 commands、名稱大小寫不敏感、未知 slash command 不會到 AI、重複名稱會在 startup 被拒絕。
+- Reset tests 證明 onSent 前 records 仍存在、onSent 後只清目前 chat，file adapter reopen 後仍維持清除，file mode 保持 `0600`。
+- Command deployment restart read-back 前後完全一致：V1、2 chats、14 turns、0 summaries、mode `0600`；production 單一 parent／worker 已連線。
+
+## Read receipt bug
+
+- 官方 Baileys contract 要求以 `sock.readMessages([WAMessageKey, ...])` 明確標記已讀；現有 consumer 完全沒有呼叫此方法，因此藍剔缺失可由 source 直接解釋。
+- Read receipt privacy 可設定 `all`／`none`；程式送 receipt 之外，personal WhatsApp account 的已讀標記 privacy 必須容許對方看到。
+- 使用者要求所有新 inbound messages 都標記已讀，不限於觸發 AI 的 text；正確 seam 是 `messages.upsert` notify batch，在 parser／group filter 前收集 keys。
+- Targeted consumer test 連續兩次 deterministic 失敗：expected text／image／group inbound keys，actual read batches 為空；自己發出的 key 正確不應包含。
+- Read receipt 應在 event-level 一次 batch call；不能放在 per-message AI queue，否則 media／disabled group filters 會漏標。
+- Fix 後 targeted tests 證明 notify batch 會包含 text／image／group inbound keys、排除 own message；append event 不送 receipt，receipt error 不阻塞 send／onSent。
+- Read-receipt deployment restart 前後 V1 memory 均為 2 chats／14 turns／0 summaries、mode `0600`；production 單一 instance 已重新連線。
+- 是否顯示藍剔仍受 WhatsApp account 的 Read Receipts privacy 控制；不自動修改全帳號 privacy setting。
+
+## Typing indicator
+
+- Baileys 使用 `sendPresenceUpdate("composing", jid)` 顯示正在輸入，並以 `paused` 清除；presence 約 10 秒過期。
+- OpenRouter request timeout 可達 30 秒，單次 composing 不足；採 8 秒 refresh interval。
+- Presence sends 需以 promise tail serialize，否則 interval 中正在執行的 composing 可能在 finally paused 之後完成，令 UI 卡在 typing。
+- Typing indicator 只包住已通過 parser／group filter 的 per-chat operation；不處理的 media 不顯示 typing，但仍會按上一階段送 read receipt。
+- 實作使用 serialized promise tail：initial composing、8 秒 refresh、operation、finally paused；即使 refresh in-flight，paused 仍保證最後執行。
+- Tests 覆蓋 success order、operation throw cleanup、presence transport failure 及長操作至少一次 refresh。
+- Typing deployment restart 前後 V1 memory 均為 2 chats／15 turns／0 summaries、mode `0600`；production 單一 instance 已連線。
+
+## Randomized response delay
+
+- 使用者要求 API 快速回傳時仍至少等待人性化隨機時間；選用可設定的均勻 2–5 秒 default range。
+- Deadline 必須在 AI request 前建立，completion 後只等待 remaining duration；若 API latency 已超過 deadline，remaining 為 0，不再增加延遲。
+- Delay policy 使用 `begin() → wait()` 小 interface，clock／random／sleep 隱藏於 production adapter並可注入 deterministic tests；commands 不經此 seam。
+- Node `timers/promises.setTimeout` 可 await remaining milliseconds；只在 remaining > 0 時呼叫，避免不必要 zero-delay scheduling。
+- Deterministic tests 覆蓋 random range 兩端、fast API remaining wait、slow API zero extra wait、invalid bounds／random source，以及 AI handler begin → API → wait ordering。
+- Delay deployment restart 前後 V1 memory 均為 2 chats／15 turns／0 summaries、mode `0600`；production 單一 instance 已連線。
+
 ## 新增需求
 
 - 專案需要可長期擴充，不能只做單檔 demo。

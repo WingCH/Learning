@@ -90,6 +90,21 @@ test("超過 chat 上限時移除最久未使用的 chat", async () => {
   assert.equal((await store.getMessages("chat-c")).length, 2);
 });
 
+test("clear 只移除指定 chat", async () => {
+  const store = createStore();
+  await appendTurn(store, "message-1", "one");
+  await store.appendTurn("chat-b", {
+    messageId: "message-b",
+    userContent: "b",
+    assistantContent: "reply-b",
+  });
+
+  await store.clear("chat-a");
+
+  assert.deepEqual(await store.getMessages("chat-a"), []);
+  assert.equal((await store.getMessages("chat-b")).length, 2);
+});
+
 function createStore(): InMemoryConversationHistoryStore {
   return new InMemoryConversationHistoryStore({
     maxChats: 10,

@@ -5,11 +5,13 @@ import type {
   IncomingTextMessage,
   OutgoingTextMessage,
 } from "./message.js";
+import type { ResponseDelayPolicy } from "./response-delay-policy.js";
 
 export class AiTextMessageHandler implements MessageHandler {
   public constructor(
     private readonly textCompletionClient: TextCompletionClient,
     private readonly conversationHistoryStore: ConversationHistoryStore,
+    private readonly responseDelayPolicy: ResponseDelayPolicy,
   ) {}
 
   public async handle(
@@ -20,6 +22,7 @@ export class AiTextMessageHandler implements MessageHandler {
       return null;
     }
 
+    const responseDelay = this.responseDelayPolicy.begin();
     const history = await this.conversationHistoryStore.getMessages(
       message.chatJid,
     );
@@ -37,6 +40,7 @@ export class AiTextMessageHandler implements MessageHandler {
     if (completion.length === 0) {
       throw new Error("OpenRouter 回傳空白內容。");
     }
+    await responseDelay.wait();
 
     return {
       text: completion,

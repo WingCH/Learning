@@ -21,6 +21,12 @@ export interface AppConfig {
   readonly maxMessageStoreEntries: number;
   readonly openRouter: OpenRouterConfig;
   readonly conversationHistory: ConversationHistoryConfig;
+  readonly responseDelay: ResponseDelayConfig;
+}
+
+export interface ResponseDelayConfig {
+  readonly minimumMs: number;
+  readonly maximumMs: number;
 }
 
 export interface OpenRouterConfig {
@@ -33,9 +39,16 @@ export interface OpenRouterConfig {
 }
 
 export interface ConversationHistoryConfig {
+  readonly filePath: string;
+  readonly legacyFilePath: string;
   readonly maxChats: number;
-  readonly maxTurnsPerChat: number;
-  readonly maxCharactersPerChat: number;
+  readonly compactionTriggerTurns: number;
+  readonly compactionTriggerCharacters: number;
+  readonly keepRecentTurns: number;
+  readonly maxSummaryCharacters: number;
+  readonly hardMaxTurnsPerChat: number;
+  readonly hardMaxCharactersPerChat: number;
+  readonly summaryModel: string;
 }
 
 const logLevels = new Set<LogLevel>([
@@ -61,9 +74,17 @@ const defaults = {
   openRouterModel: "@preset/whatsapp-auto-reply",
   openRouterEndpoint: "https://openrouter.ai/api/v1/chat/completions",
   openRouterRequestTimeoutMs: 30_000,
+  conversationMemoryPath: ".data/conversation-memory.json",
+  conversationMemoryLegacyPath: ".data/conversation-memory-legacy.json",
   conversationHistoryMaxChats: 100,
-  conversationHistoryMaxTurnsPerChat: 20,
-  conversationHistoryMaxCharactersPerChat: 12_000,
+  conversationCompactionTriggerTurns: 20,
+  conversationCompactionTriggerCharacters: 12_000,
+  conversationKeepRecentTurns: 8,
+  conversationMaxSummaryCharacters: 4_000,
+  conversationHardMaxTurnsPerChat: 40,
+  conversationHardMaxCharactersPerChat: 24_000,
+  responseDelayMinimumMs: 2_000,
+  responseDelayMaximumMs: 5_000,
 } as const;
 
 export function loadAppConfig(
@@ -127,20 +148,67 @@ export function loadAppConfig(
       appTitle: environment.BOT_NAME?.trim() || defaults.botName,
     },
     conversationHistory: {
+      filePath: resolve(
+        workingDirectory,
+        environment.CONVERSATION_MEMORY_PATH?.trim() ||
+          defaults.conversationMemoryPath,
+      ),
+      legacyFilePath: resolve(
+        workingDirectory,
+        defaults.conversationMemoryLegacyPath,
+      ),
       maxChats: parsePositiveInteger(
         "CONVERSATION_HISTORY_MAX_CHATS",
         environment.CONVERSATION_HISTORY_MAX_CHATS,
         defaults.conversationHistoryMaxChats,
       ),
-      maxTurnsPerChat: parsePositiveInteger(
-        "CONVERSATION_HISTORY_MAX_TURNS_PER_CHAT",
-        environment.CONVERSATION_HISTORY_MAX_TURNS_PER_CHAT,
-        defaults.conversationHistoryMaxTurnsPerChat,
+      compactionTriggerTurns: parsePositiveInteger(
+        "CONVERSATION_COMPACTION_TRIGGER_TURNS",
+        environment.CONVERSATION_COMPACTION_TRIGGER_TURNS ??
+          environment.CONVERSATION_HISTORY_MAX_TURNS_PER_CHAT,
+        defaults.conversationCompactionTriggerTurns,
       ),
-      maxCharactersPerChat: parsePositiveInteger(
-        "CONVERSATION_HISTORY_MAX_CHARACTERS_PER_CHAT",
-        environment.CONVERSATION_HISTORY_MAX_CHARACTERS_PER_CHAT,
-        defaults.conversationHistoryMaxCharactersPerChat,
+      compactionTriggerCharacters: parsePositiveInteger(
+        "CONVERSATION_COMPACTION_TRIGGER_CHARACTERS",
+        environment.CONVERSATION_COMPACTION_TRIGGER_CHARACTERS ??
+          environment.CONVERSATION_HISTORY_MAX_CHARACTERS_PER_CHAT,
+        defaults.conversationCompactionTriggerCharacters,
+      ),
+      keepRecentTurns: parsePositiveInteger(
+        "CONVERSATION_COMPACTION_KEEP_RECENT_TURNS",
+        environment.CONVERSATION_COMPACTION_KEEP_RECENT_TURNS,
+        defaults.conversationKeepRecentTurns,
+      ),
+      maxSummaryCharacters: parsePositiveInteger(
+        "CONVERSATION_MAX_SUMMARY_CHARACTERS",
+        environment.CONVERSATION_MAX_SUMMARY_CHARACTERS,
+        defaults.conversationMaxSummaryCharacters,
+      ),
+      hardMaxTurnsPerChat: parsePositiveInteger(
+        "CONVERSATION_HARD_MAX_TURNS_PER_CHAT",
+        environment.CONVERSATION_HARD_MAX_TURNS_PER_CHAT,
+        defaults.conversationHardMaxTurnsPerChat,
+      ),
+      hardMaxCharactersPerChat: parsePositiveInteger(
+        "CONVERSATION_HARD_MAX_CHARACTERS_PER_CHAT",
+        environment.CONVERSATION_HARD_MAX_CHARACTERS_PER_CHAT,
+        defaults.conversationHardMaxCharactersPerChat,
+      ),
+      summaryModel:
+        environment.OPENROUTER_SUMMARY_MODEL?.trim() ||
+        environment.OPENROUTER_MODEL?.trim() ||
+        defaults.openRouterModel,
+    },
+    responseDelay: {
+      minimumMs: parseNonNegativeInteger(
+        "AI_RESPONSE_DELAY_MIN_MS",
+        environment.AI_RESPONSE_DELAY_MIN_MS,
+        defaults.responseDelayMinimumMs,
+      ),
+      maximumMs: parseNonNegativeInteger(
+        "AI_RESPONSE_DELAY_MAX_MS",
+        environment.AI_RESPONSE_DELAY_MAX_MS,
+        defaults.responseDelayMaximumMs,
       ),
     },
   };
@@ -150,8 +218,40 @@ export function loadAppConfig(
       "RECONNECT_BASE_DELAY_MS 不可大於 RECONNECT_MAX_DELAY_MS。",
     );
   }
+  validateConversationHistoryConfig(config.conversationHistory);
+  if (config.responseDelay.minimumMs > config.responseDelay.maximumMs) {
+    throw new Error(
+      "AI_RESPONSE_DELAY_MIN_MS 不可大於 AI_RESPONSE_DELAY_MAX_MS。",
+    );
+  }
 
   return config;
+}
+
+function validateConversationHistoryConfig(
+  config: ConversationHistoryConfig,
+): void {
+  if (config.filePath === config.legacyFilePath) {
+    throw new Error("Conversation memory file 不可與 legacy migration file 相同。");
+  }
+  if (config.keepRecentTurns >= config.compactionTriggerTurns) {
+    throw new Error(
+      "CONVERSATION_COMPACTION_KEEP_RECENT_TURNS 必須小於 trigger turns。",
+    );
+  }
+  if (config.compactionTriggerTurns > config.hardMaxTurnsPerChat) {
+    throw new Error("Conversation compaction turn trigger 不可大於 hard max。");
+  }
+  if (
+    config.compactionTriggerCharacters > config.hardMaxCharactersPerChat
+  ) {
+    throw new Error(
+      "Conversation compaction character trigger 不可大於 hard max。",
+    );
+  }
+  if (config.maxSummaryCharacters > config.hardMaxCharactersPerChat) {
+    throw new Error("Conversation summary 上限不可大於 character hard max。");
+  }
 }
 
 function parseRequiredString(
@@ -241,5 +341,21 @@ function parsePositiveInteger(
     throw new Error(`${name} 必須是正整數。`);
   }
 
+  return parsedValue;
+}
+
+function parseNonNegativeInteger(
+  name: string,
+  value: string | undefined,
+  fallback: number,
+): number {
+  if (value === undefined || value.trim() === "") {
+    return fallback;
+  }
+
+  const parsedValue = Number(value);
+  if (!Number.isSafeInteger(parsedValue) || parsedValue < 0) {
+    throw new Error(`${name} 必須是非負整數。`);
+  }
   return parsedValue;
 }

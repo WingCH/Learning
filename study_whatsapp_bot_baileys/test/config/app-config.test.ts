@@ -25,9 +25,21 @@ test("載入適合本機個人 bot 的安全預設設定", () => {
   );
   assert.equal(config.openRouter.requestTimeoutMs, 30_000);
   assert.deepEqual(config.conversationHistory, {
+    filePath: "/tmp/whatsapp-bot/.data/conversation-memory.json",
+    legacyFilePath:
+      "/tmp/whatsapp-bot/.data/conversation-memory-legacy.json",
     maxChats: 100,
-    maxTurnsPerChat: 20,
-    maxCharactersPerChat: 12_000,
+    compactionTriggerTurns: 20,
+    compactionTriggerCharacters: 12_000,
+    keepRecentTurns: 8,
+    maxSummaryCharacters: 4_000,
+    hardMaxTurnsPerChat: 40,
+    hardMaxCharactersPerChat: 24_000,
+    summaryModel: "@preset/whatsapp-auto-reply",
+  });
+  assert.deepEqual(config.responseDelay, {
+    minimumMs: 2_000,
+    maximumMs: 5_000,
   });
 });
 
@@ -74,5 +86,38 @@ test("拒絕非 HTTPS OpenRouter endpoint", () => {
       OPENROUTER_ENDPOINT: "http://openrouter.example/api",
     }, "/tmp/whatsapp-bot"),
     /OPENROUTER_ENDPOINT 必須使用 https/,
+  );
+});
+
+test("拒絕不可能保留 recent turns 的 compaction 設定", () => {
+  assert.throws(
+    () => loadAppConfig({
+      ...requiredEnvironment,
+      CONVERSATION_COMPACTION_TRIGGER_TURNS: "8",
+      CONVERSATION_COMPACTION_KEEP_RECENT_TURNS: "8",
+    }, "/tmp/whatsapp-bot"),
+    /KEEP_RECENT_TURNS 必須小於 trigger turns/,
+  );
+});
+
+test("拒絕大於 hard max 的 summary 上限", () => {
+  assert.throws(
+    () => loadAppConfig({
+      ...requiredEnvironment,
+      CONVERSATION_MAX_SUMMARY_CHARACTERS: "30000",
+      CONVERSATION_HARD_MAX_CHARACTERS_PER_CHAT: "24000",
+    }, "/tmp/whatsapp-bot"),
+    /summary 上限不可大於 character hard max/,
+  );
+});
+
+test("拒絕 minimum 大於 maximum 的 AI response delay", () => {
+  assert.throws(
+    () => loadAppConfig({
+      ...requiredEnvironment,
+      AI_RESPONSE_DELAY_MIN_MS: "6000",
+      AI_RESPONSE_DELAY_MAX_MS: "2000",
+    }, "/tmp/whatsapp-bot"),
+    /AI_RESPONSE_DELAY_MIN_MS 不可大於 AI_RESPONSE_DELAY_MAX_MS/,
   );
 });

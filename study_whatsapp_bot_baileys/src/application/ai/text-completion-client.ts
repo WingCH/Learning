@@ -1,4 +1,4 @@
-export type TextCompletionRole = "user" | "assistant";
+export type TextCompletionRole = "system" | "user" | "assistant";
 
 export interface TextCompletionMessage {
   readonly role: TextCompletionRole;

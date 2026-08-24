@@ -799,7 +799,6 @@ TextStyle _sampleTextStyle({
   return Theme.of(context).textTheme.headlineSmall!.copyWith(
     fontFamily: profile.requestedFamily,
     fontSize: 20,
-    fontWeight: FontWeight.w600,
     letterSpacing: 0.3,
     fontFeatures: enableTnum ? const [FontFeature.tabularFigures()] : const [],
   );

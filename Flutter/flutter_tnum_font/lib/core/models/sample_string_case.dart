@@ -16,6 +16,9 @@ class SampleStringCase {
 
   static List<SampleStringCase> defaults() {
     return const [
+      SampleStringCase(id: 'a', label: '比賽狀態', value: '下'),
+      SampleStringCase(id: 'a1', label: '比賽狀態', value: '中'),
+      SampleStringCase(id: 'b', label: '比賽狀態', value: '場'),
       SampleStringCase(id: 'halftime', label: '比賽狀態', value: '04-22 中場'),
       SampleStringCase(id: 'penalty', label: 'PK 狀態', value: '04-22 點球PK'),
       SampleStringCase(id: 'extraTime', label: '加時狀態', value: '04-22 加時賽'),
